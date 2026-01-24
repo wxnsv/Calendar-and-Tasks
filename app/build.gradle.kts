@@ -39,9 +39,39 @@ android {
     buildFeatures {
         compose = true
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/INDEX.LIST"
+            excludes += "/META-INF/DEPENDENCIES"
+        }
+    }
 }
 
 dependencies {
+// Kotlin.DateTime
+    implementation(libs.kotlinx.datetime)
+// SplashScreen
+    implementation(libs.androidx.core.splashscreen)
+// Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+// Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
+// Credentials
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+// Google Play Services Auth
+    implementation(libs.play.services.auth)
+    implementation(libs.google.api.services.tasks)
+    implementation(libs.google.api.services.calendar)
+// Google API Client
+    implementation(libs.google.api.client.android)
+    implementation(libs.google.http.client.gson)
+// Koin
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.android)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -50,6 +80,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

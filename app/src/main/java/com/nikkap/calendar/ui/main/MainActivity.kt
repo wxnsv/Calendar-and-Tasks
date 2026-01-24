@@ -1,0 +1,38 @@
+package com.nikkap.calendar.ui.main
+
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.nikkap.calendar.R
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
+
+class MainActivity : AppCompatActivity() {
+    private val viewModel: MainViewModel by viewModel()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        viewModel.loadItems()
+        val recyclerView: RecyclerView = findViewById(R.id.listRV)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        val adapter = MainAdapter(mutableListOf())
+        recyclerView.adapter = adapter
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    adapter.updateList(state.items)
+                    state.errorMessage?.let { message ->
+                        Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+
+    }
+}
