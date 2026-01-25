@@ -7,12 +7,15 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface TasksApi {
 
     @GET("tasks/v1/lists/@default/tasks")
     suspend fun getUserTasks(
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
+        @Query("showCompleted") showCompleted: Boolean = true,
+        @Query("showHidden") showHidden: Boolean = true,
     ): Response<TasksListResponse>
 
     @DELETE("tasks/v1/lists/{taskListId}/tasks/{taskId}")

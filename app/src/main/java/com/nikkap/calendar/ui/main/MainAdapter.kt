@@ -4,10 +4,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.nikkap.calendar.R
-import com.nikkap.calendar.domain.model.Event
+import com.nikkap.calendar.core.utils.toReadableDate
+import com.nikkap.calendar.core.utils.toUiString
+import com.nikkap.calendar.domain.model.CalendarItem
 import com.nikkap.calendar.domain.model.Task
 
 class MainAdapter(private var items: List<ListItem>) :
@@ -43,30 +46,42 @@ class MainAdapter(private var items: List<ListItem>) :
 
     class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.itemText)
-        val time: TextView = view.findViewById(R.id.item_timestamp)
-        val checkBox: CheckBox = view.findViewById(R.id.checkBox)
+        val itemType: TextView = view.findViewById(R.id.item_type)
+        val itemIcon: ImageView = view.findViewById(R.id.item_typeIcon)
+        val itemTime: TextView = view.findViewById(R.id.item_timestamp)
+        val itemCheckBox: CheckBox = view.findViewById(R.id.checkBox)
+
 
         fun bind(task: Task) {
+
+            itemTime.text = task.date.toReadableDate()
             title.text = task.title
-//            time.text = task.timestamp
-//            checkBox.isChecked = task.isDone
+            itemType.text = "Task"
+            itemIcon.setImageResource(R.drawable.task)
+            itemCheckBox.isChecked = task.isCompleted
         }
     }
 
     class EventViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val eventTitle: TextView = view.findViewById(R.id.itemText)
-        val eventLocation: TextView = view.findViewById(R.id.item_timestamp)
+        val eventTime: TextView = view.findViewById(R.id.item_timestamp)
+        val itemType: TextView = view.findViewById(R.id.item_type)
+        val itemIcon: ImageView = view.findViewById(R.id.item_typeIcon)
 
-        fun bind(event: Event) {
-            eventTitle.text = event.summary
-            eventLocation.text = event.startDate
+        fun bind(calendarItem: CalendarItem) {
+            eventTitle.text = calendarItem.summary
+            eventTime.text = calendarItem.startTimestamp.toReadableDate()
+            val itemTypeString = calendarItem.type.toUiString(itemView.context)
+            itemType.text =
+                itemView.context.getString(R.string.calendar_type_format, itemTypeString)
+            itemIcon.setImageResource(R.drawable.event)
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = items[position]) {
             is ListItem.TaskItem -> (holder as TaskViewHolder).bind(item.task)
-            is ListItem.EventItem -> (holder as EventViewHolder).bind(item.event)
+            is ListItem.EventItem -> (holder as EventViewHolder).bind(item.calendarItem)
         }
     }
 

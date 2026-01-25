@@ -1,29 +1,19 @@
 package com.nikkap.calendar.data.remote.dto
 
-import com.nikkap.calendar.domain.model.Task
+import com.google.gson.annotations.SerializedName
 
 data class TaskDto(
+    @SerializedName("id")
     val id: String,
-    val title: String,
+    @SerializedName("title")
+    val title: String?,
+    @SerializedName("status")
     val status: String? = null,
-    val notes: String? = null
+    @SerializedName("notes")
+    val notes: String? = null,
+    @SerializedName("due")
+    val date: String?,
+    @SerializedName("updated")
+    val updated: String
 )
 //TODO("Correct class")
-
-fun Task.toTaskDto(): TaskDto {
-    return TaskDto(
-        id = this.id,
-        title = this.title,
-        status = this.status,
-        notes = this.notes
-    )
-}
-
-fun TaskDto.toTask(): Task {
-    return Task(
-        id = this.id,
-        title = this.title,
-        status = this.status,
-        notes = this.notes
-    )
-}

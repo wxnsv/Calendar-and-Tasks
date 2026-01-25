@@ -3,9 +3,11 @@ package com.nikkap.calendar.ui.main
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nikkap.calendar.R
@@ -22,7 +24,11 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         val adapter = MainAdapter(mutableListOf())
         recyclerView.adapter = adapter
-
+        val dividerItemDecoration = DividerItemDecoration(this, RecyclerView.VERTICAL)
+        ContextCompat.getDrawable(this, R.drawable.list_divider)?.let {
+            dividerItemDecoration.setDrawable(it)
+        }
+        recyclerView.addItemDecoration(dividerItemDecoration)
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->

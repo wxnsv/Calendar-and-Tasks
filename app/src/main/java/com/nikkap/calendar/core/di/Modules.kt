@@ -1,6 +1,8 @@
 package com.nikkap.calendar.core.di
 
+import androidx.room.Room
 import com.nikkap.calendar.core.auth.AuthManager
+import com.nikkap.calendar.data.local.AppDatabase
 import com.nikkap.calendar.data.remote.api.CalendarApi
 import com.nikkap.calendar.data.remote.api.TasksApi
 import com.nikkap.calendar.data.repository.CalendarRepositoryImpl
@@ -24,6 +26,19 @@ val networkModule = module {
     }
     single { get<Retrofit>().create(TasksApi::class.java) }
     single { get<Retrofit>().create(CalendarApi::class.java) }
+}
+val localModule = module {
+    single {
+        Room.databaseBuilder(
+            get(),
+            AppDatabase::class.java,
+            "app_database"
+        ).build()
+    }
+
+    // Регистрируем DAO для инъекции в репозитории
+    single { get<AppDatabase>().taskDao() }
+    single { get<AppDatabase>().calendarDao() }
 }
 val authModule = module {
     single { AuthManager(androidContext()) }

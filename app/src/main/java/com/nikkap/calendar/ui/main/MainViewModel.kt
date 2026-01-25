@@ -3,7 +3,7 @@ package com.nikkap.calendar.ui.main
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nikkap.calendar.domain.model.Event
+import com.nikkap.calendar.domain.model.CalendarItem
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
@@ -19,7 +19,7 @@ class MainViewModel(
     private val calendarRepository: CalendarRepository
 ) : ViewModel() {
     private val _itemTasks = MutableStateFlow<List<Task>>(emptyList())
-    private val _itemEvents = MutableStateFlow<List<Event>>(emptyList())
+    private val _itemEvents = MutableStateFlow<List<CalendarItem>>(emptyList())
     private val _state = MutableStateFlow(MainState())
     val state: StateFlow<MainState> = combine(
         _state,
@@ -34,7 +34,7 @@ class MainViewModel(
         val mixedList = (taskItems + eventItems).sortedBy { item ->
             when (item) {
                 is ListItem.TaskItem -> item.task.title
-                is ListItem.EventItem -> item.event.summary
+                is ListItem.EventItem -> item.calendarItem.summary
             }
         }
 
@@ -51,13 +51,15 @@ class MainViewModel(
     fun loadItems() {
         viewModelScope.launch {
             val tasksResult = tasksRepository.getTasks()
-            val eventsResult = calendarRepository.getCalendarEvents()
+            val eventsResult = calendarRepository.getCalendarItems()
 
             _itemTasks.value = tasksResult
             _itemEvents.value = eventsResult
 
             Log.d("Response", "Tasks loaded: ${tasksResult.size}")
+            tasksResult.forEach { Log.d("Response", "$it") }
             Log.d("Response", "Events loaded: ${eventsResult.size}")
+            eventsResult.forEach { Log.d("Response", "$it") }
         }
     }
 }

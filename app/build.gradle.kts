@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -45,9 +46,20 @@ android {
             excludes += "/META-INF/DEPENDENCIES"
         }
     }
+    configurations.all {
+        exclude(group = "com.intellij", module = "annotations")
+        exclude(group = "org.jetbrains", module = "annotations-java5")
+    }
 }
 
 dependencies {
+// Material
+    implementation(libs.material)
+// Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    androidTestImplementation(libs.room.testing)
 // Kotlin.DateTime
     implementation(libs.kotlinx.datetime)
 // SplashScreen

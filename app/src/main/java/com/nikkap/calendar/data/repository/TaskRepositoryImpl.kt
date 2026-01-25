@@ -1,8 +1,8 @@
 package com.nikkap.calendar.data.repository
 
 import com.nikkap.calendar.core.auth.AuthManager
+import com.nikkap.calendar.data.mapper.toTask
 import com.nikkap.calendar.data.remote.api.TasksApi
-import com.nikkap.calendar.data.remote.dto.toTask
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.repository.TaskRepository
 
