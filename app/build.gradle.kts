@@ -53,6 +53,8 @@ android {
 }
 
 dependencies {
+// XML
+    implementation(libs.androidx.swiperefreshlayout)
 // Material
     implementation(libs.material)
 // Room

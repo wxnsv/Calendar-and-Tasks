@@ -9,14 +9,15 @@ data class CalendarItem(
     val endTimestamp: Long?,
     /**  Flag for hiding the time (00:00), if date without time - true */
     val isAllDay: Boolean,
-    /**  BIRTHDAY, EVENT, HOLIDAY [CalendarItemType] */
+    /**  BIRTHDAY, DEFAULT, HOLIDAY [CalendarItemType] */
     val type: CalendarItemType,
     /**  HEX color code to match Google Calendar styling */
     val colorHex: String?,
     /**  CONFIRMED, TENTATIVE, CANCELLED [CalendarItemStatus] */
-    val status: CalendarItemStatus?,
+    val status: CalendarItemStatus,
     val updated: Long
 )
 
-enum class CalendarItemType { EVENT, BIRTHDAY, HOLIDAY }
+enum class CalendarItemType { DEFAULT, BIRTHDAY, HOLIDAY }
 enum class CalendarItemStatus { CONFIRMED, TENTATIVE, CANCELLED }
+

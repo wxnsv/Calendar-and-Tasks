@@ -1,5 +1,6 @@
 package com.nikkap.calendar.data.mapper
 
+import com.nikkap.calendar.core.utils.parseIsoDate
 import com.nikkap.calendar.data.local.entity.TaskEntity
 import com.nikkap.calendar.data.remote.dto.TaskDto
 import com.nikkap.calendar.domain.model.Task
@@ -15,23 +16,23 @@ fun Task.toTaskDto(): TaskDto {
         updated = Instant.fromEpochMilliseconds(this.updated).toString()
     )
 }
+// TODO("Replace transformations to extend")
 
 fun TaskDto.toTask(): Task {
     return Task(
         id = this.id,
-        title = this.title ?: "",
+        title = this.title,
         notes = this.notes,
-        date = this.date?.let { Instant.parse(it) }?.toEpochMilliseconds(),
-        isCompleted = if (this.status == "completed") true else false,
-        updated = runCatching { Instant.parse(this.updated).toEpochMilliseconds() }
-            .getOrDefault(System.currentTimeMillis())
+        date = this.dateLong,
+        isCompleted = isCompleted,
+        updated = updatedLong
     )
 }
 
 fun TaskEntity.toTask(): Task {
     return Task(
         id = this.id,
-        title = this.title,
+        title = this.title ?: "(No title)",
         notes = this.notes,
         date = this.date,
         isCompleted = this.isCompleted,
@@ -49,3 +50,21 @@ fun Task.toTaskEntity(): TaskEntity {
         updated = this.updated
     )
 }
+
+fun TaskDto.toTaskEntity(): TaskEntity {
+    return TaskEntity(
+        id = this.id,
+        title = this.title,
+        notes = this.notes,
+        isCompleted = this.isCompleted,
+        date = this.dateLong,
+        updated = this.updatedLong
+    )
+}
+
+val TaskDto.dateLong: Long?
+    get() = this.date?.let { parseIsoDate(it) }
+val TaskDto.isCompleted: Boolean
+    get() = this.status == "completed"
+val TaskDto.updatedLong: Long
+    get() = parseIsoDate(this.updated)

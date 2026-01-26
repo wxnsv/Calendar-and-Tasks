@@ -3,8 +3,8 @@
     <string name="item_text_sample">Item text sample</string>
     <string name="today">Today</string>
     <string name="inbox">Inbox</string>
-    <string name="type_event">Event</string>
     <string name="type_birthday">Birthday</string>
     <string name="type_holiday">Holiday</string>
     <string name="calendar_type_format">Calendar(%1$s)</string>
+    <string name="type_default">Event</string>
 </resources>

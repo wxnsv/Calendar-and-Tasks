@@ -41,7 +41,7 @@ class AuthActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         splashScreen.setKeepOnScreenCondition {
-            viewModel.state.value is AuthState.Loading
+            viewModel.state.value !is AuthState.NavigateToMain
         }
 
         viewModel.checkAuth()
@@ -49,8 +49,9 @@ class AuthActivity : ComponentActivity() {
         lifecycleScope.launch {
             viewModel.state.collect { state ->
                 when (state) {
-                    is AuthState.Authenticated -> navigateToMain()
+                    is AuthState.Authenticated -> viewModel.checkData()
                     is AuthState.Unauthenticated -> showLoginScreen()
+                    is AuthState.NavigateToMain -> navigateToMain()
                     else -> Unit
                 }
             }

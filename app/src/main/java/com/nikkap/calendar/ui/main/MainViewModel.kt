@@ -3,28 +3,31 @@ package com.nikkap.calendar.ui.main
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nikkap.calendar.domain.model.CalendarItem
-import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel(
     private val tasksRepository: TaskRepository,
     private val calendarRepository: CalendarRepository
 ) : ViewModel() {
-    private val _itemTasks = MutableStateFlow<List<Task>>(emptyList())
-    private val _itemEvents = MutableStateFlow<List<CalendarItem>>(emptyList())
+    private val calendarItemsFlow = calendarRepository.allItems
+    private val tasksFlow = tasksRepository.allTasks
     private val _state = MutableStateFlow(MainState())
     val state: StateFlow<MainState> = combine(
         _state,
-        _itemTasks,
-        _itemEvents
+        tasksFlow,
+        calendarItemsFlow
     ) { state, tasks, events ->
         val taskItems = tasks.map { ListItem.TaskItem(it) }
         val eventItems = events.map { ListItem.EventItem(it) }
@@ -48,18 +51,23 @@ class MainViewModel(
         initialValue = MainState()
     )
 
-    fun loadItems() {
+    fun refreshData() {
         viewModelScope.launch {
-            val tasksResult = tasksRepository.getTasks()
-            val eventsResult = calendarRepository.getCalendarItems()
-
-            _itemTasks.value = tasksResult
-            _itemEvents.value = eventsResult
-
-            Log.d("Response", "Tasks loaded: ${tasksResult.size}")
-            tasksResult.forEach { Log.d("Response", "$it") }
-            Log.d("Response", "Events loaded: ${eventsResult.size}")
-            eventsResult.forEach { Log.d("Response", "$it") }
+            _state.update { it.copy(isLoading = true) }
+            withContext(Dispatchers.IO) { syncAll() }// вызов твоей функции синхронизации
+            _state.update { it.copy(isLoading = false) }
         }
+    }
+
+    suspend fun syncAll() = coroutineScope {
+        val calendarStatus = async { calendarRepository.syncCalendar() }
+        val tasksStatus = async { tasksRepository.syncTasks() }
+
+        calendarStatus.await()
+        tasksStatus.await()
+
+        Log.d("Response", "Tasks status: ${tasksStatus.isCompleted}")
+
+        Log.d("Response", "Calendar status: ${calendarStatus.isCompleted}")
     }
 }

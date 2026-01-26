@@ -28,9 +28,9 @@ fun String.trimBirthdaySuffix(): String {
 fun CalendarItemType.toUiString(context: Context): String {
     return context.getString(
         when (this) {
-            CalendarItemType.EVENT -> R.string.type_event      // "Мероприятие" или "Встреча"
-            CalendarItemType.BIRTHDAY -> R.string.type_birthday // "День рождения"
-            CalendarItemType.HOLIDAY -> R.string.type_holiday   // "Праздник"
+            CalendarItemType.DEFAULT -> R.string.type_default
+            CalendarItemType.BIRTHDAY -> R.string.type_birthday
+            CalendarItemType.HOLIDAY -> R.string.type_holiday
         }
     )
 }

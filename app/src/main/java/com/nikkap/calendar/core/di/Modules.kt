@@ -35,8 +35,6 @@ val localModule = module {
             "app_database"
         ).build()
     }
-
-    // Регистрируем DAO для инъекции в репозитории
     single { get<AppDatabase>().taskDao() }
     single { get<AppDatabase>().calendarDao() }
 }
@@ -44,8 +42,8 @@ val authModule = module {
     single { AuthManager(androidContext()) }
 }
 val appModule = module {
-    single<TaskRepository> { TaskRepositoryImpl(get(), get()) }
-    single<CalendarRepository> { CalendarRepositoryImpl(get(), get()) }
-    viewModel { AuthViewModel(get()) }
+    single<TaskRepository> { TaskRepositoryImpl(get(), get(), get()) }
+    single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get()) }
+    viewModel { AuthViewModel(get(), get(), get()) }
     viewModel { MainViewModel(get(), get()) }
 }

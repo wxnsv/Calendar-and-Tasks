@@ -18,9 +18,9 @@ data class CalendarItemDto(
     @SerializedName("colorId")
     val colorId: String?,
     @SerializedName("status")
-    val status: String?,
+    val status: String,
     @SerializedName("eventType")
-    val eventType: String?,
+    val eventType: String,
 //    @SerializedName("reminders")
 //    val reminders: RemindersDto?,
 )

@@ -4,13 +4,13 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.nikkap.calendar.data.local.dao.CalendarDao
 import com.nikkap.calendar.data.local.dao.TaskDao
-import com.nikkap.calendar.data.local.entity.CalendarItemEntity
+import com.nikkap.calendar.data.local.entity.CalendarEntity
 import com.nikkap.calendar.data.local.entity.TaskEntity
 
 @Database(
     entities = [
         TaskEntity::class,
-        CalendarItemEntity::class
+        CalendarEntity::class
     ],
     version = 1,
     exportSchema = false

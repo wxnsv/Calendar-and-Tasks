@@ -12,7 +12,7 @@ import retrofit2.http.Query
 interface TasksApi {
 
     @GET("tasks/v1/lists/@default/tasks")
-    suspend fun getUserTasks(
+    suspend fun getTasks(
         @Header("Authorization") token: String,
         @Query("showCompleted") showCompleted: Boolean = true,
         @Query("showHidden") showHidden: Boolean = true,
