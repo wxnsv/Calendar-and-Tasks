@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -34,8 +34,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
     }
     buildFeatures {
         compose = true
@@ -50,9 +52,15 @@ android {
         exclude(group = "com.intellij", module = "annotations")
         exclude(group = "org.jetbrains", module = "annotations-java5")
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
+// Nav
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 // XML
     implementation(libs.androidx.swiperefreshlayout)
 // Material
@@ -68,7 +76,12 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
 // Retrofit
     implementation(libs.retrofit)
-    implementation(libs.converter.gson)
+// Moshi
+    implementation(libs.moshi.kotlin)
+    implementation(libs.converter.moshi)
+// OkHttp
+    implementation("com.squareup.okhttp3:okhttp:5.3.2")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.3.2")
 // Coroutines
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)

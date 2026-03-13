@@ -15,7 +15,8 @@ data class TaskEntity(
     @ColumnInfo("isCompleted")
     val isCompleted: Boolean,
     @ColumnInfo("date")
-    val date: Long?,
-    @ColumnInfo("updated")
-    val updated: Long
+    val deadline: Long?,
+    @ColumnInfo("taskListId")
+    val taskListId: String,
+    // TODO(Reminders)
 )

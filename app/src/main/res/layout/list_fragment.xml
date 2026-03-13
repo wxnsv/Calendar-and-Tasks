@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/main"
+    android:theme="@style/Theme.Material3.Dark.NoActionBar">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/listSwipeRef"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listRV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <View
+        android:id="@+id/scrim"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/create_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
+        android:text="Task"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:iconSize="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/create_event"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/create_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
+        android:text="Event"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:iconSize="40dp"
+        app:icon="@drawable/ic_launcher_foreground"
+        app:layout_constraintBottom_toTopOf="@+id/create_birthday"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/create_birthday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
+        android:text="birthday"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:iconSize="40dp"
+        app:icon="@drawable/ic_launcher_foreground"
+        app:layout_constraintBottom_toTopOf="@+id/create_item_button"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/create_item_button"
+        android:layout_width="70dp"
+        android:layout_height="80dp"
+        android:layout_margin="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!--        <com.google.android.material.button.MaterialButton-->
+    <!--            android:id="@+id/create_item_button"-->
+    <!--            android:layout_width="70dp"-->
+    <!--            android:layout_height="80dp"-->
+    <!--            android:layout_margin="25dp"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            android:text="+"/>-->
+</androidx.constraintlayout.widget.ConstraintLayout>
+

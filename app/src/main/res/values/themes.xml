@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Calendar" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Calendar" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
 
     <style name="Theme.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#FFFFFF</item>
@@ -8,7 +9,27 @@
         <item name="postSplashScreenTheme">@style/Theme.Calendar</item>
     </style>
 
+    <style name="ThemeOverlay.App.DatePicker" parent="ThemeOverlay.MaterialComponents.MaterialCalendar" />
     <style name="ShapeAppearance.App.Circle" parent="">
         <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
+
+    <style name="Button" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="textAllCaps">false</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="elevation">0dp</item>
+        <item name="android:gravity">start</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:contentInsetStart">0dp</item>
+        <item name="android:contentInsetEnd">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingHorizontal">45dp</item>
+        <item name="android:paddingVertical">12dp</item>
     </style>
 </resources>

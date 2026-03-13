@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="create_task_notify_custom" type="id" />
+    <item name="create_task_notify_not_repeat" type="id" />
+    <item name="create_task_notify_day" type="id" />
+    <item name="create_task_notify_week" type="id" />
+    <item name="create_task_notify_month" type="id" />
+    <item name="create_task_notify_year" type="id" />
+</resources>

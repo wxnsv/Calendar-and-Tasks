@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/create_task_notify_custom"
+        android:title="@string/create_task_event_notify_custom" />
+    <item
+        android:id="@+id/create_task_notify_not_repeat"
+        android:title="@string/create_task_event_notify_does_not_repeat" />
+    <item
+        android:id="@+id/create_task_notify_day"
+        android:title="@string/create_task_event_notify_day" />
+    <item
+        android:id="@+id/create_task_notify_week"
+        android:title="@string/create_task_event_notify_week" />
+    <item
+        android:id="@+id/create_task_notify_month"
+        android:title="@string/create_task_event_notify_month" />
+    <item
+        android:id="@+id/create_task_notify_year"
+        android:title="@string/create_task_event_notify_year" />
+</menu>

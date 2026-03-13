@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/create_birthday_notify_day_before_17"
+        android:title="@string/create_birthday_notify_day_before_17" />
+    <item
+        android:id="@+id/create_birthday_notify_day_before_9"
+        android:title="@string/create_birthday_notify_day_before_9" />
+    <item
+        android:id="@+id/create_birthday_notify_custom"
+        android:title="@string/create_birthday_notify_custom" />
+</menu> 

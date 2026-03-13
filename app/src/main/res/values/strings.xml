@@ -7,4 +7,15 @@
     <string name="type_holiday">Holiday</string>
     <string name="calendar_type_format">Calendar(%1$s)</string>
     <string name="type_default">Event</string>
+
+    <string name="create_task_event_notify_custom">Custom</string>
+    <string name="create_task_event_notify_does_not_repeat">Does not repeat</string>
+    <string name="create_task_event_notify_week">Every week</string>
+    <string name="create_task_event_notify_month">Every month</string>
+    <string name="create_task_event_notify_year">Every year</string>
+    <string name="create_task_event_notify_day">Every day</string>
+
+    <string name="create_birthday_notify_day_before_17">The day before at 17:00</string>
+    <string name="create_birthday_notify_day_before_9">The day before at 9:00</string>
+    <string name="create_birthday_notify_custom">Custom</string>
 </resources>

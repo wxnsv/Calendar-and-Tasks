@@ -1,16 +1,11 @@
 package com.nikkap.calendar.core.utils
 
-import android.content.Context
-import com.nikkap.calendar.R
-import com.nikkap.calendar.domain.model.CalendarItemType
-
-
 /**
- * Removes the system suffix added by Google CalendarItem to birthday events
+ * Removes the system suffix added by Google Event to birthday events
  * (e.g., "John Doe – Birthday" becomes "John Doe").
  * * It identifies the suffix by finding the last occurrence of a separator
  * (dash or colon) surrounded by whitespace, which is a common pattern
- * across different localized Google CalendarItem languages.
+ * across different localized Google Event languages.
  */
 fun String.trimBirthdaySuffix(): String {
 
@@ -23,14 +18,4 @@ fun String.trimBirthdaySuffix(): String {
     } else {
         this
     }
-}
-
-fun CalendarItemType.toUiString(context: Context): String {
-    return context.getString(
-        when (this) {
-            CalendarItemType.DEFAULT -> R.string.type_default
-            CalendarItemType.BIRTHDAY -> R.string.type_birthday
-            CalendarItemType.HOLIDAY -> R.string.type_holiday
-        }
-    )
 }

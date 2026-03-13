@@ -1,19 +1,23 @@
 package com.nikkap.calendar.data.remote.dto
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class TaskDto(
-    @SerializedName("id")
+    @field:Json(name = "id")
     val id: String,
-    @SerializedName("title")
+    @field:Json(name = "title")
     val title: String?,
-    @SerializedName("status")
+    @field:Json(name = "status")
     val status: String? = null,
-    @SerializedName("notes")
+    @field:Json(name = "notes")
     val notes: String? = null,
-    @SerializedName("due")
-    val date: String?,
-    @SerializedName("updated")
-    val updated: String
+    @field:Json(name = "due")
+    val deadline: String?,
+    @field:Json(name = "parent")
+    val parent: String? = null,
+    @field:Json(name = "position")
+    val position: String? = null
 )
-//TODO("Correct class")
+//TODO("reminders")
