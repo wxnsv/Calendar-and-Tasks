@@ -1,15 +1,16 @@
 package com.nikkap.calendar.data.repository
 
-import com.nikkap.calendar.core.auth.AuthManager
+import android.util.Log
 import com.nikkap.calendar.data.local.dao.TaskDao
+import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.mapper.toSubtask
 import com.nikkap.calendar.data.mapper.toSubtaskEntity
 import com.nikkap.calendar.data.mapper.toTask
+import com.nikkap.calendar.data.mapper.toTaskDto
 import com.nikkap.calendar.data.mapper.toTaskEntity
 import com.nikkap.calendar.data.mapper.toTaskList
 import com.nikkap.calendar.data.mapper.toTaskListEntity
 import com.nikkap.calendar.data.remote.api.TasksApi
-import com.nikkap.calendar.domain.model.CalendarEntry
 import com.nikkap.calendar.domain.model.Subtask
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.model.TaskList
@@ -22,8 +23,7 @@ import kotlinx.coroutines.flow.map
 
 class TaskRepositoryImpl(
     private val api: TasksApi,
-    private val authManager: AuthManager,
-    private val dao: TaskDao
+    private val dao: TaskDao,
 ) : TaskRepository {
     override val allTasks: Flow<List<Task>> = dao.getAllTasks()
         .map { entities ->
@@ -42,30 +42,40 @@ class TaskRepositoryImpl(
         return dao.getTask(id).toTask()
     }
 
-    override suspend fun saveTask(task: CalendarEntry) {
-        if (task is Task) dao.insertTask(task.toTaskEntity())
+    override suspend fun saveTask(task: Task) {
+        api.createTask(taskDto = task.toTaskDto())
+        dao.insertTask(task.toTaskEntity(PendingActions.INSERT))
+    }
+
+    override suspend fun updateTask(task: Task) {
+        api.updateTask(
+            task = task.toTaskDto(),
+            taskId = task.id!!
+        )
+        dao.updateTask(task.toTaskEntity(PendingActions.UPDATE))
     }
 
     override suspend fun syncTasks(): Result<Unit> = try {
+        Log.d("DEBUG", "TEST TASKS SYNC")
         val response = api.getTaskLists()
-            if (response.isSuccessful) {
-                val taskLists = response.body()?.items?.map { it.toTaskList() } ?: emptyList()
-                val taskListEntities =
-                    response.body()?.items?.map { it.toTaskListEntity() } ?: emptyList()
-                dao.insertTaskLists(taskListEntities)
+        if (response.isSuccessful) {
+            val taskLists = response.body()?.items?.map { it.toTaskList() } ?: emptyList()
+            val taskListEntities =
+                response.body()?.items?.map { it.toTaskListEntity() } ?: emptyList()
+            dao.insertTaskLists(taskListEntities)
 
-                coroutineScope {
-                    taskLists.map { taskList ->
-                        async { syncByTaskList(taskList) }
-                    }.awaitAll()
-                }
-
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Error in syncTaskLists: ${response.code()}"))
+            coroutineScope {
+                taskLists.map { taskList ->
+                    async { syncByTaskList(taskList) }
+                }.awaitAll()
             }
-        } catch (e: Exception) {
-            Result.failure(e)
+
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Error in syncTaskLists: ${response.code()}"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 
     override suspend fun haveLocalData(): Boolean {

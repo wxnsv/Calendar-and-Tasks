@@ -1,5 +1,7 @@
 package com.nikkap.calendar.core.di
 
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.nikkap.calendar.core.auth.AuthManager
 import com.nikkap.calendar.data.local.AppDatabase
@@ -8,6 +10,7 @@ import com.nikkap.calendar.data.remote.api.TasksApi
 import com.nikkap.calendar.data.remote.interceptor.AuthInterceptor
 import com.nikkap.calendar.data.repository.CalendarRepositoryImpl
 import com.nikkap.calendar.data.repository.TaskRepositoryImpl
+import com.nikkap.calendar.data.repository.UserPreferencesRepository
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
 import com.nikkap.calendar.ui.screens.auth.AuthViewModel
@@ -69,15 +72,22 @@ val localModule = module {
     }
     single { get<AppDatabase>().taskDao() }
     single { get<AppDatabase>().calendarDao() }
+    single {
+        PreferenceDataStoreFactory.create(
+            produceFile = { androidContext().preferencesDataStoreFile("user_prefs") }
+        )
+    }
+
+    single { UserPreferencesRepository(get()) }
 }
 val authModule = module {
     single { AuthManager(androidContext()) }
 }
 val appModule = module {
-    single<TaskRepository> { TaskRepositoryImpl(get(), get(), get()) }
+    single<TaskRepository> { TaskRepositoryImpl(get(), get()) }
     single<CalendarRepository> { CalendarRepositoryImpl(get(), get()) }
     viewModel { AuthViewModel(get(), get(), get()) }
     viewModel { ListViewModel(get(), get()) }
     viewModelOf(::CreateViewModel)
-    viewModel { MainViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get(), get()) }
 }

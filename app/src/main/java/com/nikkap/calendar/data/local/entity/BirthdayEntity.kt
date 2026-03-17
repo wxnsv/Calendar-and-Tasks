@@ -12,4 +12,10 @@ data class BirthdayEntity(
     val name: String?,
     @ColumnInfo("date")
     val date: Long,
+    @ColumnInfo("isSynced")
+    val isSynced: Boolean,
+    @ColumnInfo("pendingAction")
+    val pendingAction: PendingActions,
+    @ColumnInfo("lastModified")
+    val lastModified: Long,
 )

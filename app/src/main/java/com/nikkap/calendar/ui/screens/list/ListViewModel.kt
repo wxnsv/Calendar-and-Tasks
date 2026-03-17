@@ -79,12 +79,9 @@ class ListViewModel(
     suspend fun syncAll() = coroutineScope {
         val calendarStatus = async { calendarRepository.syncCalendar() }
         val tasksStatus = async { taskRepository.syncTasks() }
-        val taskListsStatus = async { taskRepository.syncTasks() }
 
         calendarStatus.await()
 
         tasksStatus.await()
-
-        taskListsStatus.await()
     }
 }

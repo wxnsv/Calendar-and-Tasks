@@ -40,4 +40,7 @@ interface CalendarDao {
 
     @Update
     suspend fun updateEvent(eventEntity: EventEntity)
+
+    @Update
+    suspend fun updateBirthday(birthdayEntity: BirthdayEntity)
 }

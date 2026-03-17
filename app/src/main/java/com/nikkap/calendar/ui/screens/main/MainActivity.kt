@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         splashScreen.setKeepOnScreenCondition {
-            viewModel.navigationEvent is NavEvent.ToList
+            viewModel.navigationEvent == NavEvent.ToList
         }
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.fragment_container) as NavHostFragment

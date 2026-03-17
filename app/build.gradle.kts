@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
     id("androidx.navigation.safeargs.kotlin")
+    id("org.jetbrains.kotlin.android") apply false
 }
 
 android {
@@ -55,9 +56,20 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    sourceSets {
+        getByName("main") {
+            res.srcDirs(
+                "src/main/res-screens/create",
+                "src/main/res-screens/list",
+                "src/main/res"
+            )
+        }
+    }
 }
 
 dependencies {
+// Preferences
+    implementation(libs.androidx.datastore.preferences)
 // Nav
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
@@ -80,8 +92,8 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.converter.moshi)
 // OkHttp
-    implementation("com.squareup.okhttp3:okhttp:5.3.2")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.3.2")
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 // Coroutines
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)

@@ -6,7 +6,7 @@ import com.nikkap.calendar.domain.model.TaskList
 sealed interface CreateIntent {
     data class UpdateTitle(val title: String) : CreateIntent
 
-    data class UpdateCreateType(val type: CalendarEntry) : CreateIntent
+    data class UpdateShowFragment(val type: CalendarEntry) : CreateIntent
 
     data class UpdateItem(val type: String, val id: String) : CreateIntent
 }

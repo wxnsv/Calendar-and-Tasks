@@ -1,13 +1,10 @@
 package com.nikkap.calendar.domain.model
 
 import com.nikkap.calendar.core.utils.CalendarColors
-import com.nikkap.calendar.data.remote.dto.BirthdayItemDateTime
 
 data class Birthday(
-    val id: String = "",
+    val id: String? = null,
     val name: String? = null,
-    val date: BirthdayItemDateTime = BirthdayItemDateTime(
-        date = null
-    ),
+    val date: Long? = 0L,
     val colorHex: String = CalendarColors.getBirthdayColor(null).id,
 ) : CalendarEntry()

@@ -27,19 +27,26 @@ interface CalendarApi {
     @POST("https://www.googleapis.com/calendar/v3/calendars/primary/events")
     suspend fun createEvent(
         @Body event: EventDto
-    ): Response<Unit>
+    ): Response<EventDto>
 
     @PATCH("calendar/v3/calendars/{calendarId}/events/{eventId}")
     suspend fun updateEvent(
         @Path("calendarId") calendarId: String = "primary",
         @Path("eventId") eventId: String,
         @Body event: EventDto
-    ): Response<Unit>
+    ): Response<EventDto>
+
+    @PATCH("calendar/v3/calendars/{calendarId}/events/{eventId}")
+    suspend fun updateBirthday(
+        @Path("calendarId") calendarId: String = "primary",
+        @Path("eventId") birthdayId: String,
+        @Body birthday: BirthdayDto
+    ): Response<BirthdayDto>
 
     @POST("calendar/v3/calendars/primary/events")
     suspend fun createBirthday(
         @Body birthday: BirthdayDto
-    ): Response<Unit>
+    ): Response<EventDto>
 }
 
 data class EventListResponse(

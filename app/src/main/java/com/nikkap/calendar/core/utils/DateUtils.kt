@@ -68,7 +68,8 @@ fun Long.toTime(): String {
         .format(formatter)
 }
 
-fun Long.toDate(): String {
+fun Long?.toDate(): String {
+    if (this == null) return ""
     val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy", Locale.ENGLISH)
     return Instant.ofEpochMilli(this)
         .atZone(ZoneId.systemDefault())

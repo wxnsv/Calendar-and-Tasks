@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.nikkap.calendar.R
+import com.nikkap.calendar.core.utils.toDate
 import com.nikkap.calendar.core.utils.toListDate
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.Event
@@ -112,7 +113,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
 
         fun bind(birthday: Birthday, onClick: () -> Unit) {
             birthdayName.text = birthday.name
-            birthdayDate.text = birthday.date.date
+            birthdayDate.text = birthday.date.toDate()
             itemType.text =
                 itemView.context.getString(R.string.calendar_type_format, "Birthday")
             itemIcon.setImageResource(R.drawable.event)
@@ -137,7 +138,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
         when (item) {
             is ListItem.TaskItem -> {
                 (holder as TaskViewHolder).bind(item.task, onClick = {
-                    onItemClick(item.task.id, "TASK")
+                    onItemClick(item.task.id!!, "TASK")
                 })
             }
 
@@ -149,7 +150,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
 
             is ListItem.BirthdayItem -> {
                 (holder as BirthdayViewHolder).bind(item.birthday, onClick = {
-                    onItemClick(item.birthday.id, "BIRTHDAY")
+                    onItemClick(item.birthday.id!!, "BIRTHDAY")
                 })
             }
 

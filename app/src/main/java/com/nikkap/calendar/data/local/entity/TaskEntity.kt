@@ -18,5 +18,14 @@ data class TaskEntity(
     val deadline: Long?,
     @ColumnInfo("taskListId")
     val taskListId: String,
+    @ColumnInfo("isSynced")
+    val isSynced: Boolean,
+    @ColumnInfo("pendingAction")
+    val pendingAction: PendingActions,
+    @ColumnInfo("lastModified")
+    val lastModified: Long,
+
     // TODO(Reminders)
 )
+
+enum class PendingActions { NONE, INSERT, UPDATE, DELETE }

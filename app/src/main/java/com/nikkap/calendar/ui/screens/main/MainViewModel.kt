@@ -3,6 +3,7 @@ package com.nikkap.calendar.ui.screens.main
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nikkap.calendar.data.repository.UserPreferencesRepository
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
 import com.nikkap.calendar.ui.screens.auth.AuthState
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val tasksRepository: TaskRepository,
-    private val calendarRepository: CalendarRepository
+    private val calendarRepository: CalendarRepository,
+    private val userPrefRepository: UserPreferencesRepository
 ) : ViewModel() {
     private val _navigationEvent = Channel<NavEvent>()
     val navigationEvent = _navigationEvent.receiveAsFlow()
@@ -74,7 +76,6 @@ class MainViewModel(
     private suspend fun hasData(): Boolean {
         var hasData = false
 // TODO("Refactor")
-        tasksRepository.syncTasks()
         val checkTasksData = tasksRepository.haveLocalData()
         val checkCalendarData = calendarRepository.haveLocalData()
         Log.d("AppAuth", "Have local tasks: $checkTasksData")
@@ -82,9 +83,9 @@ class MainViewModel(
         if (checkTasksData && checkCalendarData) {
             hasData = true
         } else {
-            val taskListsResult = tasksRepository.syncTasks()
+            val taskResult = tasksRepository.syncTasks()
             val calendarResult = calendarRepository.syncCalendar()
-            if (calendarResult.isSuccess && taskListsResult.isSuccess) {
+            if (calendarResult.isSuccess && taskResult.isSuccess) {
                 hasData = true
             }
         }

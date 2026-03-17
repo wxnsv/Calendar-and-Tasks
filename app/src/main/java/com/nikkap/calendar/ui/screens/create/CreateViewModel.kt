@@ -3,7 +3,6 @@ package com.nikkap.calendar.ui.screens.create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nikkap.calendar.core.utils.toTimeLong
-import com.nikkap.calendar.data.remote.dto.BirthdayItemDateTime
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.CalendarEntry
 import com.nikkap.calendar.domain.model.Event
@@ -43,9 +42,8 @@ class CreateViewModel(
 
     fun onIntent(intent: CreateIntent) {
         when (intent) {
-            is CreateIntent.UpdateCreateType -> {
-
-
+            is CreateIntent.UpdateShowFragment -> {
+                _state.update { it.copy(activeType = intent.type) }
             }
 
             is CreateIntent.UpdateTitle -> {
@@ -53,11 +51,11 @@ class CreateViewModel(
             }
 
             is CreateIntent.UpdateItem -> {
-                var intentEntry: CalendarEntry
-                when (intent.type) {
-                    "TASK" -> intentEntry = Task()
-                    "EVENT" -> intentEntry = Event()
-                    else -> intentEntry = Birthday()
+                _state.update { it.copy(isEditing = true) }
+                val intentEntry: CalendarEntry = when (intent.type) {
+                    "TASK" -> Task()
+                    "EVENT" -> Event()
+                    else -> Birthday()
                 }
                 when (intentEntry) {
                     is Task -> viewModelScope.launch {
@@ -71,9 +69,7 @@ class CreateViewModel(
                     }
 
                     is Birthday -> viewModelScope.launch {
-                        val birthday = calendarRepository.getBirthday(
-                            intent.id
-                        )
+                        val birthday = calendarRepository.getBirthday(intent.id)
                         _state.update {
                             it.copy(
                                 birthdayDraft = birthday,
@@ -127,13 +123,15 @@ class CreateViewModel(
 
             is CreateTaskIntent.SaveTask -> {
                 viewModelScope.launch {
-                    val task = state.value.taskDraft.copy(
-                        id = UUID.randomUUID().toString().replace("-", ""),
+                    val task = state.value.taskDraft
+                    val taskToSave = task.copy(
+                        id = task.id ?: UUID.randomUUID().toString().replace("-", ""),
                         title = state.value.title,
                         timestamp = state.value.taskDraft.timestamp.plus(state.value.taskTime)
                     )
                     _state.update { it.copy(isLoading = true) }
-                    taskRepository.saveTask(task)
+                    if (state.value.isEditing) taskRepository.updateTask(taskToSave)
+                    else taskRepository.saveTask(taskToSave)
                     _state.update { it.copy(isLoading = false) }
                 }
             }
@@ -177,14 +175,15 @@ class CreateViewModel(
             CreateEventIntent.SaveEvent -> {
                 viewModelScope.launch {
                     val event = state.value.eventDraft
-                    val saveEvent = event.copy(
+                    val eventToSave = event.copy(
                         id = event.id ?: UUID.randomUUID().toString().replace("-", ""),
                         summary = state.value.title,
                         startTimestamp = state.value.eventDraft.startTimestamp + state.value.eventStartTime,
                         endTimestamp = state.value.eventDraft.endTimestamp + state.value.eventEndTime
                     )
                     _state.update { it.copy(isLoading = true) }
-                    calendarRepository.saveEvent(saveEvent)
+                    if (state.value.isEditing) calendarRepository.updateEvent(eventToSave)
+                    else calendarRepository.saveEvent(eventToSave)
                     _state.update { it.copy(isLoading = false) }
                 }
             }
@@ -263,16 +262,21 @@ class CreateViewModel(
             is CreateBirthdayIntent.UpdateDate -> _state.update {
                 it.copy(
                     birthdayDraft = it.birthdayDraft.copy(
-                        date = BirthdayItemDateTime(date = intent.date.toString())
+                        date = intent.date
                     )
                 )
             }
 
             CreateBirthdayIntent.SaveBirthday -> {
                 viewModelScope.launch {
-                    val birthday = _state.value.birthdayDraft.copy(name = state.value.title)
+                    val birthday = state.value.birthdayDraft
+                    val birthdayToSave = _state.value.birthdayDraft.copy(
+                        id = birthday.id ?: UUID.randomUUID().toString().replace("-", ""),
+                        name = state.value.title
+                    )
                     _state.update { it.copy(isLoading = true) }
-                    calendarRepository.saveBirthday(birthday)
+                    if (state.value.isEditing) calendarRepository.updateBirthday(birthdayToSave)
+                    else calendarRepository.saveBirthday(birthdayToSave)
                     _state.update { it.copy(isLoading = false) }
                 }
             }

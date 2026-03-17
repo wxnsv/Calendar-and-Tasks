@@ -6,7 +6,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class EventDto(
     @field:Json(name = "id")
-    val id: String?,
+    val id: String,
     @field:Json(name = "summary")
     val summary: String?,
     @field:Json(name = "description")

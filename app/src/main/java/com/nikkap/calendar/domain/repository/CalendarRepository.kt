@@ -13,5 +13,6 @@ interface CalendarRepository {
     suspend fun getBirthday(id: String): Birthday
     suspend fun saveBirthday(birthday: Birthday)
     suspend fun saveEvent(event: Event)
+    suspend fun updateBirthday(birthday: Birthday)
     suspend fun updateEvent(event: Event)
 }

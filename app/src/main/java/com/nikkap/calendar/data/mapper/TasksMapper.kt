@@ -1,23 +1,21 @@
 package com.nikkap.calendar.data.mapper
 
 import com.nikkap.calendar.core.utils.parseIsoDate
-import com.nikkap.calendar.data.local.entity.SubtaskEntity
+import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.TaskEntity
 import com.nikkap.calendar.data.local.entity.TaskListEntity
 import com.nikkap.calendar.data.remote.dto.TaskDto
 import com.nikkap.calendar.data.remote.dto.TaskListDto
-import com.nikkap.calendar.domain.model.Subtask
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.model.TaskList
-import kotlinx.datetime.Instant
 
 fun Task.toTaskDto(): TaskDto {
     return TaskDto(
-        id = id,
+        id = id!!,
         title = title,
         status = if (isCompleted) "completed" else "needsAction",
         notes = notes,
-        deadline = deadline?.let { Instant.fromEpochMilliseconds(deadline) }.toString(),
+        deadline = deadline?.let { kotlin.time.Instant.fromEpochMilliseconds(deadline) }.toString(),
     )
 }
 fun TaskDto.toTask(): Task {
@@ -40,14 +38,17 @@ fun TaskEntity.toTask(): Task {
     )
 }
 
-fun Task.toTaskEntity(): TaskEntity {
+fun Task.toTaskEntity(pendingAction: PendingActions): TaskEntity {
     return TaskEntity(
-        id = id,
+        id = id!!,
         title = title,
         notes = notes,
         deadline = deadline,
         isCompleted = isCompleted,
         taskListId = taskListId,
+        isSynced = false,
+        pendingAction = pendingAction,
+        lastModified = System.currentTimeMillis(),
     )
 }
 
@@ -58,29 +59,14 @@ fun TaskDto.toTaskEntity(taskListId: String): TaskEntity {
         notes = notes,
         isCompleted = isCompleted,
         deadline = dateLong,
-        taskListId = taskListId
+        taskListId = taskListId,
+        isSynced = true,
+        pendingAction = PendingActions.NONE,
+        lastModified = parseIsoDate(updated)
     )
 }
 
-fun TaskDto.toSubtaskEntity(): SubtaskEntity {
-    return SubtaskEntity(
-        id = id,
-        title = title,
-        parentId = parent!!,
-        position = position.toString(),
-        isCompleted = isCompleted
-    )
-}
 
-fun SubtaskEntity.toSubtask(): Subtask {
-    return Subtask(
-        id = id,
-        title = title,
-        parentId = parentId,
-        position = position,
-        isCompleted = isCompleted
-    )
-}
 
 fun TaskListDto.toTaskList(): TaskList {
     return TaskList(

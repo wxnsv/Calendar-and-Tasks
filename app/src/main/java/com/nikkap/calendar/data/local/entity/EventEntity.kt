@@ -22,6 +22,12 @@ data class EventEntity(
     val colorHex: String?,
     @ColumnInfo("status")
     val status: String?,
+    @ColumnInfo("isSynced")
+    val isSynced: Boolean,
+    @ColumnInfo("pendingAction")
+    val pendingAction: PendingActions,
+    @ColumnInfo("lastModified")
+    val lastModified: Long,
 )
 
 

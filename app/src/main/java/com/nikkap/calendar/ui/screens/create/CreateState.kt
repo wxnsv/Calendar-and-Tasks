@@ -11,10 +11,14 @@ import com.nikkap.calendar.domain.model.TaskList
 data class CreateState(
     val title: String? = "",
     val activeType: CalendarEntry = Task(),
+
     val taskDraft: Task = Task(),
     val eventDraft: Event = Event(),
     val birthdayDraft: Birthday = Birthday(),
+
     val isLoading: Boolean = false,
+    val isEditing: Boolean = false,
+
     val taskLists: List<TaskList> = emptyList(),
     val selectedTaskList: TaskList? = null,
 
@@ -46,4 +50,10 @@ data class CreateState(
             )
         }
     }
+}
+
+sealed class ShowFragment {
+    object Task : ShowFragment()
+    object Event : ShowFragment()
+    object Birthday : ShowFragment()
 }

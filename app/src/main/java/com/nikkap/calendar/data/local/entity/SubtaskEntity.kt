@@ -16,5 +16,11 @@ data class SubtaskEntity(
     @ColumnInfo("position")
     val position: String,
     @ColumnInfo("isCompleted")
-    val isCompleted: Boolean
+    val isCompleted: Boolean,
+    @ColumnInfo("isSynced")
+    val isSynced: Boolean,
+    @ColumnInfo("pendingAction")
+    val pendingAction: PendingActions,
+    @ColumnInfo("lastModified")
+    val lastModified: Long,
 )

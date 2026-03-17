@@ -13,7 +13,7 @@ sealed class ListItem {
     }
 
     data class TaskItem(val task: Task) : ListItem() {
-        override val id: String = task.id
+        override val id: String = task.id!!
     }
 
     data class SubtaskItem(val subtask: Subtask) : ListItem() {
@@ -21,6 +21,6 @@ sealed class ListItem {
     }
 
     data class BirthdayItem(val birthday: Birthday) : ListItem() {
-        override val id: String = birthday.id
+        override val id: String = birthday.id!!
     }
 }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.nikkap.calendar.data.local.entity.SubtaskEntity
 import com.nikkap.calendar.data.local.entity.TaskEntity
 import com.nikkap.calendar.data.local.entity.TaskListEntity
@@ -27,8 +28,11 @@ interface TaskDao {
     @Query("SELECT * from subtasks WHERE id = :id")
     suspend fun getSubtask(id: String): SubtaskEntity
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(taskEntity: TaskEntity)
+
+    @Update
+    suspend fun updateTask(taskEntity: TaskEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTaskLists(taskLists: List<TaskListEntity>)
@@ -36,9 +40,9 @@ interface TaskDao {
     @Query("SELECT * from tasklist")
     fun getTaskLists(): Flow<List<TaskListEntity>>
 
-    @Query("SELECT * FROM tasks")
+    @Query("SELECT * FROM tasks WHERE pendingAction != 'DELETE'")
     fun getAllTasks(): Flow<List<TaskEntity>>
 
-    @Query("SELECT * FROM subtasks")
+    @Query("SELECT * FROM subtasks WHERE pendingAction != 'DELETE'")
     fun getAllSubtasks(): Flow<List<SubtaskEntity>>
 }

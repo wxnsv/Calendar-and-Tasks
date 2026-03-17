@@ -90,7 +90,9 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
 
         }
         binding.createSaveButton.setOnClickListener {
-            viewModel.onEventIntent(CreateEventIntent.SaveEvent)
+            viewModel.onBirthdayIntent(CreateBirthdayIntent.SaveBirthday)
+
+//            TODO
         }
     }
 
@@ -111,18 +113,24 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
             viewModel.onIntent(CreateIntent.UpdateItem(type = createType, id = itemId))
         }
         when (createType) {
-            "TASK" -> {
-                updateNestedFragment(viewModel.state.value.taskDraft)
-            }
-
+            "TASK" -> updateNestedFragment(viewModel.state.value.taskDraft)
             "EVENT" -> updateNestedFragment(viewModel.state.value.eventDraft)
             "BIRTHDAY" -> updateNestedFragment(viewModel.state.value.birthdayDraft)
         }
     }
 
     private fun updateUi(state: CreateState) {
+        val currentFragment = childFragmentManager.findFragmentById(R.id.create_fcv)
+        val currentEntry = when (currentFragment) {
+            is CreateTaskFragment -> state.taskDraft
+            is CreateEventFragment -> state.eventDraft
+            else -> state.birthdayDraft
+        }
         if (binding.createEditText.text.toString() != state.title) {
             binding.createEditText.setText(state.title)
+        }
+        if (currentEntry != state.activeType) {
+            updateNestedFragment(currentEntry)
         }
     }
 }

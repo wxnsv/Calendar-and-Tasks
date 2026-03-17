@@ -3,6 +3,7 @@ package com.nikkap.calendar.data.mapper
 import com.nikkap.calendar.core.utils.calendarDateFormatter
 import com.nikkap.calendar.core.utils.parseIsoDate
 import com.nikkap.calendar.data.local.entity.EventEntity
+import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.remote.dto.EventDto
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.EventStatus
@@ -10,7 +11,7 @@ import java.util.Locale
 
 fun EventDto.toEvent(): Event {
     return Event(
-        id = id!!,
+        id = id,
         summary = summary,
         description = description,
         startTimestamp = startTimestamp,
@@ -31,6 +32,9 @@ fun Event.toEventEntity(): EventEntity {
         isAllDay = isAllDay,
         colorHex = colorHex,
         status = status.name,
+        isSynced = false,
+        pendingAction = PendingActions.INSERT,
+        lastModified = System.currentTimeMillis(),
     )
 }
 
@@ -47,9 +51,9 @@ fun EventEntity.toEvent(): Event {
     )
 }
 
-fun Event.toEventDto(isEdit: Boolean = false): EventDto {
+fun Event.toEventDto(): EventDto {
     return EventDto(
-        id = if (isEdit) null else id,
+        id = id!!,
         summary = summary,
         description = description,
         start = calendarDateFormatter(isAllDay, startTimestamp),
@@ -62,7 +66,7 @@ fun Event.toEventDto(isEdit: Boolean = false): EventDto {
 
 fun EventDto.toEventEntity(): EventEntity {
     return EventEntity(
-        id = id!!,
+        id = id,
         summary = summary,
         description = description,
         startTimestamp = startTimestamp,
@@ -70,6 +74,9 @@ fun EventDto.toEventEntity(): EventEntity {
         isAllDay = isAllDay,
         colorHex = colorId,
         status = status,
+        isSynced = true,
+        pendingAction = PendingActions.NONE,
+        lastModified = parseIsoDate(updated),
     )
 }
 

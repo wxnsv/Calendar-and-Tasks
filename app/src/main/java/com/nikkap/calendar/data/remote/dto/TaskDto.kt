@@ -18,6 +18,8 @@ data class TaskDto(
     @field:Json(name = "parent")
     val parent: String? = null,
     @field:Json(name = "position")
-    val position: String? = null
+    val position: String? = null,
+    @field:Json(name = "updated")
+    val updated: String = ""
 )
 //TODO("reminders")

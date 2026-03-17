@@ -1,5 +1,6 @@
 package com.nikkap.calendar.data.repository
 
+import android.util.Log
 import com.nikkap.calendar.data.local.dao.CalendarDao
 import com.nikkap.calendar.data.mapper.toBirthday
 import com.nikkap.calendar.data.mapper.toBirthdayDto
@@ -13,10 +14,10 @@ import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
+import kotlin.time.Clock
 
 class CalendarRepositoryImpl(
     private val api: CalendarApi,
@@ -46,10 +47,18 @@ class CalendarRepositoryImpl(
         )
     }
 
+    override suspend fun updateBirthday(birthday: Birthday) {
+        dao.updateBirthday(birthday.toBirthdayEntity())
+        api.updateBirthday(
+            birthday = birthday.toBirthdayDto(),
+            birthdayId = birthday.id!!
+        )
+    }
+
     override suspend fun updateEvent(event: Event) {
         dao.updateEvent(event.toEventEntity())
         api.updateEvent(
-            event = event.toEventDto(true),
+            event = event.toEventDto(),
             eventId = event.id!!
         )
     }
@@ -64,16 +73,15 @@ class CalendarRepositoryImpl(
     }
 
 
-    override suspend fun syncCalendar(): Result<Unit> {
-        return try {
-            val timeMin = Clock.System.now()
-                .minus(3, DateTimeUnit.YEAR, TimeZone.UTC)
-                .toString()
-            syncEvents(timeMin)
-            syncBirthdays(timeMin)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+    override suspend fun syncCalendar(): Result<Unit> = try {
+        Log.d("DEBUG", "TEST CALENDAR SYNC")
+        val timeMin = Clock.System.now()
+            .minus(3, DateTimeUnit.YEAR, TimeZone.UTC)
+            .toString()
+        syncEvents(timeMin)
+        syncBirthdays(timeMin)
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 
     private suspend fun syncEvents(timeMin: String): Result<Unit> {

@@ -6,13 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.nikkap.calendar.R
+import com.nikkap.calendar.core.utils.toDate
 import com.nikkap.calendar.databinding.CreateBirthdayFragmentBinding
 import com.nikkap.calendar.ui.screens.create.CreateBirthdayIntent
 import com.nikkap.calendar.ui.screens.create.CreateState
 import com.nikkap.calendar.ui.screens.create.CreateViewModel
 import com.nikkap.calendar.ui.setupSetColorRecyclerView
 import com.nikkap.calendar.ui.showDatePicker
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CreateBirthdayFragment : Fragment(R.layout.create_birthday_fragment) {
@@ -33,6 +38,7 @@ class CreateBirthdayFragment : Fragment(R.layout.create_birthday_fragment) {
             resources = resources
         )
         setupListeners()
+        observeState()
     }
 
     override fun onCreateView(
@@ -49,16 +55,17 @@ class CreateBirthdayFragment : Fragment(R.layout.create_birthday_fragment) {
         _binding = null
     }
 
-    private fun setupListeners() {
-        binding.createBirthdayNotificationButton.setOnClickListener { view ->
-            val popup = PopupMenu(view.context, view)
-            popup.menuInflater.inflate(R.menu.create_task_event_notification_menu, popup.menu)
-            popup.setOnMenuItemClickListener { item ->
-                binding.createBirthdayNotificationButton.text = item.title
-                true
+    private fun observeState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    updateUi(state)
+                }
             }
-            popup.show()
         }
+    }
+
+    private fun setupListeners() {
         binding.createBirthdayNotificationButton.setOnClickListener { view ->
             val popup = PopupMenu(view.context, view)
             popup.menuInflater.inflate(R.menu.create_task_event_notification_menu, popup.menu)
@@ -79,6 +86,8 @@ class CreateBirthdayFragment : Fragment(R.layout.create_birthday_fragment) {
     private fun updateUi(state: CreateState) {
         val birthday = state.birthdayDraft
 
-//        if (binding.createBirthdayDateButton.text != birthday.date)
+        if (binding.createBirthdayDateButton.text != birthday.date!!.toDate() && birthday.date != 0L) {
+            binding.createBirthdayDateButton.text = birthday.date.toDate()
+        }
     }
 }
