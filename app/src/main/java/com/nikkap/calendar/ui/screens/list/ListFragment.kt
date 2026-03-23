@@ -57,7 +57,6 @@ class ListFragment : Fragment(R.layout.list_fragment) {
             addItemDecoration(dividerItemDecoration)
         }
         setupRecyclerView()
-//        lifecycleScope.launch { viewModel.syncAll() }
         setupListeners()
         observeState(adapter)
     }

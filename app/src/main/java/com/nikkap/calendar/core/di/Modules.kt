@@ -3,7 +3,8 @@ package com.nikkap.calendar.core.di
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
-import com.nikkap.calendar.core.auth.AuthManager
+import com.nikkap.calendar.core.auth.AuthentificationManager
+import com.nikkap.calendar.core.auth.AuthorizationManager
 import com.nikkap.calendar.data.local.AppDatabase
 import com.nikkap.calendar.data.remote.api.CalendarApi
 import com.nikkap.calendar.data.remote.api.TasksApi
@@ -45,7 +46,7 @@ val networkModule = module {
 
     single {
         AuthInterceptor(
-            tokenProvider = { get<AuthManager>().getAccessToken() }
+            tokenProvider = { get<AuthorizationManager>().getAccessToken() }
         )
     }
 
@@ -81,7 +82,8 @@ val localModule = module {
     single { UserPreferencesRepository(get()) }
 }
 val authModule = module {
-    single { AuthManager(androidContext()) }
+    single { AuthorizationManager(androidContext()) }
+    single { AuthentificationManager(androidContext()) }
 }
 val appModule = module {
     single<TaskRepository> { TaskRepositoryImpl(get(), get()) }

@@ -1,6 +1,5 @@
 package com.nikkap.calendar.data.repository
 
-import android.util.Log
 import com.nikkap.calendar.data.local.dao.TaskDao
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.mapper.toSubtask
@@ -56,7 +55,6 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun syncTasks(): Result<Unit> = try {
-        Log.d("DEBUG", "TEST TASKS SYNC")
         val response = api.getTaskLists()
         if (response.isSuccessful) {
             val taskLists = response.body()?.items?.map { it.toTaskList() } ?: emptyList()

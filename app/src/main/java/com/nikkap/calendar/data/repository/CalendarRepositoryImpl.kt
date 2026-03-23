@@ -1,6 +1,5 @@
 package com.nikkap.calendar.data.repository
 
-import android.util.Log
 import com.nikkap.calendar.data.local.dao.CalendarDao
 import com.nikkap.calendar.data.mapper.toBirthday
 import com.nikkap.calendar.data.mapper.toBirthdayDto
@@ -74,7 +73,6 @@ class CalendarRepositoryImpl(
 
 
     override suspend fun syncCalendar(): Result<Unit> = try {
-        Log.d("DEBUG", "TEST CALENDAR SYNC")
         val timeMin = Clock.System.now()
             .minus(3, DateTimeUnit.YEAR, TimeZone.UTC)
             .toString()

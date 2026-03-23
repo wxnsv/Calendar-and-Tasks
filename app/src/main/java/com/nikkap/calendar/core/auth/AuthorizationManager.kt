@@ -3,20 +3,22 @@ package com.nikkap.calendar.core.auth
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import android.util.Log
 import com.google.android.gms.auth.api.identity.AuthorizationRequest
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.Scope
 import com.google.api.services.calendar.CalendarScopes
 import com.google.api.services.tasks.TasksScopes
 import kotlinx.coroutines.tasks.await
 
-class AuthManager(context: Context) {
+class AuthorizationManager(context: Context) {
     private val authClient = Identity.getAuthorizationClient(context)
 
     private val requestedScopes = listOf(
         Scope(TasksScopes.TASKS),
-        Scope(CalendarScopes.CALENDAR_EVENTS)
+        Scope(CalendarScopes.CALENDAR_EVENTS),
+        Scope(Scopes.EMAIL),
+        Scope(Scopes.PROFILE)
     )
 
     private fun getAuthorizationRequest(): AuthorizationRequest {
@@ -40,18 +42,6 @@ class AuthManager(context: Context) {
                 onPendingIntent(result.pendingIntent!!.intentSender)
             }
         }
-    }
-
-    fun silentAuthorize(onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
-        authClient.authorize(getAuthorizationRequest())
-            .addOnSuccessListener { result ->
-                result.accessToken?.let(onSuccess) ?: onFailure(Exception("No token"))
-                Log.d("AppAuth", "Silent Authorize is Success")
-            }
-            .addOnFailureListener {
-                Log.d("AppAuth", "Silent Authorize is Failed")
-                onFailure(Exception("Silent Authorize is failed"))
-            }
     }
 
     suspend fun getAccessToken(): String? {

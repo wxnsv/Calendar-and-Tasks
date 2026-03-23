@@ -2,7 +2,6 @@ package com.nikkap.calendar.ui.screens.auth
 
 import android.app.Activity.RESULT_OK
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,26 +18,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import com.nikkap.calendar.core.auth.AuthManager
+import androidx.fragment.app.activityViewModels
+import com.nikkap.calendar.core.auth.AuthorizationManager
+import com.nikkap.calendar.ui.screens.main.MainViewModel
 import com.nikkap.calendar.ui.theme.CalendarTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AuthFragment : Fragment() {
     private val viewModel: AuthViewModel by viewModel()
-    private val authManager by lazy { AuthManager(requireContext()) }
+    private val authorizationManager by lazy { AuthorizationManager(requireContext()) }
+    private val sharedViewModel: MainViewModel by activityViewModels()
     private val authLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             viewModel.handleAuthResult(result.data)
-        } else Log.d("AppAuth", "${result.resultCode}")
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        viewModel.checkAuth()
-
+        }
+//        else TODO
     }
 
     override fun onCreateView(
@@ -56,30 +52,35 @@ class AuthFragment : Fragment() {
 
     @Composable
     private fun ShowLoginScreen() {
-            CalendarTheme {
-                LoginScreen(onLoginClick = {
-                    authManager.getAuthIntent { intentSender ->
-                        viewModel.onAuthIntentReady(intentSender, authLauncher)
+        CalendarTheme {
+            LoginScreen(
+                onLoginClick = {
+                    viewModel.startAuth {
+                        authorizationManager.getAuthIntent { intentSender ->
+                            viewModel.onAuthIntentReady(intentSender, authLauncher)
+                        }
+                        sharedViewModel.authorizeSuccess()
                     }
-                })
-            }
+                }
+            )
         }
     }
 
-@Composable
-fun LoginScreen(onLoginClick: () -> Unit) {
-    Scaffold { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                onClick = {
-                    onLoginClick()
-                }) {
-                Text("Start Authorize")
+    @Composable
+    fun LoginScreen(onLoginClick: () -> Unit) {
+        Scaffold { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(
+                    onClick = {
+                        onLoginClick()
+                    }) {
+                    Text("Start Authorize")
+                }
             }
         }
     }

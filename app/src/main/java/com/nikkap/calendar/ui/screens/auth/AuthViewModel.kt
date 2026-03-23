@@ -5,28 +5,36 @@ import android.content.IntentSender
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.ViewModel
-import com.nikkap.calendar.core.auth.AuthManager
-import com.nikkap.calendar.domain.repository.CalendarRepository
-import com.nikkap.calendar.domain.repository.TaskRepository
+import androidx.lifecycle.viewModelScope
+import com.nikkap.calendar.core.auth.AuthentificationManager
+import com.nikkap.calendar.core.auth.AuthorizationManager
+import com.nikkap.calendar.data.repository.UserPreferencesRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class AuthViewModel(
-    private val authManager: AuthManager,
-    private val tasksRepository: TaskRepository,
-    private val calendarRepository: CalendarRepository
+    private val authorizationManager: AuthorizationManager,
+    private val userPrefRepository: UserPreferencesRepository,
+    private val authentificationManager: AuthentificationManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<AuthState>(AuthState.Loading)
     val state = _state.asStateFlow()
 
-    fun checkAuth() {
-        authManager.silentAuthorize(
-            onSuccess = { _state.value = AuthState.Authenticated },
-            onFailure = { _state.value = AuthState.Unauthenticated }
-        )
+    fun startAuth(authIntent: () -> Unit) {
+        viewModelScope.launch {
+            val userInfo = authentificationManager.authenticate()
+            if (userInfo != null) {
+                userPrefRepository.authorizeSession(
+                    userInfo.email,
+                    userInfo.displayName ?: "",
+                    userInfo.photoUri.toString()
+                )
+                authIntent()
+            }
+        }
     }
-
 
     fun onAuthIntentReady(
         intentSender: IntentSender,
@@ -37,11 +45,13 @@ class AuthViewModel(
     }
 
     fun handleAuthResult(intent: Intent?) {
-        authManager.handleActivityResult(intent) { token ->
-            if (token != null) {
-                _state.value = AuthState.Authenticated
-            } else {
-                _state.value = AuthState.Unauthenticated
+        viewModelScope.launch {
+            authorizationManager.handleActivityResult(intent) { token ->
+                if (token != null) {
+                    _state.value = AuthState.Authenticated
+                } else {
+                    _state.value = AuthState.Unauthenticated
+                }
             }
         }
     }

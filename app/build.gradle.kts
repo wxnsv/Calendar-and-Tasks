@@ -29,6 +29,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -79,6 +80,7 @@ dependencies {
     implementation(libs.material)
 // Room
     implementation(libs.androidx.room.runtime)
+    implementation(libs.googleid)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     androidTestImplementation(libs.room.testing)

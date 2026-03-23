@@ -81,7 +81,6 @@ class ListViewModel(
         val tasksStatus = async { taskRepository.syncTasks() }
 
         calendarStatus.await()
-
         tasksStatus.await()
     }
 }

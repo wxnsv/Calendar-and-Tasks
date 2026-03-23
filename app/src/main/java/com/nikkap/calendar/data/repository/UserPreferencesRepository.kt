@@ -22,6 +22,8 @@ class UserPreferencesRepository(
         val LAST_SYNC_TIMESTAMP = longPreferencesKey("last_sync_timestamp")
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_NAME = stringPreferencesKey("user_name")
+        val USER_PHOTO = stringPreferencesKey("user_photo")
+        val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
     }
 
     val userStateFlow: Flow<UserPrefs> = dataStore.data
@@ -33,15 +35,18 @@ class UserPreferencesRepository(
                 isAuthorized = prefs[Keys.IS_AUTHORIZED] ?: false,
                 lastSyncTime = prefs[Keys.LAST_SYNC_TIMESTAMP],
                 email = prefs[Keys.USER_EMAIL],
-                name = prefs[Keys.USER_NAME]
+                name = prefs[Keys.USER_NAME],
+                isFirstLaunch = prefs[Keys.IS_FIRST_LAUNCH] ?: true
             )
         }
 
-    suspend fun saveSession(email: String, name: String) {
+    suspend fun authorizeSession(email: String, name: String, photoUri: String) {
         dataStore.edit { prefs ->
             prefs[Keys.USER_EMAIL] = email
             prefs[Keys.IS_AUTHORIZED] = true
+            prefs[Keys.IS_FIRST_LAUNCH] = false
             prefs[Keys.USER_NAME] = name
+            prefs[Keys.USER_PHOTO] = photoUri
         }
     }
 
@@ -53,6 +58,12 @@ class UserPreferencesRepository(
 
     suspend fun clearSession() {
         dataStore.edit { it.clear() }
+    }
+
+    suspend fun completeFirstLaunch() {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_FIRST_LAUNCH] = false
+        }
     }
 
 }
