@@ -21,6 +21,7 @@ import kotlin.time.Clock
 class CalendarRepositoryImpl(
     private val api: CalendarApi,
     private val dao: CalendarDao,
+    private val userPrefRepository: UserPreferencesRepository
 ) : CalendarRepository {
     override val allEvents: Flow<List<Event>> = dao.getAllEvents()
         .map { entities ->
@@ -76,8 +77,16 @@ class CalendarRepositoryImpl(
         val timeMin = Clock.System.now()
             .minus(3, DateTimeUnit.YEAR, TimeZone.UTC)
             .toString()
-        syncEvents(timeMin)
-        syncBirthdays(timeMin)
+        val eventsResult = syncEvents(timeMin)
+        val birthdayResult = syncBirthdays(timeMin)
+        if (eventsResult.isSuccess) {
+            userPrefRepository.updateEventSyncTime()
+        }
+        if (birthdayResult.isSuccess) {
+            userPrefRepository.updateBirthdaySyncTime()
+        }
+        eventsResult
+        // TODO
     } catch (e: Exception) {
         Result.failure(e)
     }

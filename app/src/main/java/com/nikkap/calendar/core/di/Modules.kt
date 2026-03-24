@@ -12,6 +12,7 @@ import com.nikkap.calendar.data.remote.interceptor.AuthInterceptor
 import com.nikkap.calendar.data.repository.CalendarRepositoryImpl
 import com.nikkap.calendar.data.repository.TaskRepositoryImpl
 import com.nikkap.calendar.data.repository.UserPreferencesRepository
+import com.nikkap.calendar.data.worker.SyncWorker
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
 import com.nikkap.calendar.ui.screens.auth.AuthViewModel
@@ -23,6 +24,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.dsl.worker
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -86,8 +88,9 @@ val authModule = module {
     single { AuthentificationManager(androidContext()) }
 }
 val appModule = module {
+    worker { SyncWorker(get(), get(), get(), get()) }
     single<TaskRepository> { TaskRepositoryImpl(get(), get()) }
-    single<CalendarRepository> { CalendarRepositoryImpl(get(), get()) }
+    single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get()) }
     viewModel { AuthViewModel(get(), get(), get()) }
     viewModel { ListViewModel(get(), get()) }
     viewModelOf(::CreateViewModel)

@@ -19,11 +19,13 @@ class UserPreferencesRepository(
 
     private object Keys {
         val IS_AUTHORIZED = booleanPreferencesKey("is_authorized")
-        val LAST_SYNC_TIMESTAMP = longPreferencesKey("last_sync_timestamp")
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_NAME = stringPreferencesKey("user_name")
         val USER_PHOTO = stringPreferencesKey("user_photo")
         val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
+        val EVENT_LAST_SYNC = longPreferencesKey("event_last_sync")
+        val BIRTHDAY_LAST_SYNC = longPreferencesKey("birthday_last_sync")
+        val TASK_LAST_SYNC = longPreferencesKey("task_last_sync")
     }
 
     val userStateFlow: Flow<UserPrefs> = dataStore.data
@@ -33,7 +35,9 @@ class UserPreferencesRepository(
         .map { prefs ->
             UserPrefs(
                 isAuthorized = prefs[Keys.IS_AUTHORIZED] ?: false,
-                lastSyncTime = prefs[Keys.LAST_SYNC_TIMESTAMP],
+                birthdayLastSync = prefs[Keys.BIRTHDAY_LAST_SYNC],
+                eventLastSync = prefs[Keys.EVENT_LAST_SYNC],
+                taskLastSync = prefs[Keys.TASK_LAST_SYNC],
                 email = prefs[Keys.USER_EMAIL],
                 name = prefs[Keys.USER_NAME],
                 isFirstLaunch = prefs[Keys.IS_FIRST_LAUNCH] ?: true
@@ -50,9 +54,21 @@ class UserPreferencesRepository(
         }
     }
 
-    suspend fun updateSyncTime() {
+    suspend fun updateTaskSyncTime() {
         dataStore.edit { prefs ->
-            prefs[Keys.LAST_SYNC_TIMESTAMP] = System.currentTimeMillis()
+            prefs[Keys.TASK_LAST_SYNC] = System.currentTimeMillis()
+        }
+    }
+
+    suspend fun updateEventSyncTime() {
+        dataStore.edit { prefs ->
+            prefs[Keys.EVENT_LAST_SYNC] = System.currentTimeMillis()
+        }
+    }
+
+    suspend fun updateBirthdaySyncTime() {
+        dataStore.edit { prefs ->
+            prefs[Keys.BIRTHDAY_LAST_SYNC] = System.currentTimeMillis()
         }
     }
 
@@ -65,5 +81,6 @@ class UserPreferencesRepository(
             prefs[Keys.IS_FIRST_LAUNCH] = false
         }
     }
+
 
 }

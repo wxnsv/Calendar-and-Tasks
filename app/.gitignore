@@ -1,2 +1,3 @@
 /build
 credentials.json
+app\src\main\java\com\nikkap\calendar\core\Secrets.kt

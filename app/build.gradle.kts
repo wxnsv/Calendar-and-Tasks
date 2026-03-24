@@ -33,16 +33,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+    //noinspection WrongGradleMethod
     kotlin {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
-    }
-    buildFeatures {
-        compose = true
     }
     packaging {
         resources {
@@ -56,6 +54,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
     }
     sourceSets {
         getByName("main") {
@@ -69,6 +68,9 @@ android {
 }
 
 dependencies {
+// Work
+    implementation(libs.androidx.work.runtime.ktx)
+
 // Preferences
     implementation(libs.androidx.datastore.preferences)
 // Nav
@@ -112,6 +114,7 @@ dependencies {
 // Koin
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.android)
+    implementation("io.insert-koin:koin-androidx-workmanager:3.5.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

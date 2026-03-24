@@ -1,8 +1,17 @@
 package com.nikkap.calendar.ui.screens.main
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import com.nikkap.calendar.data.repository.UserPreferencesRepository
+import com.nikkap.calendar.data.worker.SyncWorker
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
 import com.nikkap.calendar.ui.navigation.NavEvent
@@ -13,6 +22,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.concurrent.TimeUnit
 
 class MainViewModel(
     private val tasksRepository: TaskRepository,
@@ -55,13 +65,36 @@ class MainViewModel(
 
     }
 
-    fun authorizeSuccess() {
+    fun authorizeSuccess(context: Context) {
         viewModelScope.launch {
             userPrefRepository.completeFirstLaunch()
             _navigationEvent.send(
                 NavEvent.NavigateTo(
                     NavigationTarget.List
                 )
+            )
+
+
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(
+                30, TimeUnit.MINUTES,
+                5, TimeUnit.MINUTES
+            )
+                .setConstraints(constraints)
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
+                .build()
+
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                "PeriodicSync",
+                ExistingPeriodicWorkPolicy.KEEP,
+                syncRequest
             )
         }
     }

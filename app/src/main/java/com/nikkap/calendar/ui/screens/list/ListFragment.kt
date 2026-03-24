@@ -27,7 +27,6 @@ class ListFragment : Fragment(R.layout.list_fragment) {
     private val viewModel: ListViewModel by viewModel()
     private val sharedViewModel: MainViewModel by activityViewModels()
 
-//    private var adapter: ListAdapter? = null
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -46,6 +45,13 @@ class ListFragment : Fragment(R.layout.list_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val adapter = ListAdapter { id, type -> sharedViewModel.onListItemClicked(id, type) }
+
+        setupRecyclerView(adapter)
+        setupListeners()
+        observeState(adapter)
+    }
+
+    private fun setupRecyclerView(adapter: ListAdapter) {
         val dividerItemDecoration = DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
 
         ContextCompat.getDrawable(requireContext(), R.drawable.list_divider)?.let {
@@ -56,13 +62,6 @@ class ListFragment : Fragment(R.layout.list_fragment) {
             layoutManager = LinearLayoutManager(requireView().context)
             addItemDecoration(dividerItemDecoration)
         }
-        setupRecyclerView()
-        setupListeners()
-        observeState(adapter)
-    }
-
-    private fun setupRecyclerView() {
-
     }
 
     private fun setupListeners() {

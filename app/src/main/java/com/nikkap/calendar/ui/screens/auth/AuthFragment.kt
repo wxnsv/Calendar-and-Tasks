@@ -59,7 +59,7 @@ class AuthFragment : Fragment() {
                         authorizationManager.getAuthIntent { intentSender ->
                             viewModel.onAuthIntentReady(intentSender, authLauncher)
                         }
-                        sharedViewModel.authorizeSuccess()
+                        sharedViewModel.authorizeSuccess(requireContext())
                     }
                 }
             )
