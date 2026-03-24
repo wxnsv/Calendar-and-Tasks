@@ -72,7 +72,7 @@ class MainViewModel(
                 NavEvent.NavigateTo(
                     NavigationTarget.Create(
                         "TASK", ""
-                    ), NavigationTarget.List
+                    )
                 )
             )
         }
@@ -85,7 +85,7 @@ class MainViewModel(
                     NavigationTarget.Create(
                         itemId = id,
                         type = type
-                    ), NavigationTarget.List
+                    )
                 )
             )
         }

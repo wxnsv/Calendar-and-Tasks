@@ -49,10 +49,14 @@ class MainActivity : AppCompatActivity() {
                                 is NavigationTarget.Create -> R.id.createFragment
                                 is NavigationTarget.List -> R.id.listFragment
                             }
+                            if (event.route is NavigationTarget.Create) {
+                                val bundle = Bundle().apply {
+                                    putString("type", event.route.type)
+                                    putString("id", event.route.itemId)
+                                }
+                                navController.navigate(resId, bundle)
+                            } else navController.navigate(resId)
 
-                            navController.navigate(resId) {
-                                event.popUpTo?.let { popUpTo(it) { inclusive = true } }
-                            }
                         }
 
                         is NavEvent.SetRoot -> {

@@ -6,13 +6,14 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.nikkap.calendar.core.Secrets
 
 class AuthentificationManager(private val context: Context) {
     private val credentialManager: CredentialManager = CredentialManager.create(context)
 
     private fun getCredentialRequest(): GetCredentialRequest {
         val googleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId("")
+            .setServerClientId(Secrets.GOOGLE_CLIENT_ID)
             .setFilterByAuthorizedAccounts(false)
             .setAutoSelectEnabled(false)
             .build()
