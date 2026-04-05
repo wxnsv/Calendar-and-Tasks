@@ -5,5 +5,6 @@ data class Subtask(
     val title: String?,
     val parentId: String,
     val position: String,
-    val isCompleted: Boolean
+    val isCompleted: Boolean,
+    val taskListId: String,
 )
