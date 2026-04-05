@@ -8,7 +8,7 @@ data class BirthdayDto(
     @field:Json(name = "id")
     val id: String,
     @field:Json(name = "summary")
-    val name: String?,
+    val summary: String?,
     @field:Json(name = "start")
     val start: BirthdayItemDateTime,
     @field:Json(name = "updated")
