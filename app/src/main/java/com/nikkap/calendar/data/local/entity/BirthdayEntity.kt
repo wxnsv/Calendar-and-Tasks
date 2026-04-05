@@ -7,15 +7,13 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "birthday")
 data class BirthdayEntity(
     @PrimaryKey(autoGenerate = false)
-    val id: String,
+    override val id: String,
+    @ColumnInfo("pendingAction")
+    override val pendingAction: PendingActions,
+    @ColumnInfo("lastModified")
+    override val lastModified: Long,
     @ColumnInfo("name")
     val name: String?,
     @ColumnInfo("date")
     val date: Long,
-    @ColumnInfo("isSynced")
-    val isSynced: Boolean,
-    @ColumnInfo("pendingAction")
-    val pendingAction: PendingActions,
-    @ColumnInfo("lastModified")
-    val lastModified: Long,
-)
+) : SyncableEntity

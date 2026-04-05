@@ -7,7 +7,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "tasks")
 data class TaskEntity(
     @PrimaryKey(autoGenerate = false)
-    val id: String,
+    override val id: String,
+    @ColumnInfo("pendingAction")
+    override val pendingAction: PendingActions,
+    @ColumnInfo("lastModified")
+    override val lastModified: Long,
     @ColumnInfo("title")
     val title: String?,
     @ColumnInfo("notes")
@@ -17,15 +21,9 @@ data class TaskEntity(
     @ColumnInfo("date")
     val deadline: Long?,
     @ColumnInfo("taskListId")
-    val taskListId: String,
-    @ColumnInfo("isSynced")
-    val isSynced: Boolean,
-    @ColumnInfo("pendingAction")
-    val pendingAction: PendingActions,
-    @ColumnInfo("lastModified")
-    val lastModified: Long,
+    val taskListId: String
 
     // TODO(Reminders)
-)
+) : SyncableEntity
 
 enum class PendingActions { NONE, INSERT, UPDATE, DELETE }

@@ -8,7 +8,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "subtasks")
 data class SubtaskEntity(
     @PrimaryKey(autoGenerate = false)
-    val id: String,
+    override val id: String,
+    @ColumnInfo("pendingAction")
+    override val pendingAction: PendingActions,
+    @ColumnInfo("lastModified")
+    override val lastModified: Long,
     @ColumnInfo("title")
     val title: String?,
     @ColumnInfo("parentId")
@@ -17,10 +21,6 @@ data class SubtaskEntity(
     val position: String,
     @ColumnInfo("isCompleted")
     val isCompleted: Boolean,
-    @ColumnInfo("isSynced")
-    val isSynced: Boolean,
-    @ColumnInfo("pendingAction")
-    val pendingAction: PendingActions,
-    @ColumnInfo("lastModified")
-    val lastModified: Long,
-)
+    @ColumnInfo("taskListId")
+    val taskListId: String,
+) : SyncableEntity

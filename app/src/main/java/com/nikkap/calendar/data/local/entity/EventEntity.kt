@@ -7,7 +7,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "event")
 data class EventEntity(
     @PrimaryKey(autoGenerate = false)
-    val id: String,
+    override val id: String,
+    @ColumnInfo("pendingAction")
+    override val pendingAction: PendingActions,
+    @ColumnInfo("lastModified")
+    override val lastModified: Long,
     @ColumnInfo("summary")
     val summary: String?,
     @ColumnInfo("description")
@@ -19,15 +23,9 @@ data class EventEntity(
     @ColumnInfo("isAllDay")
     val isAllDay: Boolean,
     @ColumnInfo("colorHex")
-    val colorHex: String?,
+    val colorId: String?,
     @ColumnInfo("status")
     val status: String?,
-    @ColumnInfo("isSynced")
-    val isSynced: Boolean,
-    @ColumnInfo("pendingAction")
-    val pendingAction: PendingActions,
-    @ColumnInfo("lastModified")
-    val lastModified: Long,
-)
+) : SyncableEntity
 
 
