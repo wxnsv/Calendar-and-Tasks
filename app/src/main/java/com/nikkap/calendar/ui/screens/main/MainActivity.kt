@@ -25,10 +25,9 @@ class MainActivity : AppCompatActivity() {
             showSplash
         }
 
-
         setContentView(R.layout.activity_main)
         observeNavigation()
-        viewModel.checkAuthAndNavigate()
+        viewModel.checkAuthAndNavigate(this)
     }
 
     private fun observeNavigation() {
