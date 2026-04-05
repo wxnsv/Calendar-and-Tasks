@@ -23,8 +23,7 @@ class UserPreferencesRepository(
         val USER_NAME = stringPreferencesKey("user_name")
         val USER_PHOTO = stringPreferencesKey("user_photo")
         val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
-        val EVENT_LAST_SYNC = longPreferencesKey("event_last_sync")
-        val BIRTHDAY_LAST_SYNC = longPreferencesKey("birthday_last_sync")
+        val CALENDAR_LAST_SYNC = longPreferencesKey("event_last_sync")
         val TASK_LAST_SYNC = longPreferencesKey("task_last_sync")
     }
 
@@ -35,13 +34,26 @@ class UserPreferencesRepository(
         .map { prefs ->
             UserPrefs(
                 isAuthorized = prefs[Keys.IS_AUTHORIZED] ?: false,
-                birthdayLastSync = prefs[Keys.BIRTHDAY_LAST_SYNC],
-                eventLastSync = prefs[Keys.EVENT_LAST_SYNC],
+                eventLastSync = prefs[Keys.CALENDAR_LAST_SYNC],
                 taskLastSync = prefs[Keys.TASK_LAST_SYNC],
                 email = prefs[Keys.USER_EMAIL],
                 name = prefs[Keys.USER_NAME],
                 isFirstLaunch = prefs[Keys.IS_FIRST_LAUNCH] ?: true
             )
+        }
+
+    val taskSyncTime: Flow<Long?> = dataStore.data.catch { exception ->
+        if (exception is IOException) emit(emptyPreferences()) else throw exception
+    }
+        .map { prefs ->
+            prefs[Keys.TASK_LAST_SYNC]
+        }
+
+    val calendarSyncTime: Flow<Long?> = dataStore.data.catch { exception ->
+        if (exception is IOException) emit(emptyPreferences()) else throw exception
+    }
+        .map { prefs ->
+            prefs[Keys.CALENDAR_LAST_SYNC]
         }
 
     suspend fun authorizeSession(email: String, name: String, photoUri: String) {
@@ -62,13 +74,7 @@ class UserPreferencesRepository(
 
     suspend fun updateEventSyncTime() {
         dataStore.edit { prefs ->
-            prefs[Keys.EVENT_LAST_SYNC] = System.currentTimeMillis()
-        }
-    }
-
-    suspend fun updateBirthdaySyncTime() {
-        dataStore.edit { prefs ->
-            prefs[Keys.BIRTHDAY_LAST_SYNC] = System.currentTimeMillis()
+            prefs[Keys.CALENDAR_LAST_SYNC] = System.currentTimeMillis()
         }
     }
 
