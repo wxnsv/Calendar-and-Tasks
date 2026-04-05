@@ -21,6 +21,8 @@ import com.nikkap.calendar.ui.screens.list.ListViewModel
 import com.nikkap.calendar.ui.screens.main.MainViewModel
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okhttp3.Cache
+import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
@@ -30,6 +32,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.concurrent.TimeUnit
 
 val networkModule = module {
     val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
@@ -59,9 +62,19 @@ val networkModule = module {
     }
 
     single {
+        val cacheSize = 10 * 1024 * 1024L
+        Cache(androidContext().cacheDir, cacheSize)
+    }
+
+    single {
         OkHttpClient.Builder()
             .addInterceptor(get<AuthInterceptor>())
             .addInterceptor(get<HttpLoggingInterceptor>())
+            .cache(get())
+            .dispatcher(Dispatcher().apply {
+                maxRequestsPerHost = 15
+            })
+            .connectTimeout(15, TimeUnit.SECONDS)
             .build()
     }
 }
@@ -89,7 +102,7 @@ val authModule = module {
 }
 val appModule = module {
     worker { SyncWorker(get(), get(), get(), get()) }
-    single<TaskRepository> { TaskRepositoryImpl(get(), get()) }
+    single<TaskRepository> { TaskRepositoryImpl(get(), get(), get()) }
     single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get()) }
     viewModel { AuthViewModel(get(), get(), get()) }
     viewModel { ListViewModel(get(), get()) }
