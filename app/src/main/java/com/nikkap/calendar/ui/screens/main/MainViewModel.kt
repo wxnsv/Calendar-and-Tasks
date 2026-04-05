@@ -7,6 +7,7 @@ import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
@@ -38,7 +39,7 @@ class MainViewModel(
     }
 
 
-    fun checkAuthAndNavigate() {
+    fun checkAuthAndNavigate(context: Context) {
         val isFirst = prefs.isFirstLaunch
         val isAuthorized = prefs.isAuthorized
         viewModelScope.launch {
@@ -49,7 +50,7 @@ class MainViewModel(
                     )
                 )
             } else if (isAuthorized) {
-                syncData()
+                syncData(context)
                 _navigationEvent.send(
                     NavEvent.SetRoot(
                         NavigationTarget.List
@@ -144,9 +145,18 @@ class MainViewModel(
         }
     }
 
-    private suspend fun syncData() {
-        tasksRepository.syncTasks()
-        calendarRepository.syncCalendar()
+    private fun syncData(context: Context) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(
+            syncRequest
+        )
         // TODO (exceptions)
     }
 }
