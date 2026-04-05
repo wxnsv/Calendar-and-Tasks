@@ -17,6 +17,8 @@ data class EventDto(
     val end: CalendarItemDateTime?,
     @field:Json(name = "updated")
     val updated: String?,
+    @field:Json(name = "deleted")
+    val deleted: Boolean = false,
     @field:Json(name = "colorId")
     val colorId: String?,
     @field:Json(name = "status")
