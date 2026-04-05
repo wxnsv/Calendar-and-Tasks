@@ -7,7 +7,11 @@ import androidx.room.PrimaryKey
 @Entity("tasklist")
 data class TaskListEntity(
     @PrimaryKey(autoGenerate = false)
-    val id: String,
+    override val id: String,
+    @ColumnInfo("pendingAction")
+    override val pendingAction: PendingActions,
+    @ColumnInfo("lastModified")
+    override val lastModified: Long,
     @ColumnInfo("title")
-    val title: String
-)
+    val title: String,
+) : SyncableEntity
