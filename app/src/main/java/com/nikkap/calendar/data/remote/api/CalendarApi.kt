@@ -4,6 +4,7 @@ import com.nikkap.calendar.data.remote.dto.BirthdayDto
 import com.nikkap.calendar.data.remote.dto.EventDto
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -14,17 +15,29 @@ interface CalendarApi {
     @GET("calendar/v3/calendars/primary/events")
     suspend fun getEvents(
         @Query("timeMin") timeMin: String,
-        @Query("eventTypes") type: String,
+        @Query("eventTypes") type: String = "default",
+        @Query("updatedMin") updatedMin: String?,
         @Query("singleEvents") singleEvents: Boolean,
+        @Query("showHidden") showHidden: Boolean = true,
+        @Query("showDeleted") showDeleted: Boolean = true,
     ): Response<EventListResponse>
+
+    @DELETE("calendar/v3/calendars/{calendarId}/events/{eventId}")
+    suspend fun deleteItem(
+        @Path("calendarId") calendarId: String = "primary",
+        @Path("eventId") eventId: String
+    ): Response<Unit>
 
     @GET("calendar/v3/calendars/primary/events")
     suspend fun getBirthdays(
         @Query("timeMin") timeMin: String,
-        @Query("eventTypes") type: String,
+        @Query("updatedMin") updatedMin: String?,
+        @Query("eventTypes") type: String = "birthday",
+        @Query("showHidden") showHidden: Boolean = true,
+        @Query("showDeleted") showDeleted: Boolean = true,
     ): Response<BirthdayListResponse>
 
-    @POST("https://www.googleapis.com/calendar/v3/calendars/primary/events")
+    @POST("calendar/v3/calendars/primary/events")
     suspend fun createEvent(
         @Body event: EventDto
     ): Response<EventDto>
@@ -46,7 +59,7 @@ interface CalendarApi {
     @POST("calendar/v3/calendars/primary/events")
     suspend fun createBirthday(
         @Body birthday: BirthdayDto
-    ): Response<EventDto>
+    ): Response<BirthdayDto>
 }
 
 data class EventListResponse(

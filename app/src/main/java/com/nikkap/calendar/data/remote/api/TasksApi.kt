@@ -9,16 +9,18 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface TasksApi {
-
     @GET("tasks/v1/lists/{taskListId}/tasks")
     suspend fun getTasks(
         @Path("taskListId") taskListId: String,
+        @Query("updatedMin") updatedMin: String?,
         @Query("showCompleted") showCompleted: Boolean = true,
         @Query("showHidden") showHidden: Boolean = true,
+        @Query("showDeleted") showDeleted: Boolean = true,
     ): Response<TasksListResponse>
 
     @POST("tasks/v1/lists/{tasklist}/tasks")
@@ -36,6 +38,8 @@ interface TasksApi {
 
     @GET("tasks/v1/users/@me/lists")
     suspend fun getTaskLists(
+        @Query("updatedMin") updatedMin: String?,
+        @Query("maxResults") maxResults: Int? = 100,
     ): Response<TaskListsResponse>
 
     @DELETE("tasks/v1/lists/{taskListId}/tasks/{taskId}")
@@ -43,6 +47,42 @@ interface TasksApi {
         @Path("taskListId") taskListId: String = "@default",
         @Path("taskId") taskId: String
     ): Response<Unit>
+
+    @POST("tasks/v1/users/@me/lists")
+    suspend fun createTaskList(
+        @Body taskList: TaskListDto
+    ): Response<TaskListDto>
+
+    @PUT("tasks/v1/users/@me/lists/{tasklist}")
+    suspend fun updateTaskList(
+        @Path("tasklist") taskListId: String,
+        @Body taskList: TaskListDto
+    ): Response<TaskListDto>
+
+    @DELETE("tasks/v1/users/@me/lists/{tasklist}")
+    suspend fun deleteTaskList(
+        @Path("tasklist") taskListId: String
+    ): Response<Unit>
+
+    @POST("lists/{tasklist}/tasks")
+    suspend fun createSubtask(
+        @Path("tasklist") taskListId: String,
+        @Body subtask: TaskDto
+    ): Response<TaskDto>
+
+    @PUT("lists/{tasklist}/tasks/{task}")
+    suspend fun updateSubtask(
+        @Path("tasklist") taskListId: String,
+        @Path("task") subtaskId: String,
+        @Body subtask: TaskDto
+    ): Response<TaskDto>
+
+    @DELETE("lists/{tasklist}/tasks/{task}")
+    suspend fun deleteSubtask(
+        @Path("tasklist") taskListId: String,
+        @Path("task") subtaskId: String
+    ): Response<Unit>
+
 }
 
 data class TasksListResponse(
