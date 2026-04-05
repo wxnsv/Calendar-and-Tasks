@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface CalendarRepository {
     suspend fun syncCalendar(): Result<Unit>
-    suspend fun haveLocalData(): Boolean
     val allEvents: Flow<List<Event>>
     val allBirthdays: Flow<List<Birthday>>
     suspend fun getEvent(id: String): Event

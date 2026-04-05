@@ -6,8 +6,7 @@ import com.nikkap.calendar.domain.model.TaskList
 import kotlinx.coroutines.flow.Flow
 
 interface TaskRepository {
-    suspend fun syncTasks(): Result<Unit>
-    suspend fun haveLocalData(): Boolean
+    suspend fun syncAllTasks(): Result<Unit>
     val allTasks: Flow<List<Task>>
     val allSubtasks: Flow<List<Subtask>>
     val allTaskLists: Flow<List<TaskList>>
