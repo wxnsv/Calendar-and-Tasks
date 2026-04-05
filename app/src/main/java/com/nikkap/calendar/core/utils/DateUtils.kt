@@ -3,6 +3,7 @@ package com.nikkap.calendar.core.utils
 import com.nikkap.calendar.data.remote.dto.CalendarItemDateTime
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
@@ -54,6 +55,13 @@ fun Long.toIsoDate(): String {
     return DateTimeFormatter.ISO_INSTANT.format(instant)
 }
 
+fun Long?.toRfc3339(): String? {
+    return if (this != null) Instant.ofEpochMilli(this)
+        .atOffset(ZoneOffset.UTC)
+        .format(DateTimeFormatter.ISO_INSTANT)
+    else null
+}
+
 fun Long.toIsoDateAllDay(): String {
     val instant = Instant.ofEpochMilli(this)
 
@@ -76,9 +84,13 @@ fun Long?.toDate(): String {
         .format(formatter)
 }
 
-fun calendarDateFormatter(isAllDay: Boolean, timeStamp: Long): CalendarItemDateTime {
-    return if (isAllDay) CalendarItemDateTime(
+fun calendarDateFormatter(isAllDay: Boolean, timeStamp: Long?): CalendarItemDateTime {
+    return if (isAllDay && timeStamp != null) CalendarItemDateTime(
         dateTime = null,
         date = timeStamp.toIsoDateAllDay()
-    ) else CalendarItemDateTime(dateTime = timeStamp.toIsoDate(), date = null)
+    ) else if (!isAllDay && timeStamp != null) CalendarItemDateTime(
+        dateTime = timeStamp.toIsoDate(),
+        date = null
+    )
+    else CalendarItemDateTime(dateTime = null, date = null)
 }
