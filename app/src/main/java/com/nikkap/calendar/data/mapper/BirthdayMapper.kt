@@ -13,8 +13,7 @@ fun BirthdayDto.toBirthdayEntity(): BirthdayEntity {
     return BirthdayEntity(
         id = id,
         name = cleanName,
-        date = parseIsoDate(start.date),
-        isSynced = true,
+        date = parseIsoDate(start.date, true),
         pendingAction = PendingActions.NONE,
         lastModified = parseIsoDate(updated)
     )
@@ -28,13 +27,41 @@ fun BirthdayEntity.toBirthday(): Birthday {
     )
 }
 
-fun Birthday.toBirthdayEntity(): BirthdayEntity {
+fun BirthdayEntity.toBirthdayDto(): BirthdayDto {
+    return BirthdayDto(
+        id = id,
+        summary = name,
+        start = BirthdayItemDateTime(date.toIsoDate()),
+        updated = lastModified.toIsoDate()
+    )
+}
+
+fun BirthdayEntity.changePendingAction(pendingAction: PendingActions): BirthdayEntity {
+    return BirthdayEntity(
+        id = id,
+        name = name,
+        date = date,
+        pendingAction = pendingAction,
+        lastModified = lastModified
+    )
+}
+
+fun BirthdayEntity.synchronize(lastModified: Long? = null): BirthdayEntity {
+    return BirthdayEntity(
+        id = id,
+        name = name,
+        date = date,
+        pendingAction = PendingActions.NONE,
+        lastModified = lastModified ?: System.currentTimeMillis(),
+    )
+}
+
+fun Birthday.toBirthdayEntity(pendingAction: PendingActions): BirthdayEntity {
     return BirthdayEntity(
         id = id!!,
         name = name,
         date = date!!,
-        isSynced = false,
-        pendingAction = PendingActions.INSERT,
+        pendingAction = pendingAction,
         lastModified = System.currentTimeMillis()
     )
 }
@@ -42,11 +69,11 @@ fun Birthday.toBirthdayEntity(): BirthdayEntity {
 fun Birthday.toBirthdayDto(): BirthdayDto {
     return BirthdayDto(
         id = id!!,
-        name = name,
+        summary = name,
         start = BirthdayItemDateTime(date = date!!.toIsoDate())
     )
 }
 
 
 val BirthdayDto.cleanName: String?
-    get() = name?.trimBirthdaySuffix()
+    get() = summary?.trimBirthdaySuffix()

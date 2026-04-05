@@ -1,13 +1,12 @@
 package com.nikkap.calendar.data.mapper
 
 import com.nikkap.calendar.core.utils.parseIsoDate
+import com.nikkap.calendar.core.utils.toIsoDate
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.TaskEntity
-import com.nikkap.calendar.data.local.entity.TaskListEntity
 import com.nikkap.calendar.data.remote.dto.TaskDto
-import com.nikkap.calendar.data.remote.dto.TaskListDto
 import com.nikkap.calendar.domain.model.Task
-import com.nikkap.calendar.domain.model.TaskList
+import kotlin.time.Instant
 
 fun Task.toTaskDto(): TaskDto {
     return TaskDto(
@@ -15,7 +14,7 @@ fun Task.toTaskDto(): TaskDto {
         title = title,
         status = if (isCompleted) "completed" else "needsAction",
         notes = notes,
-        deadline = deadline?.let { kotlin.time.Instant.fromEpochMilliseconds(deadline) }.toString(),
+        deadline = deadline?.let { Instant.fromEpochMilliseconds(deadline) }.toString(),
     )
 }
 fun TaskDto.toTask(): Task {
@@ -46,7 +45,6 @@ fun Task.toTaskEntity(pendingAction: PendingActions): TaskEntity {
         deadline = deadline,
         isCompleted = isCompleted,
         taskListId = taskListId,
-        isSynced = false,
         pendingAction = pendingAction,
         lastModified = System.currentTimeMillis(),
     )
@@ -60,36 +58,68 @@ fun TaskDto.toTaskEntity(taskListId: String): TaskEntity {
         isCompleted = isCompleted,
         deadline = dateLong,
         taskListId = taskListId,
-        isSynced = true,
         pendingAction = PendingActions.NONE,
         lastModified = parseIsoDate(updated)
     )
 }
 
-
-
-fun TaskListDto.toTaskList(): TaskList {
-    return TaskList(
+fun TaskDto.toDeletedTaskEntity(taskListId: String): TaskEntity {
+    return TaskEntity(
         id = id,
-        title = title
+        title = title,
+        notes = notes,
+        isCompleted = isCompleted,
+        deadline = dateLong,
+        taskListId = taskListId,
+        pendingAction = PendingActions.DELETE,
+        lastModified = parseIsoDate(updated)
     )
 }
 
-fun TaskListDto.toTaskListEntity(): TaskListEntity {
-    return TaskListEntity(
+fun TaskEntity.toTaskDto(): TaskDto {
+    return TaskDto(
         id = id,
-        title = title
+        title = title,
+        notes = notes,
+        status = isCompletedString,
+        deadline = deadline?.toIsoDate(), // TODO (IS ALL DAY?)
+        parent = null,
+        position = null,
+        updated = lastModified.toIsoDate(),
     )
 }
 
-fun TaskListEntity.toTaskList(): TaskList {
-    return TaskList(
+fun TaskEntity.synchronize(lastModified: Long? = null): TaskEntity {
+    return TaskEntity(
         id = id,
-        title = title
+        title = title,
+        notes = notes,
+        isCompleted = isCompleted,
+        deadline = deadline,
+        taskListId = taskListId,
+        pendingAction = PendingActions.NONE,
+        lastModified = lastModified ?: System.currentTimeMillis()
     )
 }
+
+fun TaskEntity.changePendingAction(pendingAction: PendingActions): TaskEntity {
+    return TaskEntity(
+        id = id,
+        title = title,
+        notes = notes,
+        isCompleted = isCompleted,
+        deadline = deadline,
+        taskListId = taskListId,
+        pendingAction = pendingAction,
+        lastModified = lastModified
+    )
+}
+
 
 val TaskDto.dateLong: Long?
     get() = deadline?.let { parseIsoDate(it) }
 val TaskDto.isCompleted: Boolean
     get() = status == "completed"
+
+val TaskEntity.isCompletedString: String
+    get() = if (isCompleted) "completed" else "needsAction"

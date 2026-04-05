@@ -2,6 +2,7 @@ package com.nikkap.calendar.data.mapper
 
 import com.nikkap.calendar.core.utils.calendarDateFormatter
 import com.nikkap.calendar.core.utils.parseIsoDate
+import com.nikkap.calendar.core.utils.toIsoDate
 import com.nikkap.calendar.data.local.entity.EventEntity
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.remote.dto.EventDto
@@ -30,11 +31,10 @@ fun Event.toEventEntity(): EventEntity {
         startTimestamp = startTimestamp,
         endTimestamp = endTimestamp,
         isAllDay = isAllDay,
-        colorHex = colorHex,
+        colorId = colorHex,
         status = status.name,
-        isSynced = false,
-        pendingAction = PendingActions.INSERT,
-        lastModified = System.currentTimeMillis(),
+        pendingAction = PendingActions.NONE,
+        lastModified = System.currentTimeMillis()
     )
 }
 
@@ -46,8 +46,51 @@ fun EventEntity.toEvent(): Event {
         startTimestamp = startTimestamp,
         endTimestamp = endTimestamp!!,
         isAllDay = isAllDay,
-        colorHex = colorHex,
+        colorHex = colorId,
         status = EventStatus.valueOf(status?.uppercase() ?: ""),
+    )
+}
+
+fun EventEntity.toEventDto(): EventDto {
+    return EventDto(
+        id = id,
+        summary = summary,
+        description = description,
+        start = calendarDateFormatter(isAllDay, startTimestamp),
+        end = calendarDateFormatter(isAllDay, endTimestamp),
+        updated = lastModified.toIsoDate(),
+        colorId = colorId,
+        status = status
+    )
+}
+
+fun EventEntity.synchronize(lastModified: Long? = null): EventEntity {
+    return EventEntity(
+        id = id,
+        summary = summary ?: "(No title)",
+        description = description,
+        startTimestamp = startTimestamp,
+        endTimestamp = endTimestamp!!,
+        isAllDay = isAllDay,
+        colorId = colorId,
+        status = status,
+        pendingAction = PendingActions.NONE,
+        lastModified = lastModified ?: System.currentTimeMillis(),
+    )
+}
+
+fun EventEntity.changePendingAction(pendingAction: PendingActions): EventEntity {
+    return EventEntity(
+        id = id,
+        summary = summary ?: "(No title)",
+        description = description,
+        startTimestamp = startTimestamp,
+        endTimestamp = endTimestamp!!,
+        isAllDay = isAllDay,
+        colorId = colorId,
+        status = status,
+        pendingAction = pendingAction,
+        lastModified = lastModified,
     )
 }
 
@@ -72,9 +115,8 @@ fun EventDto.toEventEntity(): EventEntity {
         startTimestamp = startTimestamp,
         endTimestamp = endTimestamp,
         isAllDay = isAllDay,
-        colorHex = colorId,
+        colorId = colorId,
         status = status,
-        isSynced = true,
         pendingAction = PendingActions.NONE,
         lastModified = parseIsoDate(updated),
     )
