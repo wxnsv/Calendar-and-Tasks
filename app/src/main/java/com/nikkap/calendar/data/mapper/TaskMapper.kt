@@ -63,19 +63,6 @@ fun TaskDto.toTaskEntity(taskListId: String): TaskEntity {
     )
 }
 
-fun TaskDto.toDeletedTaskEntity(taskListId: String): TaskEntity {
-    return TaskEntity(
-        id = id,
-        title = title,
-        notes = notes,
-        isCompleted = isCompleted,
-        deadline = dateLong,
-        taskListId = taskListId,
-        pendingAction = PendingActions.DELETE,
-        lastModified = parseIsoDate(updated)
-    )
-}
-
 fun TaskEntity.toTaskDto(): TaskDto {
     return TaskDto(
         id = id,
