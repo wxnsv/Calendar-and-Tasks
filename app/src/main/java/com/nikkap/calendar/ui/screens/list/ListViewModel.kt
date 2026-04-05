@@ -1,11 +1,16 @@
 package com.nikkap.calendar.ui.screens.list
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.nikkap.calendar.data.worker.SyncWorker
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -68,19 +73,25 @@ class ListViewModel(
         _state.update { it.copy(isMenuExpanded = !it.isMenuExpanded) }
     }
 
-    fun refreshData() {
+    fun refreshData(context: Context) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            withContext(Dispatchers.IO) { syncAll() }
+            withContext(Dispatchers.IO) { syncAll(context) }
             _state.update { it.copy(isLoading = false) }
         }
     }
 
-    suspend fun syncAll() = coroutineScope {
-        val calendarStatus = async { calendarRepository.syncCalendar() }
-        val tasksStatus = async { taskRepository.syncTasks() }
+    suspend fun syncAll(context: Context) = coroutineScope {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
 
-        calendarStatus.await()
-        tasksStatus.await()
+        val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(
+            syncRequest
+        )
     }
 }

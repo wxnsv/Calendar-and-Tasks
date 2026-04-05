@@ -66,7 +66,7 @@ class ListFragment : Fragment(R.layout.list_fragment) {
 
     private fun setupListeners() {
         binding.listSwipeRef.setOnRefreshListener {
-            viewModel.refreshData()
+            viewModel.refreshData(requireContext())
         }
 
         binding.scrim.setOnClickListener { viewModel.toggleMenu() }
