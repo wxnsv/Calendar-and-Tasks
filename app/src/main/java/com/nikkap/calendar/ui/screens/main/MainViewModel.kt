@@ -18,9 +18,12 @@ import com.nikkap.calendar.domain.repository.TaskRepository
 import com.nikkap.calendar.ui.navigation.NavEvent
 import com.nikkap.calendar.ui.navigation.NavigationTarget
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
@@ -38,6 +41,9 @@ class MainViewModel(
         userPrefRepository.userStateFlow.first()
     }
 
+    init {
+        if (prefs.isAuthorized) startActiveSync()
+    }
 
     fun checkAuthAndNavigate(context: Context) {
         val isFirst = prefs.isFirstLaunch
@@ -66,6 +72,29 @@ class MainViewModel(
 
     }
 
+    fun popBackStack() {
+        viewModelScope.launch {
+            _navigationEvent.send(
+                NavEvent.PopBack
+            )
+        }
+    }
+
+    private fun startActiveSync() {
+        viewModelScope.launch {
+
+            while (isActive) {
+                val tasksDeferred = async { tasksRepository.syncAllTasks() }
+                val calendarDeferred = async { calendarRepository.syncCalendar() }
+
+                tasksDeferred.await()
+                calendarDeferred.await()
+
+                delay(3 * 60 * 1000L)
+            }
+        }
+    }
+
     fun authorizeSuccess(context: Context) {
         viewModelScope.launch {
             userPrefRepository.completeFirstLaunch()
@@ -74,7 +103,6 @@ class MainViewModel(
                     NavigationTarget.List
                 )
             )
-
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
