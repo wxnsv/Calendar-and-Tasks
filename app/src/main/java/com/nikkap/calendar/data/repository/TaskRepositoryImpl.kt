@@ -54,16 +54,16 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun saveTask(task: Task) {
+        dao.insertTask(task.toTaskEntity().changePendingAction(PendingActions.INSERT))
         api.createTask(taskDto = task.toTaskDto())
-        dao.insertTask(task.toTaskEntity(PendingActions.INSERT))
     }
 
     override suspend fun updateTask(task: Task) {
+        dao.updateTask(task.toTaskEntity().changePendingAction(PendingActions.UPDATE))
         api.updateTask(
             task = task.toTaskDto(),
             taskId = task.id!!
         )
-        dao.updateTask(task.toTaskEntity(PendingActions.UPDATE))
     }
 
     private suspend fun getRemoteTaskLists(lastSyncTime: String?): Result<List<TaskListDto>?> {
@@ -75,8 +75,7 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun syncAllTasks(): Result<Unit> = try {
-        val tasksSyncTime =
-            userPrefRepository.taskSyncTime.first()?.toRfc3339()
+        val tasksSyncTime = userPrefRepository.taskSyncTime.first()?.toRfc3339()
         val listsPendingResult = tasklistsPendingSync()
 
         if (listsPendingResult.isFailure) {

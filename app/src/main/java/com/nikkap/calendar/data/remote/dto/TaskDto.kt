@@ -14,7 +14,7 @@ data class TaskDto(
     @field:Json(name = "notes")
     val notes: String? = null,
     @field:Json(name = "due")
-    val deadline: String?,
+    val due: String?,
     @field:Json(name = "parent")
     val parent: String? = null,
     @field:Json(name = "position")
