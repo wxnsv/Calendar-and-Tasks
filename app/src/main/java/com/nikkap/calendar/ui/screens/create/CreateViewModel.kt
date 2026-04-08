@@ -9,10 +9,12 @@ import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,6 +41,9 @@ class CreateViewModel(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = CreateState()
     )
+
+    private val _errorEvents = Channel<String>()
+    val errorEvents = _errorEvents.receiveAsFlow()
 
     fun onIntent(intent: CreateIntent) {
         when (intent) {
@@ -105,14 +110,6 @@ class CreateViewModel(
                 )
             }
 
-            is CreateTaskIntent.UpdateIsAllDay -> _state.update {
-                it.copy(
-                    taskDraft = it.taskDraft.copy(
-                        isAllDay = intent.isAllDay
-                    )
-                )
-            }
-
             is CreateTaskIntent.UpdateDeadline -> _state.update {
                 it.copy(
                     taskDraft = it.taskDraft.copy(
@@ -127,7 +124,6 @@ class CreateViewModel(
                     val taskToSave = task.copy(
                         id = task.id ?: UUID.randomUUID().toString().replace("-", ""),
                         title = state.value.title,
-                        timestamp = state.value.taskDraft.timestamp.plus(state.value.taskTime)
                     )
                     _state.update { it.copy(isLoading = true) }
                     if (state.value.isEditing) taskRepository.updateTask(taskToSave)
@@ -149,24 +145,6 @@ class CreateViewModel(
                     )
                 }
             }
-
-            is CreateTaskIntent.UpdateTime -> {
-                _state.update {
-                    it.copy(
-                        taskTime = intent.time
-                    )
-                }
-            }
-
-            is CreateTaskIntent.UpdateDate -> {
-                _state.update {
-                    it.copy(
-                        taskDraft = it.taskDraft.copy(
-                            timestamp = intent.date
-                        )
-                    )
-                }
-            }
         }
     }
 
@@ -175,16 +153,26 @@ class CreateViewModel(
             CreateEventIntent.SaveEvent -> {
                 viewModelScope.launch {
                     val event = state.value.eventDraft
+
+                    val startTimestamp =
+                        if (!event.isAllDay) state.value.eventDraft.startTimestamp + state.value.eventStartTime
+                        else state.value.eventDraft.startTimestamp
+
+                    val endTimestamp =
+                        if (!event.isAllDay) state.value.eventDraft.endTimestamp + state.value.eventEndTime
+                        else state.value.eventDraft.endTimestamp
+
                     val eventToSave = event.copy(
                         id = event.id ?: UUID.randomUUID().toString().replace("-", ""),
                         summary = state.value.title,
-                        startTimestamp = state.value.eventDraft.startTimestamp + state.value.eventStartTime,
-                        endTimestamp = state.value.eventDraft.endTimestamp + state.value.eventEndTime
+                        startTimestamp = startTimestamp,
+                        endTimestamp = endTimestamp
                     )
                     _state.update { it.copy(isLoading = true) }
                     if (state.value.isEditing) calendarRepository.updateEvent(eventToSave)
                     else calendarRepository.saveEvent(eventToSave)
                     _state.update { it.copy(isLoading = false) }
+
                 }
             }
 
@@ -281,5 +269,82 @@ class CreateViewModel(
                 }
             }
         }
+    }
+
+    fun saveItemResult(): Result<Unit> {
+        val state = state.value
+        when (state.activeType) {
+            is Task -> {
+                val task = state.taskDraft
+                if (state.title == null || state.title == "") {
+                    viewModelScope.launch {
+                        _errorEvents.send("Title cant be empty")
+                    }
+                    return Result.failure(Exception("Title cant be empty"))
+                }
+                if (state.title.length > 1024) {
+                    viewModelScope.launch {
+                        _errorEvents.send("Title is too long")
+                    }
+                    return Result.failure(Exception("Title is too long"))
+                }
+                if ((task.notes?.length ?: 0) > 8192) {
+                    viewModelScope.launch {
+                        _errorEvents.send("Description is too long")
+                    }
+                    return Result.failure(Exception("Description is too long"))
+                } else {
+                    onTaskIntent(CreateTaskIntent.SaveTask)
+                }
+            }
+
+            is Event -> {
+                val event = state.eventDraft
+                if (state.title == null || state.title == "") {
+                    viewModelScope.launch {
+                        _errorEvents.send("Title cant be empty")
+                    }
+                    return Result.failure(Exception("Title cant be empty"))
+                }
+                if (state.title.length > 1024) {
+                    viewModelScope.launch {
+                        _errorEvents.send("Title is too long")
+                    }
+                    return Result.failure(Exception("Title is too long"))
+                }
+                if ((event.description?.length ?: 0) > 8192) {
+                    viewModelScope.launch {
+                        _errorEvents.send("Description is too long")
+                    }
+                    return Result.failure(Exception("Description is too long"))
+                }
+                if (!event.isAllDay && event.startTimestamp + state.eventStartTime > event.endTimestamp + state.eventEndTime) {
+                    viewModelScope.launch {
+                        _errorEvents.send("Event start cant be later than end")
+                    }
+                    return Result.failure(Exception("Event start cant be later than end"))
+                } else {
+                    onEventIntent(CreateEventIntent.SaveEvent)
+                }
+            }
+
+            is Birthday -> {
+                if (state.title == null || state.title == "") {
+                    viewModelScope.launch {
+                        _errorEvents.send("Name cant be empty")
+                    }
+                    return Result.failure(Exception("Name cant be empty"))
+                }
+                if (state.title.length > 1024) {
+                    viewModelScope.launch {
+                        _errorEvents.send("Name is too long")
+                    }
+                    return Result.failure(Exception("Name is too long"))
+                } else {
+                    onBirthdayIntent(CreateBirthdayIntent.SaveBirthday)
+                }
+            }
+        }
+        return Result.success(Unit)
     }
 }

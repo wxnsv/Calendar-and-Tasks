@@ -51,14 +51,14 @@ class CalendarRepositoryImpl(
     }
 
     override suspend fun saveEvent(event: Event) {
-        dao.insertEvent(event.toEventEntity())
+        dao.insertEvent(event.toEventEntity().changePendingAction(PendingActions.INSERT))
         api.createEvent(
             event = event.toEventDto(),
         )
     }
 
     override suspend fun updateBirthday(birthday: Birthday) {
-        dao.updateBirthday(birthday.toBirthdayEntity(PendingActions.UPDATE))
+        dao.updateBirthday(birthday.toBirthdayEntity().changePendingAction(PendingActions.UPDATE))
         api.updateBirthday(
             birthday = birthday.toBirthdayDto(),
             birthdayId = birthday.id!!
@@ -66,7 +66,7 @@ class CalendarRepositoryImpl(
     }
 
     override suspend fun updateEvent(event: Event) {
-        dao.updateEvent(event.toEventEntity())
+        dao.updateEvent(event.toEventEntity().changePendingAction(PendingActions.UPDATE))
         api.updateEvent(
             event = event.toEventDto(),
             eventId = event.id!!
@@ -74,15 +74,16 @@ class CalendarRepositoryImpl(
     }
 
     override suspend fun saveBirthday(birthday: Birthday) {
-        dao.insertBirthday(birthday.toBirthdayEntity(PendingActions.INSERT))
+        dao.insertBirthday(birthday.toBirthdayEntity().changePendingAction(PendingActions.INSERT))
         api.createBirthday(birthday.toBirthdayDto())
     }
 
     override suspend fun syncCalendar(): Result<Unit> = try {
         val calendarSyncTime = userPrefRepository.calendarSyncTime.first()?.toRfc3339()
         val timeMin = Clock.System.now()
-            .minus(3, DateTimeUnit.YEAR, TimeZone.UTC)
+            .minus(1, DateTimeUnit.YEAR, TimeZone.UTC)
             .toString()
+
         coroutineScope {
             val eventPendingResult = async { eventsPendingSync() }
             val birthdayPendingResult = async { birthdaysPendingSync() }
