@@ -56,12 +56,12 @@ fun BirthdayEntity.synchronize(lastModified: Long? = null): BirthdayEntity {
     )
 }
 
-fun Birthday.toBirthdayEntity(pendingAction: PendingActions): BirthdayEntity {
+fun Birthday.toBirthdayEntity(): BirthdayEntity {
     return BirthdayEntity(
         id = id!!,
         name = name,
         date = date!!,
-        pendingAction = pendingAction,
+        pendingAction = PendingActions.NONE,
         lastModified = System.currentTimeMillis()
     )
 }

@@ -14,7 +14,7 @@ fun Task.toTaskDto(): TaskDto {
         title = title,
         status = if (isCompleted) "completed" else "needsAction",
         notes = notes,
-        deadline = deadline?.let { Instant.fromEpochMilliseconds(deadline) }.toString(),
+        due = deadline?.let { Instant.fromEpochMilliseconds(deadline) }.toString(),
     )
 }
 fun TaskDto.toTask(): Task {
@@ -37,7 +37,7 @@ fun TaskEntity.toTask(): Task {
     )
 }
 
-fun Task.toTaskEntity(pendingAction: PendingActions): TaskEntity {
+fun Task.toTaskEntity(): TaskEntity {
     return TaskEntity(
         id = id!!,
         title = title,
@@ -45,7 +45,7 @@ fun Task.toTaskEntity(pendingAction: PendingActions): TaskEntity {
         deadline = deadline,
         isCompleted = isCompleted,
         taskListId = taskListId,
-        pendingAction = pendingAction,
+        pendingAction = PendingActions.NONE,
         lastModified = System.currentTimeMillis(),
     )
 }
@@ -69,7 +69,7 @@ fun TaskEntity.toTaskDto(): TaskDto {
         title = title,
         notes = notes,
         status = isCompletedString,
-        deadline = deadline?.toIsoDate(), // TODO (IS ALL DAY?)
+        due = deadline?.toIsoDate(), // TODO (IS ALL DAY?)
         parent = null,
         position = null,
         updated = lastModified.toIsoDate(),
@@ -104,7 +104,7 @@ fun TaskEntity.changePendingAction(pendingAction: PendingActions): TaskEntity {
 
 
 val TaskDto.dateLong: Long?
-    get() = deadline?.let { parseIsoDate(it) }
+    get() = due?.let { parseIsoDate(it, true) }
 val TaskDto.isCompleted: Boolean
     get() = status == "completed"
 

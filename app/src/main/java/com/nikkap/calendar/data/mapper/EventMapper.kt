@@ -1,6 +1,6 @@
 package com.nikkap.calendar.data.mapper
 
-import com.nikkap.calendar.core.utils.calendarDateFormatter
+import com.nikkap.calendar.core.utils.eventIsAllDayFormatter
 import com.nikkap.calendar.core.utils.parseIsoDate
 import com.nikkap.calendar.core.utils.toIsoDate
 import com.nikkap.calendar.data.local.entity.EventEntity
@@ -16,7 +16,7 @@ fun EventDto.toEvent(): Event {
         summary = summary,
         description = description,
         startTimestamp = startTimestamp,
-        endTimestamp = endTimestamp!!,
+        endTimestamp = endTimestamp,
         isAllDay = isAllDay,
         colorHex = colorId,
         status = statusType,
@@ -44,7 +44,7 @@ fun EventEntity.toEvent(): Event {
         summary = summary ?: "(No title)",
         description = description,
         startTimestamp = startTimestamp,
-        endTimestamp = endTimestamp!!,
+        endTimestamp = endTimestamp,
         isAllDay = isAllDay,
         colorHex = colorId,
         status = EventStatus.valueOf(status?.uppercase() ?: ""),
@@ -52,12 +52,13 @@ fun EventEntity.toEvent(): Event {
 }
 
 fun EventEntity.toEventDto(): EventDto {
+    val (start, end) = eventIsAllDayFormatter(startTimestamp, endTimestamp, isAllDay)
     return EventDto(
         id = id,
         summary = summary,
         description = description,
-        start = calendarDateFormatter(isAllDay, startTimestamp),
-        end = calendarDateFormatter(isAllDay, endTimestamp),
+        start = start,
+        end = end,
         updated = lastModified.toIsoDate(),
         colorId = colorId,
         status = status
@@ -70,7 +71,7 @@ fun EventEntity.synchronize(lastModified: Long? = null): EventEntity {
         summary = summary ?: "(No title)",
         description = description,
         startTimestamp = startTimestamp,
-        endTimestamp = endTimestamp!!,
+        endTimestamp = endTimestamp,
         isAllDay = isAllDay,
         colorId = colorId,
         status = status,
@@ -85,7 +86,7 @@ fun EventEntity.changePendingAction(pendingAction: PendingActions): EventEntity 
         summary = summary ?: "(No title)",
         description = description,
         startTimestamp = startTimestamp,
-        endTimestamp = endTimestamp!!,
+        endTimestamp = endTimestamp,
         isAllDay = isAllDay,
         colorId = colorId,
         status = status,
@@ -95,16 +96,18 @@ fun EventEntity.changePendingAction(pendingAction: PendingActions): EventEntity 
 }
 
 fun Event.toEventDto(): EventDto {
+    val (start, end) = eventIsAllDayFormatter(startTimestamp, endTimestamp, isAllDay)
     return EventDto(
         id = id!!,
         summary = summary,
         description = description,
-        start = calendarDateFormatter(isAllDay, startTimestamp),
-        end = calendarDateFormatter(isAllDay, endTimestamp),
+        start = end,
+        end = start,
         updated = null,
         colorId = colorHex,
         status = status.name.lowercase(Locale.ROOT),
     )
+
 }
 
 fun EventDto.toEventEntity(): EventEntity {
@@ -124,14 +127,16 @@ fun EventDto.toEventEntity(): EventEntity {
 
 val EventDto.startTimestamp: Long
     get() = parseIsoDate(
-        (start.dateTime ?: start.date).toString(),
+        (start.dateTime ?: start.date),
         start.dateTime == null
     )
 
-val EventDto.endTimestamp: Long?
-    get() = end?.let {
-        parseIsoDate((it.dateTime ?: it.date).toString(), it.dateTime == null)
-    }
+val EventDto.endTimestamp: Long
+    get() = parseIsoDate(
+        (end.dateTime ?: end.date),
+        end.dateTime == null
+    )
+
 
 val EventDto.isAllDay: Boolean
     get() = start.dateTime == null

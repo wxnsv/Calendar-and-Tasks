@@ -19,7 +19,7 @@ data class EventEntity(
     @ColumnInfo("startTimestamp")
     val startTimestamp: Long,
     @ColumnInfo("endTimestamp")
-    val endTimestamp: Long?,
+    val endTimestamp: Long,
     @ColumnInfo("isAllDay")
     val isAllDay: Boolean,
     @ColumnInfo("colorHex")

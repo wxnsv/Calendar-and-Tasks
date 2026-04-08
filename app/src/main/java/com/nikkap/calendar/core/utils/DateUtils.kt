@@ -84,13 +84,45 @@ fun Long?.toDate(): String {
         .format(formatter)
 }
 
-fun calendarDateFormatter(isAllDay: Boolean, timeStamp: Long?): CalendarItemDateTime {
-    return if (isAllDay && timeStamp != null) CalendarItemDateTime(
+private fun eventDateFormatter(isAllDay: Boolean, timeStamp: Long): CalendarItemDateTime {
+    return if (isAllDay) CalendarItemDateTime(
         dateTime = null,
         date = timeStamp.toIsoDateAllDay()
-    ) else if (!isAllDay && timeStamp != null) CalendarItemDateTime(
+    ) else CalendarItemDateTime(
         dateTime = timeStamp.toIsoDate(),
         date = null
     )
-    else CalendarItemDateTime(dateTime = null, date = null)
+}
+
+fun eventIsAllDayFormatter(
+    startTimestamp: Long,
+    endTimestamp: Long,
+    isAllDay: Boolean
+): Pair<CalendarItemDateTime, CalendarItemDateTime> {
+    if (!isAllDay) return Pair(
+        eventDateFormatter(false, startTimestamp),
+        eventDateFormatter(false, endTimestamp)
+    )
+    val startDate =
+        Instant.ofEpochMilli(startTimestamp).atZone(ZoneId.systemDefault()).toLocalDate()
+    val endDate = Instant.ofEpochMilli(endTimestamp).atZone(ZoneId.systemDefault()).toLocalDate()
+    if (startDate == endDate) {
+        endDate.plusDays(1)
+    }
+    return Pair(
+        eventDateFormatter(
+            true,
+            startDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        ),
+        eventDateFormatter(
+            true,
+            endDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        )
+    )
+}
+
+fun Long.toCalendar(): Calendar {
+    return Calendar.getInstance().apply {
+        timeInMillis = this@toCalendar
+    }
 }

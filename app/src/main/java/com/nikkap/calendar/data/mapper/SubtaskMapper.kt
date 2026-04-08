@@ -52,7 +52,7 @@ fun SubtaskEntity.toTaskDto(): TaskDto {
         parent = parentId,
         position = position,
         updated = lastModified.toIsoDate(),
-        deadline = null,
+        due = null,
     )
 }
 
