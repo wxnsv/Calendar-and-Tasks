@@ -13,12 +13,9 @@ sealed interface CreateIntent {
 
 sealed interface CreateTaskIntent {
     data class UpdateDescription(val description: String) : CreateTaskIntent
-    data class UpdateIsAllDay(val isAllDay: Boolean) : CreateTaskIntent
     data class UpdateList(val taskList: TaskList) : CreateTaskIntent
     data class UpdateRepeat(val repeat: String) : CreateTaskIntent
     data class UpdateDeadline(val deadline: Long) : CreateTaskIntent
-    data class UpdateDate(val date: Long) : CreateTaskIntent
-    data class UpdateTime(val time: Long) : CreateTaskIntent
     object SaveTask : CreateTaskIntent
 }
 

@@ -6,51 +6,13 @@
     android:layout_height="match_parent"
     android:theme="@style/Theme.Material3.Dark.NoActionBar">
 
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/create_task_allDay_button"
-        style="@style/Button"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:checked="false"
-        android:text="All-day"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <LinearLayout
-        android:id="@+id/create_task_set_date_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="3"
-        app:layout_constraintTop_toBottomOf="@+id/create_task_allDay_button">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/create_task_set_date_button"
-            style="@style/Button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="Sun, Feb 1 2026"
-            app:layout_constraintTop_toBottomOf="@+id/create_task_allDay_button" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/create_task_set_time_button"
-            style="@style/Button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_weight="1"
-            android:text="20:00" />
-
-    </LinearLayout>
-
     <com.google.android.material.button.MaterialButton
         android:id="@+id/create_task_deadline_button"
         style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add deadline"
-        app:layout_constraintTop_toBottomOf="@+id/create_task_set_date_container" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         style="@style/Divider"
@@ -80,7 +42,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Add details"
-        app:layout_constraintTop_toBottomOf="@+id/create_task_deadline_button" />
+        app:counterEnabled="true"
+        app:counterMaxLength="8192"
+        app:layout_constraintTop_toBottomOf="@+id/create_task_repeat_button" />
 
     <View
         style="@style/Divider"
@@ -105,11 +69,11 @@
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/create_task_description_edit_text"
-        android:textColor="@color/black"
         style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Add description"
+        android:textColor="@color/black"
         app:layout_constraintTop_toBottomOf="@+id/create_task_set_list_button" />
 
     <androidx.recyclerview.widget.RecyclerView

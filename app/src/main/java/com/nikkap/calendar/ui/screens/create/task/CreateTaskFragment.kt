@@ -13,17 +13,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nikkap.calendar.R
-import com.nikkap.calendar.core.utils.toDate
 import com.nikkap.calendar.core.utils.toListDate
-import com.nikkap.calendar.core.utils.toTime
 import com.nikkap.calendar.databinding.CreateTaskFragmentBinding
 import com.nikkap.calendar.domain.model.TaskList
-import com.nikkap.calendar.ui.renderCreateDateTime
 import com.nikkap.calendar.ui.screens.create.CreateState
 import com.nikkap.calendar.ui.screens.create.CreateTaskIntent
 import com.nikkap.calendar.ui.screens.create.CreateViewModel
 import com.nikkap.calendar.ui.showDatePicker
-import com.nikkap.calendar.ui.showTimePicker
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -62,20 +58,12 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
         binding.createTaskDetailsEditText.doAfterTextChanged {
             viewModel.onTaskIntent(CreateTaskIntent.UpdateDescription(it.toString()))
         }
-        binding.createTaskAllDayButton.setOnClickListener {
-            val isChecked = binding.createTaskAllDayButton.isChecked
-            viewModel.onTaskIntent(CreateTaskIntent.UpdateIsAllDay(isAllDay = isChecked))
-            renderCreateDateTime(
-                dateButton = binding.createTaskSetDateButton,
-                timeButton = binding.createTaskSetTimeButton,
-                container = binding.createTaskSetDateContainer,
-                isAllDay = isChecked
-            )
-        }
         binding.createTaskDeadlineButton.setOnClickListener {
+            val task = viewModel.state.value.taskDraft
             showDatePicker(
                 onClick = { viewModel.onTaskIntent(CreateTaskIntent.UpdateDeadline(it)) },
-                fragmentManager = parentFragmentManager
+                fragmentManager = parentFragmentManager,
+                task.deadline ?: System.currentTimeMillis()
             )
         }
         binding.createTaskSetListButton.setOnClickListener { view ->
@@ -85,22 +73,6 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
             } else {
                 showTaskListMenu(view, state.taskLists)
             }
-        }
-        binding.createTaskSetTimeButton.setOnClickListener {
-            showTimePicker(
-                onClick = {
-                    viewModel.onTaskIntent(CreateTaskIntent.UpdateTime(it))
-                },
-                requireContext()
-            )
-        }
-        binding.createTaskSetDateButton.setOnClickListener {
-            showDatePicker(
-                onClick = {
-                    viewModel.onTaskIntent(CreateTaskIntent.UpdateDate(it))
-                },
-                fragmentManager = parentFragmentManager,
-            )
         }
     }
 
@@ -117,12 +89,6 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
 
     private fun updateUi(state: CreateState) {
         val task = state.taskDraft
-        if (binding.createTaskSetDateButton.text != task.timestamp.toDate() && task.timestamp != 0L) {
-            binding.createTaskSetDateButton.text = task.timestamp.toDate()
-        }
-        if (binding.createTaskSetTimeButton.text != state.taskTime.toTime()) {
-            binding.createTaskSetTimeButton.text = state.taskTime.toTime()
-        }
         if (binding.createTaskDetailsEditText.text.toString() != task.notes) {
             binding.createTaskDetailsEditText.setText(task.notes)
         }
@@ -131,26 +97,10 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
             binding.createTaskSetListButton.text = state.selectedTaskList?.title
         }
 
-        if (binding.createTaskAllDayButton.isChecked != task.isCompleted) {
-            binding.createTaskAllDayButton.isChecked = task.isCompleted
-        }
-
         if (binding.createTaskDeadlineButton.text != state.taskDraft.deadline.toListDate() && state.taskDraft.deadline != null) {
             binding.createTaskDeadlineButton.text = state.taskDraft.deadline.toListDate()
         }
 
-        if (binding.createTaskSetDateButton.text != state.taskDraft.deadline.toListDate() && state.taskDraft.deadline != null) {
-            binding.createTaskSetDateButton.text = state.taskDraft.deadline.toListDate()
-        }
-        if (binding.createTaskAllDayButton.isChecked != task.isAllDay) {
-            binding.createTaskAllDayButton.isChecked = task.isAllDay
-            renderCreateDateTime(
-                dateButton = binding.createTaskSetDateButton,
-                timeButton = binding.createTaskSetTimeButton,
-                container = binding.createTaskSetDateContainer,
-                isAllDay = task.isAllDay
-            )
-        }
     }
 
     private fun showTaskListMenu(anchor: View, taskLists: List<TaskList>) {

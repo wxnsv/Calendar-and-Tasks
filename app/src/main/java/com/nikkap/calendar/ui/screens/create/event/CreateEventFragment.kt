@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nikkap.calendar.R
+import com.nikkap.calendar.core.utils.toCalendar
 import com.nikkap.calendar.core.utils.toDate
 import com.nikkap.calendar.core.utils.toTime
 import com.nikkap.calendar.databinding.CreateEventFragmentBinding
@@ -85,9 +86,11 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
             )
         }
         binding.createEventStartDateButton.setOnClickListener {
+            val event = viewModel.state.value.eventDraft
             showDatePicker(
                 onClick = { viewModel.onEventIntent(CreateEventIntent.UpdateStartDate(it)) },
-                fragmentManager = parentFragmentManager
+                fragmentManager = parentFragmentManager,
+                if (event.startTimestamp != 0L) event.startTimestamp else System.currentTimeMillis()
             )
         }
         binding.createEventStartTimeButton.setOnClickListener {
@@ -96,6 +99,7 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
                     viewModel.onEventIntent(CreateEventIntent.UpdateStartTime(it))
                 },
                 requireContext(),
+                viewModel.state.value.eventStartTime.toCalendar()
             )
         }
         binding.createEventEndTimeButton.setOnClickListener {
@@ -104,12 +108,15 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
                     viewModel.onEventIntent(CreateEventIntent.UpdateEndTime(it))
                 },
                 requireContext(),
+                viewModel.state.value.eventEndTime.toCalendar()
             )
         }
         binding.createEventEndDateButton.setOnClickListener {
+            val event = viewModel.state.value.eventDraft
             showDatePicker(
                 onClick = { viewModel.onEventIntent(CreateEventIntent.UpdateEndDate(it)) },
-                fragmentManager = parentFragmentManager
+                fragmentManager = parentFragmentManager,
+                if (event.endTimestamp != 0L) event.endTimestamp else System.currentTimeMillis()
             )
         }
         setupSetColorRecyclerView(

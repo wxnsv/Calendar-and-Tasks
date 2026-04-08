@@ -15,10 +15,10 @@ import com.nikkap.calendar.ui.screens.create.colorpicker.ColorPickerAdapter
 import com.nikkap.calendar.ui.screens.create.colorpicker.ColorPickerFadeDecoration
 import java.util.Calendar
 
-fun showDatePicker(onClick: (Long) -> Unit, fragmentManager: FragmentManager) {
+fun showDatePicker(onClick: (Long) -> Unit, fragmentManager: FragmentManager, dateLong: Long) {
     val datePicker = MaterialDatePicker.Builder.datePicker()
         .setTitleText("Set date")
-        .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+        .setSelection(dateLong)
         .build()
 
     datePicker.addOnPositiveButtonClickListener { selection ->
@@ -28,8 +28,7 @@ fun showDatePicker(onClick: (Long) -> Unit, fragmentManager: FragmentManager) {
     datePicker.show(fragmentManager, "DATE_PICKER")
 }
 
-fun showTimePicker(onClick: (Long) -> Unit, context: Context) {
-    val calendar = Calendar.getInstance()
+fun showTimePicker(onClick: (Long) -> Unit, context: Context, calendar: Calendar) {
     val hour = calendar.get(Calendar.HOUR_OF_DAY)
     val minute = calendar.get(Calendar.MINUTE)
 

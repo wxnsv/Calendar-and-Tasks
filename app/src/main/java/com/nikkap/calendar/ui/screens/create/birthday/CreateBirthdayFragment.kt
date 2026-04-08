@@ -76,9 +76,11 @@ class CreateBirthdayFragment : Fragment(R.layout.create_birthday_fragment) {
             popup.show()
         }
         binding.createBirthdayDateButton.setOnClickListener {
+            val birthday = viewModel.state.value.birthdayDraft
             showDatePicker(
                 onClick = { viewModel.onBirthdayIntent(CreateBirthdayIntent.UpdateDate(it)) },
-                fragmentManager = parentFragmentManager
+                fragmentManager = parentFragmentManager,
+                birthday.date ?: System.currentTimeMillis()
             )
         }
     }
@@ -86,7 +88,7 @@ class CreateBirthdayFragment : Fragment(R.layout.create_birthday_fragment) {
     private fun updateUi(state: CreateState) {
         val birthday = state.birthdayDraft
 
-        if (binding.createBirthdayDateButton.text != birthday.date!!.toDate() && birthday.date != 0L) {
+        if (binding.createBirthdayDateButton.text != birthday.date.toDate() && birthday.date != null) {
             binding.createBirthdayDateButton.text = birthday.date.toDate()
         }
     }
