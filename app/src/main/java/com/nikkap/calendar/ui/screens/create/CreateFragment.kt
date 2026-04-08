@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
@@ -19,6 +22,7 @@ import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.ui.screens.create.birthday.CreateBirthdayFragment
 import com.nikkap.calendar.ui.screens.create.event.CreateEventFragment
 import com.nikkap.calendar.ui.screens.create.task.CreateTaskFragment
+import com.nikkap.calendar.ui.screens.main.MainViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -28,6 +32,8 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
     private val binding get() = _binding!!
 
     private val viewModel: CreateViewModel by viewModel()
+
+    private val sharedViewModel: MainViewModel by activityViewModels()
 
     private val args: CreateFragmentArgs by navArgs()
 
@@ -44,22 +50,36 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
         initial()
         setupListeners()
         observeState()
+        observeErrors()
+    }
+
+    private fun observeErrors() {
+        lifecycleScope.launch {
+            viewModel.errorEvents.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { errorMessage ->
+
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 
     private fun updateNestedFragment(item: CalendarEntry) {
         val fragment = when (item) {
             is Task -> {
                 binding.createEditText.hint = "Add title"
+                viewModel.onIntent(CreateIntent.UpdateShowFragment(Task()))
                 CreateTaskFragment()
             }
 
             is Event -> {
                 binding.createEditText.hint = "Add title"
+                viewModel.onIntent(CreateIntent.UpdateShowFragment(Event()))
                 CreateEventFragment()
             }
 
             is Birthday -> {
                 binding.createEditText.hint = "Add name"
+                viewModel.onIntent(CreateIntent.UpdateShowFragment(Birthday()))
                 CreateBirthdayFragment()
             }
 
@@ -76,23 +96,26 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
     private fun setupListeners() {
         binding.createTaskButton.setOnClickListener {
             updateNestedFragment(viewModel.state.value.taskDraft)
+            viewModel.onIntent(CreateIntent.UpdateShowFragment(Task()))
         }
         binding.createEventButton.setOnClickListener {
             updateNestedFragment(viewModel.state.value.eventDraft)
+            viewModel.onIntent(CreateIntent.UpdateShowFragment(Event()))
         }
         binding.createBirthdayButton.setOnClickListener {
             updateNestedFragment(viewModel.state.value.birthdayDraft)
+            viewModel.onIntent(CreateIntent.UpdateShowFragment(Birthday()))
         }
         binding.createEditText.doAfterTextChanged {
             viewModel.onIntent(CreateIntent.UpdateTitle(it.toString()))
         }
         binding.createBackButton.setOnClickListener {
-
+            sharedViewModel.popBackStack()
         }
         binding.createSaveButton.setOnClickListener {
-            viewModel.onBirthdayIntent(CreateBirthdayIntent.SaveBirthday)
+            val result = viewModel.saveItemResult()
 
-//            TODO
+            if (result.isSuccess) sharedViewModel.popBackStack()
         }
     }
 
