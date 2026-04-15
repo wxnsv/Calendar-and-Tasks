@@ -65,12 +65,14 @@ android {
             )
         }
     }
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
 }
 
 dependencies {
 // Work
     implementation(libs.androidx.work.runtime.ktx)
-
 // Preferences
     implementation(libs.androidx.datastore.preferences)
 // Nav
@@ -101,6 +103,7 @@ dependencies {
 // Coroutines
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
+    testImplementation(libs.kotlinx.coroutines.test)
 // Credentials
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
@@ -115,6 +118,10 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.android)
     implementation("io.insert-koin:koin-androidx-workmanager:3.5.0")
+// Unit Test
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
+    testImplementation(libs.mockk)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -127,11 +134,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.recyclerview)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
+
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

@@ -6,7 +6,7 @@ import com.nikkap.calendar.core.utils.toIsoDateWithoutSeconds
 import com.nikkap.calendar.data.local.dao.CalendarDao
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.mapper.changePendingAction
-import com.nikkap.calendar.data.mapper.synchronize
+import com.nikkap.calendar.data.mapper.markAsSynchronized
 import com.nikkap.calendar.data.mapper.toBirthday
 import com.nikkap.calendar.data.mapper.toBirthdayDto
 import com.nikkap.calendar.data.mapper.toBirthdayEntity
@@ -23,10 +23,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
-import kotlin.time.Clock
 
 class CalendarRepositoryImpl(
     private val api: CalendarApi,
@@ -72,6 +68,8 @@ class CalendarRepositoryImpl(
             eventId = event.id!!
         )
     }
+
+//    TODO fun deleteEvent
 
     override suspend fun saveBirthday(birthday: Birthday) {
         dao.insertBirthday(birthday.toBirthdayEntity().changePendingAction(PendingActions.INSERT))
@@ -163,7 +161,7 @@ class CalendarRepositoryImpl(
                             if (result.isSuccessful
                             ) {
                                 dao.updateBirthday(
-                                    entity.synchronize(
+                                    entity.markAsSynchronized(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
@@ -174,7 +172,7 @@ class CalendarRepositoryImpl(
                             val result = api.createBirthday(entity.toBirthdayDto())
                             if (result.isSuccessful) {
                                 dao.insertBirthday(
-                                    entity.synchronize(
+                                    entity.markAsSynchronized(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
@@ -204,14 +202,14 @@ class CalendarRepositoryImpl(
                                 event = entity.toEventDto()
                             )
                             if (result.isSuccessful) {
-                                dao.updateEvent(entity.synchronize(parseIsoDate(result.body()?.updated)))
+                                dao.updateEvent(entity.markAsSynchronized(parseIsoDate(result.body()?.updated)))
                             }
                         }
 
                         PendingActions.INSERT -> {
                             val result = api.createEvent(entity.toEventDto())
                             if (result.isSuccessful) dao.updateEvent(
-                                entity.synchronize(parseIsoDate(result.body()?.updated))
+                                entity.markAsSynchronized(parseIsoDate(result.body()?.updated))
                             )
                         }
 

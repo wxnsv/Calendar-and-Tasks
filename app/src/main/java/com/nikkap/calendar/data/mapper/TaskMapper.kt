@@ -7,7 +7,6 @@ import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.TaskEntity
 import com.nikkap.calendar.data.remote.dto.TaskDto
 import com.nikkap.calendar.domain.model.Task
-import kotlin.time.Instant
 
 fun Task.toTaskDto(): TaskDto {
     return TaskDto(
@@ -15,16 +14,7 @@ fun Task.toTaskDto(): TaskDto {
         title = title,
         status = if (isCompleted) "completed" else "needsAction",
         notes = notes,
-        due = deadline?.let { Instant.fromEpochMilliseconds(deadline) }.toString(),
-    )
-}
-fun TaskDto.toTask(): Task {
-    return Task(
-        id = id,
-        title = title,
-        notes = notes,
-        deadline = dateLong,
-        isCompleted = isCompleted
+        due = deadline.toIsoDate(),
     )
 }
 
@@ -38,7 +28,7 @@ fun TaskEntity.toTask(): Task {
     )
 }
 
-fun Task.toTaskEntity(): TaskEntity {
+fun Task.toTaskEntity(currentTime: Long = System.currentTimeMillis()): TaskEntity {
     return TaskEntity(
         id = id!!,
         title = title,
@@ -47,7 +37,7 @@ fun Task.toTaskEntity(): TaskEntity {
         isCompleted = isCompleted,
         taskListId = taskListId,
         pendingAction = PendingActions.NONE,
-        lastModified = System.currentTimeMillis(),
+        lastModified = currentTime,
     )
 }
 
@@ -76,29 +66,19 @@ fun TaskEntity.toTaskDto(): TaskDto {
     )
 }
 
-fun TaskEntity.synchronize(lastModified: Long? = null): TaskEntity {
-    return TaskEntity(
-        id = id,
-        title = title,
-        notes = notes,
-        isCompleted = isCompleted,
-        deadline = deadline,
-        taskListId = taskListId,
+fun TaskEntity.markAsSynchronized(
+    lastModified: Long? = null,
+    currentTime: Long = System.currentTimeMillis()
+): TaskEntity {
+    return this.copy(
         pendingAction = PendingActions.NONE,
-        lastModified = lastModified ?: System.currentTimeMillis()
+        lastModified = lastModified ?: currentTime
     )
 }
 
 fun TaskEntity.changePendingAction(pendingAction: PendingActions): TaskEntity {
-    return TaskEntity(
-        id = id,
-        title = title,
-        notes = notes,
-        isCompleted = isCompleted,
-        deadline = deadline,
-        taskListId = taskListId,
+    return this.copy(
         pendingAction = pendingAction,
-        lastModified = lastModified
     )
 }
 

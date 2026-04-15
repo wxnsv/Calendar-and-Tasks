@@ -2,12 +2,12 @@ package com.nikkap.calendar.data.repository
 
 import com.nikkap.calendar.core.utils.parseIsoDate
 import com.nikkap.calendar.core.utils.syncEntities
-import com.nikkap.calendar.core.utils.toRfc3339
+import com.nikkap.calendar.core.utils.toIsoDateWithoutSeconds
 import com.nikkap.calendar.data.local.dao.TaskDao
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.TaskListEntity
 import com.nikkap.calendar.data.mapper.changePendingAction
-import com.nikkap.calendar.data.mapper.synchronize
+import com.nikkap.calendar.data.mapper.markAsSynchronized
 import com.nikkap.calendar.data.mapper.toSubtask
 import com.nikkap.calendar.data.mapper.toSubtaskEntity
 import com.nikkap.calendar.data.mapper.toTask
@@ -75,7 +75,7 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun syncAllTasks(): Result<Unit> = try {
-        val tasksSyncTime = userPrefRepository.taskSyncTime.first()?.toRfc3339()
+        val tasksSyncTime = userPrefRepository.taskSyncTime.first()?.toIsoDateWithoutSeconds()
         val listsPendingResult = tasklistsPendingSync()
 
         if (listsPendingResult.isFailure) {
@@ -147,6 +147,7 @@ class TaskRepositoryImpl(
                 ).changePendingAction(PendingActions.DELETE)
             }
         }
+
         coroutineScope {
             val tasksResult = async {
                 syncEntities(
@@ -201,7 +202,7 @@ class TaskRepositoryImpl(
                             if (result.isSuccessful
                             ) {
                                 dao.updateTask(
-                                    entity.synchronize(
+                                    entity.markAsSynchronized(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
@@ -216,7 +217,7 @@ class TaskRepositoryImpl(
                             if (result.isSuccessful
                             ) {
                                 dao.insertTask(
-                                    entity.synchronize(
+                                    entity.markAsSynchronized(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
@@ -261,7 +262,7 @@ class TaskRepositoryImpl(
                             )
                             if (result.isSuccessful) {
                                 dao.updateSubtask(
-                                    entity.synchronize(
+                                    entity.markAsSynchronized(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
@@ -276,7 +277,7 @@ class TaskRepositoryImpl(
                             if (result.isSuccessful
                             ) {
                                 dao.insertSubtask(
-                                    entity.synchronize(
+                                    entity.markAsSynchronized(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
@@ -310,7 +311,7 @@ class TaskRepositoryImpl(
                             )
                             if (result.isSuccessful) {
                                 dao.updateTasklist(
-                                    entity.synchronize(
+                                    entity.markAsSynchronized(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
@@ -323,7 +324,7 @@ class TaskRepositoryImpl(
                                 api.createTaskList(taskList = entity.toTaskListDto())
                             if (result.isSuccessful) {
                                 dao.insertTaskList(
-                                    entity.synchronize(
+                                    entity.markAsSynchronized(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
@@ -340,6 +341,7 @@ class TaskRepositoryImpl(
                 }
             }
         }.awaitAll()
+
         if (results.all { it }) {
             Result.success(Unit)
         } else {

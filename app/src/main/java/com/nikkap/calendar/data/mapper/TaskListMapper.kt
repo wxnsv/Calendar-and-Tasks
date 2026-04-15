@@ -6,13 +6,6 @@ import com.nikkap.calendar.data.local.entity.TaskListEntity
 import com.nikkap.calendar.data.remote.dto.TaskListDto
 import com.nikkap.calendar.domain.model.TaskList
 
-fun TaskListDto.toTaskList(): TaskList {
-    return TaskList(
-        id = id,
-        title = title
-    )
-}
-
 fun TaskListDto.toTaskListEntity(): TaskListEntity {
     return TaskListEntity(
         id = id,
@@ -37,20 +30,18 @@ fun TaskListEntity.toTaskListDto(): TaskListDto {
     )
 }
 
-fun TaskListEntity.synchronize(lastModified: Long? = null): TaskListEntity {
-    return TaskListEntity(
-        id = id,
-        title = title,
+fun TaskListEntity.markAsSynchronized(
+    lastModified: Long? = null,
+    currentTime: Long = System.currentTimeMillis()
+): TaskListEntity {
+    return this.copy(
         pendingAction = PendingActions.NONE,
-        lastModified = lastModified ?: System.currentTimeMillis()
+        lastModified = lastModified ?: currentTime
     )
 }
 
 fun TaskListEntity.changePendingAction(pendingAction: PendingActions): TaskListEntity {
-    return TaskListEntity(
-        id = id,
-        title = title,
+    return this.copy(
         pendingAction = pendingAction,
-        lastModified = lastModified
     )
 }

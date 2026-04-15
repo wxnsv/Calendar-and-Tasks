@@ -11,7 +11,7 @@ fun TaskDto.toSubtaskEntity(taskListId: String): SubtaskEntity {
         id = id,
         title = title,
         parentId = parent!!,
-        position = position.toString(),
+        position = position!!,
         isCompleted = isCompleted,
         pendingAction = PendingActions.NONE,
         lastModified = parseIsoDate(updated),
@@ -30,7 +30,7 @@ fun SubtaskEntity.toSubtask(): Subtask {
     )
 }
 
-fun Subtask.toSubtaskEntity(): SubtaskEntity {
+fun Subtask.toSubtaskEntity(lastModified: Long = System.currentTimeMillis()): SubtaskEntity {
     return SubtaskEntity(
         id = id,
         title = title,
@@ -38,7 +38,7 @@ fun Subtask.toSubtaskEntity(): SubtaskEntity {
         position = position,
         isCompleted = isCompleted,
         pendingAction = PendingActions.NONE,
-        lastModified = System.currentTimeMillis(),
+        lastModified = lastModified,
         taskListId = taskListId
     )
 }
@@ -54,29 +54,19 @@ fun SubtaskEntity.toTaskDto(): TaskDto {
     )
 }
 
-fun SubtaskEntity.synchronize(lastModified: Long? = null): SubtaskEntity {
-    return SubtaskEntity(
-        id = id,
-        title = title,
-        parentId = parentId,
-        position = position,
-        isCompleted = isCompleted,
+fun SubtaskEntity.markAsSynchronized(
+    lastModified: Long? = null,
+    currentTime: Long = System.currentTimeMillis()
+): SubtaskEntity {
+    return this.copy(
         pendingAction = PendingActions.NONE,
-        lastModified = lastModified ?: System.currentTimeMillis(),
-        taskListId = taskListId
+        lastModified = lastModified ?: currentTime
     )
 }
 
 fun SubtaskEntity.changePendingAction(pendingAction: PendingActions): SubtaskEntity {
-    return SubtaskEntity(
-        id = id,
-        title = title,
-        parentId = parentId,
-        position = position,
-        isCompleted = isCompleted,
+    return this.copy(
         pendingAction = pendingAction,
-        lastModified = lastModified,
-        taskListId = taskListId
     )
 }
 

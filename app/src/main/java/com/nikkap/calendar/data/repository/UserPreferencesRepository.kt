@@ -7,11 +7,16 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.nikkap.calendar.core.utils.toIsoDateWithoutSeconds
 import com.nikkap.calendar.data.local.prefs.UserPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import java.io.IOException
+import kotlin.time.Clock
 
 class UserPreferencesRepository(
     private val dataStore: DataStore<Preferences>,
@@ -25,6 +30,7 @@ class UserPreferencesRepository(
         val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
         val CALENDAR_LAST_SYNC = longPreferencesKey("event_last_sync")
         val TASK_LAST_SYNC = longPreferencesKey("task_last_sync")
+        val CALENDAR_TIME_MIN = stringPreferencesKey("calendar_time_min")
     }
 
     val userStateFlow: Flow<UserPrefs> = dataStore.data
@@ -56,6 +62,13 @@ class UserPreferencesRepository(
             prefs[Keys.CALENDAR_LAST_SYNC]
         }
 
+    val calendarTimeMin = dataStore.data.catch { exception ->
+        if (exception is IOException) emit(emptyPreferences()) else throw exception
+    }
+        .map { prefs ->
+            prefs[Keys.CALENDAR_TIME_MIN]
+        }
+
     suspend fun authorizeSession(email: String, name: String, photoUri: String) {
         dataStore.edit { prefs ->
             prefs[Keys.USER_EMAIL] = email
@@ -85,6 +98,9 @@ class UserPreferencesRepository(
     suspend fun completeFirstLaunch() {
         dataStore.edit { prefs ->
             prefs[Keys.IS_FIRST_LAUNCH] = false
+            prefs[Keys.CALENDAR_TIME_MIN] = Clock.System.now()
+                .minus(1, DateTimeUnit.YEAR, TimeZone.UTC)
+                .toEpochMilliseconds().toIsoDateWithoutSeconds()!!
         }
     }
 

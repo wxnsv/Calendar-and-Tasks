@@ -9,20 +9,7 @@ import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.EventStatus
 import java.util.Locale
 
-fun EventDto.toEvent(): Event {
-    return Event(
-        id = id,
-        summary = summary,
-        description = description,
-        startTimestamp = startTimestamp,
-        endTimestamp = endTimestamp,
-        isAllDay = isAllDay,
-        colorHex = colorId,
-        status = statusType,
-    )
-}
-
-fun Event.toEventEntity(): EventEntity {
+fun Event.toEventEntity(lastModified: Long = System.currentTimeMillis()): EventEntity {
     return EventEntity(
         id = id!!,
         summary = summary,
@@ -33,7 +20,7 @@ fun Event.toEventEntity(): EventEntity {
         colorId = colorHex,
         status = status.name,
         pendingAction = PendingActions.NONE,
-        lastModified = System.currentTimeMillis()
+        lastModified = lastModified
     )
 }
 
@@ -65,33 +52,19 @@ fun EventEntity.toEventDto(): EventDto {
     )
 }
 
-fun EventEntity.synchronize(lastModified: Long? = null): EventEntity {
-    return EventEntity(
-        id = id,
-        summary = summary ?: "(No title)",
-        description = description,
-        startTimestamp = startTimestamp,
-        endTimestamp = endTimestamp,
-        isAllDay = isAllDay,
-        colorId = colorId,
-        status = status,
+fun EventEntity.markAsSynchronized(
+    lastModified: Long? = null,
+    currentTime: Long = System.currentTimeMillis()
+): EventEntity {
+    return this.copy(
         pendingAction = PendingActions.NONE,
-        lastModified = lastModified ?: System.currentTimeMillis(),
+        lastModified = lastModified ?: currentTime
     )
 }
 
 fun EventEntity.changePendingAction(pendingAction: PendingActions): EventEntity {
-    return EventEntity(
-        id = id,
-        summary = summary ?: "(No title)",
-        description = description,
-        startTimestamp = startTimestamp,
-        endTimestamp = endTimestamp,
-        isAllDay = isAllDay,
-        colorId = colorId,
-        status = status,
+    return this.copy(
         pendingAction = pendingAction,
-        lastModified = lastModified,
     )
 }
 

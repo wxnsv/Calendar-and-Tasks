@@ -75,7 +75,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
 
 
         fun bind(task: Task, onClick: () -> Unit) {
-            itemTime.text = task.deadline.toListDate()
+            itemTime.text = task.deadline?.toListUiDate() ?: ""
             title.text = task.title
             itemType.text = "Task"
             itemIcon.setImageResource(R.drawable.task)

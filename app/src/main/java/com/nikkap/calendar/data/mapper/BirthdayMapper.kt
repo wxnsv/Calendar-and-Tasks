@@ -13,7 +13,7 @@ import com.nikkap.calendar.domain.model.Birthday
 fun BirthdayDto.toBirthdayEntity(): BirthdayEntity {
     return BirthdayEntity(
         id = id,
-        name = cleanName,
+        name = summary?.trimBirthdaySuffix(),
         date = parseIsoDate(start.date, true),
         pendingAction = PendingActions.NONE,
         lastModified = parseIsoDate(updated)
@@ -37,32 +37,27 @@ fun BirthdayEntity.toBirthdayDto(): BirthdayDto {
 }
 
 fun BirthdayEntity.changePendingAction(pendingAction: PendingActions): BirthdayEntity {
-    return BirthdayEntity(
-        id = id,
-        name = name,
-        date = date,
-        pendingAction = pendingAction,
-        lastModified = lastModified
-    )
+    return this.copy(pendingAction = pendingAction)
+
 }
 
-fun BirthdayEntity.synchronize(lastModified: Long? = null): BirthdayEntity {
-    return BirthdayEntity(
-        id = id,
-        name = name,
-        date = date,
+fun BirthdayEntity.markAsSynchronized(
+    lastModified: Long? = null,
+    currentTime: Long = System.currentTimeMillis()
+): BirthdayEntity {
+    return this.copy(
         pendingAction = PendingActions.NONE,
-        lastModified = lastModified ?: System.currentTimeMillis(),
+        lastModified = lastModified ?: currentTime,
     )
 }
 
-fun Birthday.toBirthdayEntity(): BirthdayEntity {
+fun Birthday.toBirthdayEntity(currentTime: Long = System.currentTimeMillis()): BirthdayEntity {
     return BirthdayEntity(
         id = id!!,
         name = name,
         date = date!!,
         pendingAction = PendingActions.NONE,
-        lastModified = System.currentTimeMillis()
+        lastModified = currentTime
     )
 }
 
@@ -73,7 +68,3 @@ fun Birthday.toBirthdayDto(): BirthdayDto {
         start = BirthdayDateTime(date = date!!.toIsoDateWithoutSeconds())
     )
 }
-
-
-val BirthdayDto.cleanName: String?
-    get() = summary?.trimBirthdaySuffix()
