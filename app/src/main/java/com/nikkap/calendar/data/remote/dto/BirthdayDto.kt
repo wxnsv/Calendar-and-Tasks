@@ -10,14 +10,14 @@ data class BirthdayDto(
     @field:Json(name = "summary")
     val summary: String?,
     @field:Json(name = "start")
-    val start: BirthdayItemDateTime,
+    val start: BirthdayDateTime,
     @field:Json(name = "updated")
     val updated: String = "",
     @field:Json(name = "deleted")
     val deleted: Boolean = false,
 )
 
-data class BirthdayItemDateTime(
+data class BirthdayDateTime(
     @field:Json(name = "date")
     val date: String?
 )
