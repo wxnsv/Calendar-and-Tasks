@@ -14,7 +14,7 @@ import retrofit2.http.Query
 interface CalendarApi {
     @GET("calendar/v3/calendars/primary/events")
     suspend fun getEvents(
-        @Query("timeMin") timeMin: String,
+        @Query("timeMin") timeMin: String?,
         @Query("eventTypes") type: String = "default",
         @Query("updatedMin") updatedMin: String?,
         @Query("singleEvents") singleEvents: Boolean,
@@ -30,7 +30,7 @@ interface CalendarApi {
 
     @GET("calendar/v3/calendars/primary/events")
     suspend fun getBirthdays(
-        @Query("timeMin") timeMin: String,
+        @Query("timeMin") timeMin: String?,
         @Query("updatedMin") updatedMin: String?,
         @Query("eventTypes") type: String = "birthday",
         @Query("showHidden") showHidden: Boolean = true,

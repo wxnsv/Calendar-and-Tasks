@@ -79,10 +79,9 @@ class CalendarRepositoryImpl(
     }
 
     override suspend fun syncCalendar(): Result<Unit> = try {
-        val calendarSyncTime = userPrefRepository.calendarSyncTime.first()?.toRfc3339()
-        val timeMin = Clock.System.now()
-            .minus(1, DateTimeUnit.YEAR, TimeZone.UTC)
-            .toString()
+        val calendarSyncTime =
+            userPrefRepository.calendarSyncTime.first()?.toIsoDateWithoutSeconds()
+        val timeMin = userPrefRepository.calendarTimeMin.first()
 
         coroutineScope {
             val eventPendingResult = async { eventsPendingSync() }
