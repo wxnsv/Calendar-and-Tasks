@@ -1,7 +1,6 @@
 package com.nikkap.calendar.data.mapper
 
 import com.nikkap.calendar.core.utils.parseIsoDate
-import com.nikkap.calendar.core.utils.toIsoDate
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.SubtaskEntity
 import com.nikkap.calendar.data.remote.dto.TaskDto
@@ -51,7 +50,6 @@ fun SubtaskEntity.toTaskDto(): TaskDto {
         status = isCompletedString,
         parent = parentId,
         position = position,
-        updated = lastModified.toIsoDate(),
         due = null,
     )
 }

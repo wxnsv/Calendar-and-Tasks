@@ -1,8 +1,7 @@
 package com.nikkap.calendar.data.mapper
 
-import com.nikkap.calendar.core.utils.eventIsAllDayFormatter
+import com.nikkap.calendar.core.utils.eventDateFormatter
 import com.nikkap.calendar.core.utils.parseIsoDate
-import com.nikkap.calendar.core.utils.toIsoDate
 import com.nikkap.calendar.data.local.entity.EventEntity
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.remote.dto.EventDto
@@ -52,14 +51,15 @@ fun EventEntity.toEvent(): Event {
 }
 
 fun EventEntity.toEventDto(): EventDto {
-    val (start, end) = eventIsAllDayFormatter(startTimestamp, endTimestamp, isAllDay)
+    val (start, end) =
+        eventDateFormatter(startTimestamp, endTimestamp, isAllDay)
     return EventDto(
         id = id,
         summary = summary,
         description = description,
         start = start,
         end = end,
-        updated = lastModified.toIsoDate(),
+        updated = "",
         colorId = colorId,
         status = status
     )
@@ -96,7 +96,7 @@ fun EventEntity.changePendingAction(pendingAction: PendingActions): EventEntity 
 }
 
 fun Event.toEventDto(): EventDto {
-    val (start, end) = eventIsAllDayFormatter(startTimestamp, endTimestamp, isAllDay)
+    val (start, end) = eventDateFormatter(startTimestamp, endTimestamp, isAllDay)
     return EventDto(
         id = id!!,
         summary = summary,

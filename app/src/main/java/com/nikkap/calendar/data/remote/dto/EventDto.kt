@@ -12,9 +12,9 @@ data class EventDto(
     @field:Json(name = "description")
     val description: String?,
     @field:Json(name = "start")
-    val start: CalendarItemDateTime,
+    val start: EventDateTime,
     @field:Json(name = "end")
-    val end: CalendarItemDateTime,
+    val end: EventDateTime,
     @field:Json(name = "updated")
     val updated: String?,
     @field:Json(name = "deleted")
@@ -25,7 +25,7 @@ data class EventDto(
     val status: String?,
 )
 
-data class CalendarItemDateTime(
+data class EventDateTime(
     @field:Json(name = "dateTime")
     val dateTime: String?,
     @field:Json(name = "date")

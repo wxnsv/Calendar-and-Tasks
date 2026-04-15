@@ -10,7 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nikkap.calendar.R
-import com.nikkap.calendar.core.utils.toDate
+import com.nikkap.calendar.core.utils.toUiDate
 import com.nikkap.calendar.databinding.CreateBirthdayFragmentBinding
 import com.nikkap.calendar.ui.screens.create.CreateBirthdayIntent
 import com.nikkap.calendar.ui.screens.create.CreateState
@@ -88,8 +88,8 @@ class CreateBirthdayFragment : Fragment(R.layout.create_birthday_fragment) {
     private fun updateUi(state: CreateState) {
         val birthday = state.birthdayDraft
 
-        if (binding.createBirthdayDateButton.text != birthday.date.toDate() && birthday.date != null) {
-            binding.createBirthdayDateButton.text = birthday.date.toDate()
+        if (binding.createBirthdayDateButton.text != birthday.date.toUiDate() && birthday.date != null) {
+            binding.createBirthdayDateButton.text = birthday.date.toUiDate()
         }
     }
 }

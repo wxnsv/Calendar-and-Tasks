@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.nikkap.calendar.R
-import com.nikkap.calendar.core.utils.toDate
-import com.nikkap.calendar.core.utils.toListDate
+import com.nikkap.calendar.core.utils.toListUiDate
+import com.nikkap.calendar.core.utils.toUiDate
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.Subtask
@@ -95,7 +95,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
 
         fun bind(event: Event, onClick: () -> Unit) {
             eventTitle.text = event.summary
-            eventTime.text = event.startTimestamp.toListDate(event.isAllDay)
+            eventTime.text = event.startTimestamp.toListUiDate(event.isAllDay)
             itemType.text =
                 itemView.context.getString(R.string.calendar_type_format, "Event")
             itemIcon.setImageResource(R.drawable.event)
@@ -113,7 +113,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
 
         fun bind(birthday: Birthday, onClick: () -> Unit) {
             birthdayName.text = birthday.name
-            birthdayDate.text = birthday.date.toDate()
+            birthdayDate.text = birthday.date.toUiDate()
             itemType.text =
                 itemView.context.getString(R.string.calendar_type_format, "Birthday")
             itemIcon.setImageResource(R.drawable.event)

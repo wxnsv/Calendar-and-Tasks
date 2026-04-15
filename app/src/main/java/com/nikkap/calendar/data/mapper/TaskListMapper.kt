@@ -1,7 +1,6 @@
 package com.nikkap.calendar.data.mapper
 
 import com.nikkap.calendar.core.utils.parseIsoDate
-import com.nikkap.calendar.core.utils.toRfc3339
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.TaskListEntity
 import com.nikkap.calendar.data.remote.dto.TaskListDto
@@ -34,7 +33,7 @@ fun TaskListEntity.toTaskListDto(): TaskListDto {
     return TaskListDto(
         id = id,
         title = title,
-        updated = lastModified.toRfc3339()!!
+        updated = ""
     )
 }
 

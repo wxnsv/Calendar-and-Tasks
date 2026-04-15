@@ -13,7 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nikkap.calendar.R
-import com.nikkap.calendar.core.utils.toListDate
+import com.nikkap.calendar.core.utils.toUiDate
 import com.nikkap.calendar.databinding.CreateTaskFragmentBinding
 import com.nikkap.calendar.domain.model.TaskList
 import com.nikkap.calendar.ui.screens.create.CreateState
@@ -97,8 +97,8 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
             binding.createTaskSetListButton.text = state.selectedTaskList?.title
         }
 
-        if (binding.createTaskDeadlineButton.text != state.taskDraft.deadline.toListDate() && state.taskDraft.deadline != null) {
-            binding.createTaskDeadlineButton.text = state.taskDraft.deadline.toListDate()
+        if (state.taskDraft.deadline != null && binding.createTaskDeadlineButton.text != state.taskDraft.deadline.toUiDate()) {
+            binding.createTaskDeadlineButton.text = state.taskDraft.deadline.toUiDate()
         }
 
     }

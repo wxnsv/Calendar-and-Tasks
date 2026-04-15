@@ -2,6 +2,7 @@ package com.nikkap.calendar.data.mapper
 
 import com.nikkap.calendar.core.utils.parseIsoDate
 import com.nikkap.calendar.core.utils.toIsoDate
+import com.nikkap.calendar.core.utils.toIsoDateWithoutTime
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.TaskEntity
 import com.nikkap.calendar.data.remote.dto.TaskDto
@@ -69,10 +70,9 @@ fun TaskEntity.toTaskDto(): TaskDto {
         title = title,
         notes = notes,
         status = isCompletedString,
-        due = deadline?.toIsoDate(), // TODO (IS ALL DAY?)
+        due = deadline?.toIsoDateWithoutTime(),
         parent = null,
-        position = null,
-        updated = lastModified.toIsoDate(),
+        position = null, // TODO check
     )
 }
 

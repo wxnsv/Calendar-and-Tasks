@@ -13,8 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.nikkap.calendar.R
 import com.nikkap.calendar.core.utils.toCalendar
-import com.nikkap.calendar.core.utils.toDate
-import com.nikkap.calendar.core.utils.toTime
+import com.nikkap.calendar.core.utils.toUiDate
+import com.nikkap.calendar.core.utils.toUiTime
 import com.nikkap.calendar.databinding.CreateEventFragmentBinding
 import com.nikkap.calendar.ui.renderCreateDateTime
 import com.nikkap.calendar.ui.screens.create.CreateEventIntent
@@ -140,14 +140,14 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
 
     private fun updateUi(state: CreateState) {
         val event = state.eventDraft
-        if (binding.createEventStartDateButton.text != event.startTimestamp.toDate() && event.startTimestamp != 0L) {
-            binding.createEventStartDateButton.text = event.startTimestamp.toDate()
+        if (binding.createEventStartDateButton.text != event.startTimestamp.toUiDate() && event.startTimestamp != 0L) {
+            binding.createEventStartDateButton.text = event.startTimestamp.toUiDate()
         }
-        if (binding.createEventStartTimeButton.text != state.eventStartTime.toTime()) {
-            binding.createEventStartTimeButton.text = state.eventStartTime.toTime()
+        if (binding.createEventStartTimeButton.text != state.eventStartTime.toUiTime()) {
+            binding.createEventStartTimeButton.text = state.eventStartTime.toUiTime()
         }
-        if (binding.createEventEndTimeButton.text != state.eventEndTime.toTime()) {
-            binding.createEventEndTimeButton.text = state.eventEndTime.toTime()
+        if (binding.createEventEndTimeButton.text != state.eventEndTime.toUiTime()) {
+            binding.createEventEndTimeButton.text = state.eventEndTime.toUiTime()
         }
         if (binding.createEventStartTimeButton.isGone != event.isAllDay) {
             binding.createEventStartTimeButton.isGone = event.isAllDay
@@ -169,8 +169,8 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
                 isAllDay = event.isAllDay
             )
         }
-        if (binding.createEventEndDateButton.text != event.endTimestamp.toDate() && event.endTimestamp != 0L) {
-            binding.createEventEndDateButton.text = event.endTimestamp.toDate()
+        if (binding.createEventEndDateButton.text != event.endTimestamp.toUiDate() && event.endTimestamp != 0L) {
+            binding.createEventEndDateButton.text = event.endTimestamp.toUiDate()
         }
         if (binding.createEventDescriptionEditText.text.toString() != event.description) {
             binding.createEventDescriptionEditText.setText(event.description)

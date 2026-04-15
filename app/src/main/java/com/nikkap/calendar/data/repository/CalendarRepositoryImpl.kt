@@ -2,7 +2,7 @@ package com.nikkap.calendar.data.repository
 
 import com.nikkap.calendar.core.utils.parseIsoDate
 import com.nikkap.calendar.core.utils.syncEntities
-import com.nikkap.calendar.core.utils.toRfc3339
+import com.nikkap.calendar.core.utils.toIsoDateWithoutSeconds
 import com.nikkap.calendar.data.local.dao.CalendarDao
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.mapper.changePendingAction
