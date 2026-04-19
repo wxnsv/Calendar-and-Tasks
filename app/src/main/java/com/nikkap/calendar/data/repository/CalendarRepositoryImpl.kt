@@ -90,14 +90,21 @@ class CalendarRepositoryImpl(
 
             val eventsResult = async {
 
-                val remoteEvents = api.getEvents(
+                val responseEvents = api.getEvents(
                     timeMin,
                     updatedMin = calendarSyncTime,
                     singleEvents = true,
-                ).body()?.items?.map {
+                )
+
+                val remoteEvents = responseEvents.body()?.items?.map {
                     if (!it.deleted) it.toEventEntity() else it.toEventEntity()
                         .changePendingAction(PendingActions.DELETE)
                 } ?: emptyList()
+
+                if (responseEvents.code() != 200) {
+                    handleErrorCode(responseEvents.code())
+                    return@async Result.failure(Exception("Failed to sync events and birthdays"))
+                }
 
                 if (remoteEvents.isNotEmpty()) {
                     syncEntities(
@@ -110,10 +117,17 @@ class CalendarRepositoryImpl(
             }
             val birthdayResult = async {
 
-                val remoteBirthdays = api.getBirthdays(
+                val responseBirthdays = api.getBirthdays(
                     timeMin,
                     updatedMin = calendarSyncTime,
-                ).body()?.items?.map {
+                )
+
+                if (responseBirthdays.code() != 200) {
+                    handleErrorCode(responseBirthdays.code())
+                    return@async Result.failure(Exception("Failed to sync events and birthdays"))
+                }
+
+                val remoteBirthdays = responseBirthdays.body()?.items?.map {
                     if (!it.deleted) it.toBirthdayEntity() else it.toBirthdayEntity()
                         .changePendingAction(PendingActions.DELETE)
                 } ?: emptyList()
@@ -138,6 +152,16 @@ class CalendarRepositoryImpl(
         }
     } catch (e: Exception) {
         Result.failure(Exception("Failed to sync events and birthdays with ${e.message} message"))
+    }
+
+    private suspend fun handleErrorCode(code: Int) {
+        when (code) {
+            410 -> {
+                userPrefRepository.clearLastCalendarSyncTime()
+            }
+            // TODO
+
+        }
     }
 
 

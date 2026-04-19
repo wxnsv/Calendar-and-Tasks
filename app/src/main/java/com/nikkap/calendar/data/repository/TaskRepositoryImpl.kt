@@ -71,7 +71,10 @@ class TaskRepositoryImpl(
         if (taskLists.isSuccessful) {
             val entities = taskLists.body()?.items
             return Result.success(entities)
-        } else return Result.failure(Exception("Failed to sync tasks with ${taskLists.code()} code"))
+        } else {
+            handleErrorCode(taskLists.code())
+            return Result.failure(Exception("Failed to sync tasks with ${taskLists.code()} code"))
+        }
     }
 
     override suspend fun syncAllTasks(): Result<Unit> = try {
@@ -178,6 +181,16 @@ class TaskRepositoryImpl(
 
     } catch (e: Exception) {
         Result.failure(e)
+    }
+
+    private suspend fun handleErrorCode(code: Int) {
+        when (code) {
+            410 -> {
+                userPrefRepository.clearLastTaskSyncTime()
+            }
+            // TODO
+
+        }
     }
 
     private suspend fun tasksPendingSync(): Result<Unit> = coroutineScope {
@@ -367,6 +380,7 @@ class TaskRepositoryImpl(
                     if (response.isSuccessful) {
                         taskList.id to (response.body()?.items ?: emptyList())
                     } else {
+                        handleErrorCode(response.code())
                         throw Exception("API Error ${response.code()}: Failed to fetch tasks for list ${taskList.id}")
                     }
                 }

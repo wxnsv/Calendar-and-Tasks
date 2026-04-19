@@ -85,9 +85,21 @@ class UserPreferencesRepository(
         }
     }
 
-    suspend fun updateEventSyncTime() {
+    suspend fun updateEventSyncTime(syncTime: Long = System.currentTimeMillis()) {
         dataStore.edit { prefs ->
-            prefs[Keys.CALENDAR_LAST_SYNC] = System.currentTimeMillis()
+            prefs[Keys.CALENDAR_LAST_SYNC] = syncTime
+        }
+    }
+
+    suspend fun clearLastCalendarSyncTime() {
+        dataStore.edit { preferences ->
+            preferences.remove(Keys.CALENDAR_LAST_SYNC)
+        }
+    }
+
+    suspend fun clearLastTaskSyncTime() {
+        dataStore.edit { preferences ->
+            preferences.remove(Keys.CALENDAR_LAST_SYNC)
         }
     }
 
