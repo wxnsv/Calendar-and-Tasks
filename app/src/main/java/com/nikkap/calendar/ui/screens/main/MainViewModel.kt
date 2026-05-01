@@ -11,63 +11,85 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import com.nikkap.calendar.data.local.prefs.UserPrefs
 import com.nikkap.calendar.data.repository.UserPreferencesRepository
 import com.nikkap.calendar.data.worker.SyncWorker
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
 import com.nikkap.calendar.ui.navigation.NavEvent
 import com.nikkap.calendar.ui.navigation.NavigationTarget
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 
 class MainViewModel(
     private val tasksRepository: TaskRepository,
     private val calendarRepository: CalendarRepository,
-    private val userPrefRepository: UserPreferencesRepository,
+    private val userPrefRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _navigationEvent = Channel<NavEvent>()
     val navigationEvent = _navigationEvent.receiveAsFlow()
+    private val _prefsFlow = userPrefRepository.userStateFlow.map<UserPrefs, UserPrefs?> { it }
+        .onStart { emit(null) }
+    private val _state = MutableStateFlow(MainState())
+    val state: StateFlow<MainState> = combine(
+        _state,
+        _prefsFlow,
+    ) { state, prefs ->
 
-    val prefs = runBlocking(Dispatchers.IO) {
-        userPrefRepository.userStateFlow.first()
-    }
+        if (prefs == null) {
+            state.copy(isLoading = true)
+        } else {
+            state.copy(
+                userState = prefs,
+                isLoading = false,
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = MainState()
+    )
 
     init {
-        if (prefs.isAuthorized) startActiveSync()
+        viewModelScope.launch {
+            state.first { !it.isLoading }
+            val prefs = state.value.userState
+            if (prefs.isAuthorized) startActiveSync()
+        }
     }
 
     fun checkAuthAndNavigate(context: Context) {
-        val isFirst = prefs.isFirstLaunch
-        val isAuthorized = prefs.isAuthorized
         viewModelScope.launch {
+            state.first { !it.isLoading }
+            val prefs = state.value.userState
+            val isFirst = prefs.isFirstLaunch
+            val isAuthorized = prefs.isAuthorized
             if (isFirst) {
                 _navigationEvent.send(
                     NavEvent.SetRoot(
                         NavigationTarget.Auth
                     )
                 )
-            } else if (isAuthorized) {
-                syncData(context)
-                _navigationEvent.send(
-                    NavEvent.SetRoot(
-                        NavigationTarget.List
-                    )
-                )
-            } else
-                _navigationEvent.send(
-                    NavEvent.SetRoot(
-                        NavigationTarget.List
-                    )
-                )
+            } else if (isAuthorized) syncData(context)
+            _navigationEvent.send(
+                NavEvent.SetRoot(
+                    NavigationTarget.List
+                ) //TODO // FIX
+            )
         }
 
     }
@@ -82,7 +104,6 @@ class MainViewModel(
 
     private fun startActiveSync() {
         viewModelScope.launch {
-
             while (isActive) {
                 val tasksDeferred = async { tasksRepository.syncAllTasks() }
                 val calendarDeferred = async { calendarRepository.syncCalendar() }
@@ -128,46 +149,71 @@ class MainViewModel(
         }
     }
 
-    fun onTaskClicked() {
+    fun onEditListItemClicked(id: String, type: String) {
+        when (type) {
+            "BIRTHDAY" -> toCreateBirthday(id)
+            "EVENT" -> toCreateEvent(id)
+            "TASK" -> toCreateTask(id)
+        }
+    }
+
+    fun onDeleteListItemClicked(id: String, type: String) {
+        viewModelScope.launch {
+            when (type) {
+                "BIRTHDAY" -> calendarRepository.deleteBirthday(id)
+                "EVENT" -> calendarRepository.deleteEvent(id)
+                "TASK" -> tasksRepository.deleteTask(id)
+                "SUBTASK" -> tasksRepository.deleteSubtask(id)
+            }
+        }
+    }
+
+    fun onCompleteListItemClicked(id: String, type: String) {
+        viewModelScope.launch {
+            when (type) {
+                "SUBTASK" -> tasksRepository.deleteSubtask(id)
+                "TASK" -> tasksRepository.deleteTask(id)
+            }
+        }
+    }
+
+    fun toCreateTask(id: String = "") {
         viewModelScope.launch {
             _navigationEvent.send(
                 NavEvent.NavigateTo(
                     NavigationTarget.Create(
-                        "TASK", ""
+                        "TASK", id
                     )
                 )
             )
         }
     }
 
-    fun onListItemClicked(id: String, type: String) {
+    fun toCreateEvent(id: String = "") {
         viewModelScope.launch {
             _navigationEvent.send(
                 NavEvent.NavigateTo(
-                    NavigationTarget.Create(
-                        itemId = id,
-                        type = type
-                    )
+                    NavigationTarget.Create("EVENT", id)
                 )
             )
         }
     }
 
-    fun onEventClicked() {
+    fun toCreateBirthday(id: String = "") {
         viewModelScope.launch {
             _navigationEvent.send(
                 NavEvent.NavigateTo(
-                    NavigationTarget.Create("EVENT", "")
+                    NavigationTarget.Create("BIRTHDAY", id)
                 )
             )
         }
     }
 
-    fun onBirthdayClicked() {
+    fun toCreateSubtask(id: String = "") {
         viewModelScope.launch {
             _navigationEvent.send(
                 NavEvent.NavigateTo(
-                    NavigationTarget.Create("BIRTHDAY", "")
+                    NavigationTarget.Create("BIRTHDAY", id)
                 )
             )
         }

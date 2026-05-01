@@ -1,11 +1,15 @@
 package com.nikkap.calendar.core.utils
 
 import com.nikkap.calendar.data.remote.dto.EventDateTime
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
+import java.time.Month
+import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
 import java.util.Locale
@@ -136,4 +140,42 @@ fun Long.toCalendar(): Calendar {
     return Calendar.getInstance().apply {
         timeInMillis = this@toCalendar
     }
+}
+
+fun Long.toLocalDate(): LocalDate {
+    return Instant.ofEpochMilli(this)
+        .atZone(ZoneId.of("UTC"))
+        .toLocalDate()
+}
+
+fun Long?.toShortUiDate(): String {
+    if (this == null) return ""
+    val formatter = DateTimeFormatter.ofPattern("EE, MMM d", Locale.ENGLISH)
+    return Instant.ofEpochMilli(this)
+        .atZone(ZoneId.systemDefault())
+        .format(formatter)
+}
+
+private val enLocale = Locale("en-US")
+
+fun YearMonth.displayText(short: Boolean = false): String {
+    return "${month.displayText(short = short)} $year"
+}
+
+
+fun Month.displayText(short: Boolean = true): String {
+    return getDisplayName(if (short) TextStyle.SHORT else TextStyle.FULL, enLocale)
+}
+
+fun DayOfWeek.displayText(uppercase: Boolean = false, narrow: Boolean = false): String {
+    return getDisplayName(if (narrow) TextStyle.NARROW else TextStyle.FULL, enLocale).let { value ->
+        if (uppercase) value.uppercase(enLocale) else value
+    }
+}
+
+fun LocalDate.toDisplayDate(showYear: Boolean = false): String {
+    val short = DateTimeFormatter.ofPattern("EEE, MMMM   d", enLocale)
+    val long = DateTimeFormatter.ofPattern("EEE, MMMM d yyyy", enLocale)
+
+    return if (!showYear) this.format(short) else this.format(long)
 }

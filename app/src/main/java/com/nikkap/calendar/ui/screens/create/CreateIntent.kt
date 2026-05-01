@@ -21,7 +21,7 @@ sealed interface CreateTaskIntent {
 
 sealed interface CreateEventIntent {
     data class UpdateIsAllDay(val isAllDay: Boolean) : CreateEventIntent
-    data class UpdateColor(val color: String?) : CreateEventIntent
+    data class UpdateColor(val color: Int) : CreateEventIntent
     data class UpdateDescription(val description: String) : CreateEventIntent
     data class UpdateStartDate(val startDate: Long) : CreateEventIntent
     data class UpdateStartTime(val startTime: Long) : CreateEventIntent
@@ -32,7 +32,7 @@ sealed interface CreateEventIntent {
 }
 
 sealed interface CreateBirthdayIntent {
-    data class UpdateColor(val color: String) : CreateBirthdayIntent
+    data class UpdateColor(val color: Int) : CreateBirthdayIntent
     data class UpdateDate(val date: Long) : CreateBirthdayIntent
     object SaveBirthday : CreateBirthdayIntent
 }

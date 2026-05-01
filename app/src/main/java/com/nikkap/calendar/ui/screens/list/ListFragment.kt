@@ -44,7 +44,7 @@ class ListFragment : Fragment(R.layout.list_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = ListAdapter { id, type -> sharedViewModel.onListItemClicked(id, type) }
+        val adapter = ListAdapter { id, type -> sharedViewModel.onEditListItemClicked(id, type) }
 
         setupRecyclerView(adapter)
         setupListeners()
@@ -73,15 +73,15 @@ class ListFragment : Fragment(R.layout.list_fragment) {
 
         binding.createTask.setOnClickListener {
             viewModel.toggleMenu()
-            sharedViewModel.onTaskClicked()
+            sharedViewModel.toCreateTask()
         }
         binding.createEvent.setOnClickListener {
             viewModel.toggleMenu()
-            sharedViewModel.onEventClicked()
+            sharedViewModel.toCreateEvent()
         }
         binding.createBirthday.setOnClickListener {
             viewModel.toggleMenu()
-            sharedViewModel.onBirthdayClicked()
+            sharedViewModel.toCreateBirthday()
         }
         binding.createItemButton.setOnClickListener {
             viewModel.toggleMenu()

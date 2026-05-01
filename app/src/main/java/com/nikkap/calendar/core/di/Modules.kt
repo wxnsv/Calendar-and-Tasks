@@ -19,6 +19,7 @@ import com.nikkap.calendar.ui.screens.auth.AuthViewModel
 import com.nikkap.calendar.ui.screens.create.CreateViewModel
 import com.nikkap.calendar.ui.screens.list.ListViewModel
 import com.nikkap.calendar.ui.screens.main.MainViewModel
+import com.nikkap.calendar.ui.screens.split.SplitViewModel
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.Cache
@@ -105,6 +106,7 @@ val appModule = module {
     single<TaskRepository> { TaskRepositoryImpl(get(), get(), get()) }
     single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get()) }
     viewModel { AuthViewModel(get(), get(), get()) }
+    viewModel { SplitViewModel(get(), get()) }
     viewModel { ListViewModel(get(), get()) }
     viewModelOf(::CreateViewModel)
     viewModel { MainViewModel(get(), get(), get()) }

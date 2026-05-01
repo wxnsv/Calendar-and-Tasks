@@ -36,4 +36,13 @@
             app:popUpToInclusive="true"
             app:destination="@id/listFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/splitFragment"
+        android:name="com.nikkap.calendar.ui.screens.split.SplitFragment"
+        android:label="SplitFragment">
+        <action
+            android:id="@+id/action_splitFragment_to_createFragment"
+            app:destination="@id/createFragment" />
+    </fragment>
 </navigation>

@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Jan 27"
-        app:icon="@drawable/editor_birthday_date"
+        app:icon="@drawable/birthday"
         app:iconTint="@color/black"
         app:layout_constraintTop_toTopOf="parent" />
 
