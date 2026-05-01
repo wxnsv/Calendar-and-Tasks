@@ -67,7 +67,7 @@ class AuthFragment : Fragment() {
     }
 
     @Composable
-    fun LoginScreen(onLoginClick: () -> Unit) {
+    private fun LoginScreen(onLoginClick: () -> Unit) {
         Scaffold { paddingValues ->
             Box(
                 modifier = Modifier

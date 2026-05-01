@@ -17,10 +17,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModel()
     private lateinit var navController: NavController
-    var showSplash = true
+    private var showSplash = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         installSplashScreen().setKeepOnScreenCondition {
             showSplash
         }
@@ -47,6 +46,7 @@ class MainActivity : AppCompatActivity() {
                                 is NavigationTarget.Auth -> R.id.authFragment
                                 is NavigationTarget.Create -> R.id.createFragment
                                 is NavigationTarget.List -> R.id.listFragment
+                                is NavigationTarget.Split -> R.id.splitFragment
                             }
                             if (event.route is NavigationTarget.Create) {
                                 val bundle = Bundle().apply {
@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity() {
                         is NavEvent.SetRoot -> {
                             val resId = when (event.route) {
                                 is NavigationTarget.Auth -> R.id.authFragment
+                                is NavigationTarget.Split -> R.id.splitFragment
                                 else -> R.id.listFragment
                             }
 
