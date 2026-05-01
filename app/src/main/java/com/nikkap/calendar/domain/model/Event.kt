@@ -1,8 +1,5 @@
 package com.nikkap.calendar.domain.model
 
-import com.nikkap.calendar.core.utils.CalendarColors
-
-
 data class Event(
     val id: String? = null,
     val summary: String? = null,
@@ -10,8 +7,8 @@ data class Event(
     val startTimestamp: Long = 0L,
     val endTimestamp: Long = 0L,
     val isAllDay: Boolean = false,
-    val colorHex: String? = CalendarColors.getEventColor(null).id,
-    val status: EventStatus = EventStatus.CONFIRMED,
+    val colorId: Int? = null,
+    val status: EventStatus? = null,
 ) : CalendarEntry()
 
 enum class EventStatus { CONFIRMED, TENTATIVE, CANCELLED }

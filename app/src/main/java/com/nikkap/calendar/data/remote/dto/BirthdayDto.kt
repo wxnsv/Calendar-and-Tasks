@@ -15,6 +15,8 @@ data class BirthdayDto(
     val updated: String = "",
     @field:Json(name = "deleted")
     val deleted: Boolean = false,
+    @field:Json(name = "colorId")
+    val colorId: String?,
 )
 
 data class BirthdayDateTime(

@@ -6,6 +6,7 @@ import com.nikkap.calendar.core.utils.toIsoDateWithoutTime
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.TaskEntity
 import com.nikkap.calendar.data.remote.dto.TaskDto
+import com.nikkap.calendar.data.remote.dto.update.TaskUpdateDto
 import com.nikkap.calendar.domain.model.Task
 
 fun Task.toTaskDto(): TaskDto {
@@ -41,6 +42,28 @@ fun Task.toTaskEntity(currentTime: Long = System.currentTimeMillis()): TaskEntit
     )
 }
 
+fun Task.toTaskUpdateDto(): TaskUpdateDto {
+    return TaskUpdateDto(
+        id = id!!,
+        title = if (title.isNullOrBlank()) null else title,
+        status = if (isCompleted) "completed" else "needsAction",
+        notes = if (notes.isNullOrBlank()) null else notes,
+        due = if (deadline != null && deadline != 0L) deadline.toIsoDate() else null,
+    )
+}
+
+fun TaskEntity.toTaskUpdateDto(): TaskUpdateDto {
+    return TaskUpdateDto(
+        id = id,
+        title = title,
+        notes = notes,
+        status = isCompletedString,
+        due = deadline?.toIsoDateWithoutTime(),
+        parent = null,
+        position = null,
+    )
+}
+
 fun TaskDto.toTaskEntity(taskListId: String): TaskEntity {
     return TaskEntity(
         id = id,
@@ -62,7 +85,7 @@ fun TaskEntity.toTaskDto(): TaskDto {
         status = isCompletedString,
         due = deadline?.toIsoDateWithoutTime(),
         parent = null,
-        position = null, // TODO check
+        position = null,
     )
 }
 
@@ -85,6 +108,7 @@ fun TaskEntity.changePendingAction(pendingAction: PendingActions): TaskEntity {
 
 val TaskDto.dateLong: Long?
     get() = due?.let { parseIsoDate(it, true) }
+
 val TaskDto.isCompleted: Boolean
     get() = status == "completed"
 

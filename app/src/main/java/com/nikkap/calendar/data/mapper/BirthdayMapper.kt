@@ -8,6 +8,7 @@ import com.nikkap.calendar.data.local.entity.BirthdayEntity
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.remote.dto.BirthdayDateTime
 import com.nikkap.calendar.data.remote.dto.BirthdayDto
+import com.nikkap.calendar.data.remote.dto.update.BirthdayUpdateDto
 import com.nikkap.calendar.domain.model.Birthday
 
 fun BirthdayDto.toBirthdayEntity(): BirthdayEntity {
@@ -16,7 +17,8 @@ fun BirthdayDto.toBirthdayEntity(): BirthdayEntity {
         name = summary?.trimBirthdaySuffix(),
         date = parseIsoDate(start.date, true),
         pendingAction = PendingActions.NONE,
-        lastModified = parseIsoDate(updated)
+        lastModified = parseIsoDate(updated),
+        colorId = colorId?.toInt() ?: 2
     )
 }
 
@@ -24,7 +26,17 @@ fun BirthdayEntity.toBirthday(): Birthday {
     return Birthday(
         id = id,
         name = name,
-        date = date
+        date = date,
+        colorId = colorId
+    )
+}
+
+fun Birthday.toBirthdayUpdateDto(): BirthdayUpdateDto {
+    return BirthdayUpdateDto(
+        id = id!!,
+        summary = if (name.isNullOrBlank()) null else name,
+        start = if (date == 0L || date == null) null else BirthdayDateTime(date.toIsoDateAllDay()),
+        colorId = colorId?.toString()
     )
 }
 
@@ -32,7 +44,8 @@ fun BirthdayEntity.toBirthdayDto(): BirthdayDto {
     return BirthdayDto(
         id = id,
         summary = name,
-        start = BirthdayDateTime(date.toIsoDateAllDay())
+        start = BirthdayDateTime(date.toIsoDateAllDay()),
+        colorId = colorId.toString()
     )
 }
 
@@ -57,7 +70,8 @@ fun Birthday.toBirthdayEntity(currentTime: Long = System.currentTimeMillis()): B
         name = name,
         date = date!!,
         pendingAction = PendingActions.NONE,
-        lastModified = currentTime
+        lastModified = currentTime,
+        colorId = colorId ?: 2
     )
 }
 
@@ -65,6 +79,7 @@ fun Birthday.toBirthdayDto(): BirthdayDto {
     return BirthdayDto(
         id = id!!,
         summary = name,
-        start = BirthdayDateTime(date = date!!.toIsoDateWithoutSeconds())
+        start = BirthdayDateTime(date = date!!.toIsoDateWithoutSeconds()),
+        colorId = colorId.toString()
     )
 }

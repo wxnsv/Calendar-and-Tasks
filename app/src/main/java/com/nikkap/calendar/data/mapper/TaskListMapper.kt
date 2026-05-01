@@ -4,6 +4,7 @@ import com.nikkap.calendar.core.utils.parseIsoDate
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.TaskListEntity
 import com.nikkap.calendar.data.remote.dto.TaskListDto
+import com.nikkap.calendar.data.remote.dto.update.TaskListUpdateDto
 import com.nikkap.calendar.domain.model.TaskList
 
 fun TaskListDto.toTaskListEntity(): TaskListEntity {
@@ -15,6 +16,16 @@ fun TaskListDto.toTaskListEntity(): TaskListEntity {
     )
 }
 
+fun TaskList.toTaskListEntity(currentTime: Long = System.currentTimeMillis()): TaskListEntity {
+    return TaskListEntity(
+        id = id,
+        title = title,
+        pendingAction = PendingActions.NONE,
+        lastModified = currentTime,
+    )
+}
+
+
 fun TaskListEntity.toTaskList(): TaskList {
     return TaskList(
         id = id,
@@ -24,6 +35,14 @@ fun TaskListEntity.toTaskList(): TaskList {
 
 fun TaskListEntity.toTaskListDto(): TaskListDto {
     return TaskListDto(
+        id = id,
+        title = title,
+        updated = ""
+    )
+}
+
+fun TaskListEntity.toTaskListUpdateDto(): TaskListUpdateDto {
+    return TaskListUpdateDto(
         id = id,
         title = title,
         updated = ""
@@ -43,5 +62,12 @@ fun TaskListEntity.markAsSynchronized(
 fun TaskListEntity.changePendingAction(pendingAction: PendingActions): TaskListEntity {
     return this.copy(
         pendingAction = pendingAction,
+    )
+}
+
+fun TaskList.toTaskListUpdateDto(): TaskListUpdateDto {
+    return TaskListUpdateDto(
+        id = id,
+        title = title.ifBlank { null }
     )
 }

@@ -16,4 +16,6 @@ data class BirthdayEntity(
     val name: String?,
     @ColumnInfo("date")
     val date: Long,
+    @ColumnInfo("colorId")
+    val colorId: Int,
 ) : SyncableEntity

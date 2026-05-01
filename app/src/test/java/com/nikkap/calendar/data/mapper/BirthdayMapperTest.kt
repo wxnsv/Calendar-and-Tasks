@@ -19,32 +19,35 @@ private fun testEntity(
     name = name,
     date = date,
     pendingAction = pendingAction,
-    lastModified = lastModified
+    lastModified = lastModified,
+    colorId = 2
 )
 
 private fun testDto(
     id: String = "default_id",
     summary: String = "Default Name",
     date: String = "1970-01-01",
-    updated: String = "2020-04-10T12:21:00Z"
+    updated: String = "2020-04-10T12:21:00Z",
+    colorId: Int = 2
 ): BirthdayDto =
     BirthdayDto(
         id = id,
         summary = summary,
         start = BirthdayDateTime(date),
-        updated = updated
+        updated = updated,
+        colorId = colorId.toString()
     )
 
 fun testBirthday(
     id: String? = "default_id",
     name: String = "Default Name",
     date: Long? = 0L,
-    color: String = "1"
+    color: Int = 2
 ) = Birthday(
     id = id,
     name = name,
     date = date,
-    colorHex = color
+    colorId = color
 )
 
 
@@ -115,7 +118,7 @@ class BirthdayMapperTest {
             id = "123",
             name = "John",
             date = 0L,
-            color = "1"
+            color = 1
         )
 
         val entity = domain.toBirthdayEntity(1767225600000L)

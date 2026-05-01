@@ -14,7 +14,7 @@ import com.nikkap.calendar.databinding.ItemColorPickerBinding
 class ColorPickerAdapter :
     ListAdapter<CalendarColors, ColorPickerAdapter.ViewHolder>(DiffCallback) {
 
-    private var selectedColorId: String? = null
+    private var selectedColorId: Int? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =

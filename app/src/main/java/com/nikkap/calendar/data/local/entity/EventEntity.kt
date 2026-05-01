@@ -23,7 +23,7 @@ data class EventEntity(
     @ColumnInfo("isAllDay")
     val isAllDay: Boolean,
     @ColumnInfo("colorHex")
-    val colorId: String?,
+    val colorId: Int,
     @ColumnInfo("status")
     val status: String?,
 ) : SyncableEntity

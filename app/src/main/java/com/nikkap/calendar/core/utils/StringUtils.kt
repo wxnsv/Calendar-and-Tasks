@@ -19,3 +19,20 @@ fun String.trimBirthdaySuffix(): String {
         this
     }
 }
+
+fun String.toColor(): Color {
+    val cleanHex = this.replace("#", "").replace("0x", "")
+
+    val alphaHex = if (cleanHex.length == 6) {
+        "FF$cleanHex"
+    } else {
+        cleanHex
+    }
+
+    return Color(java.lang.Long.parseLong(alphaHex, 16))
+}
+
+const val loremIpsum =
+    "lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+            "Integer suscipit erat et orci eleifend, tempus fermentum" +
+            " lorem vestibulum. Duis at tincidunt libero. Donec at nunc"

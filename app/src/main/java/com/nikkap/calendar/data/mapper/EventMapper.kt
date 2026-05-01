@@ -5,6 +5,7 @@ import com.nikkap.calendar.core.utils.parseIsoDate
 import com.nikkap.calendar.data.local.entity.EventEntity
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.remote.dto.EventDto
+import com.nikkap.calendar.data.remote.dto.update.EventUpdateDto
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.EventStatus
 import java.util.Locale
@@ -17,8 +18,8 @@ fun Event.toEventEntity(lastModified: Long = System.currentTimeMillis()): EventE
         startTimestamp = startTimestamp,
         endTimestamp = endTimestamp,
         isAllDay = isAllDay,
-        colorId = colorHex,
-        status = status.name,
+        colorId = colorId ?: 7,
+        status = status?.name,
         pendingAction = PendingActions.NONE,
         lastModified = lastModified
     )
@@ -32,7 +33,7 @@ fun EventEntity.toEvent(): Event {
         startTimestamp = startTimestamp,
         endTimestamp = endTimestamp,
         isAllDay = isAllDay,
-        colorHex = colorId,
+        colorId = colorId,
         status = EventStatus.valueOf(status?.uppercase() ?: ""),
     )
 }
@@ -47,7 +48,7 @@ fun EventEntity.toEventDto(): EventDto {
         start = start,
         end = end,
         updated = "",
-        colorId = colorId,
+        colorId = colorId.toString(),
         status = status
     )
 }
@@ -77,10 +78,35 @@ fun Event.toEventDto(): EventDto {
         start = end,
         end = start,
         updated = null,
-        colorId = colorHex,
-        status = status.name.lowercase(Locale.ROOT),
+        colorId = colorId.toString(),
+        status = status?.name?.lowercase(Locale.ROOT),
     )
+}
 
+fun Event.toEventUpdateDto(): EventUpdateDto {
+    val (start, end) = eventDateFormatter(startTimestamp, endTimestamp, isAllDay)
+    return EventUpdateDto(
+        id = id!!,
+        summary = if (summary.isNullOrBlank()) null else summary,
+        description = if (description.isNullOrBlank()) null else description,
+        start = if (startTimestamp == 0L) null else start,
+        end = if (endTimestamp == 0L) null else end,
+        colorId = colorId?.toString(),
+        status = status?.name?.lowercase(Locale.ROOT),
+    )
+}
+
+fun EventEntity.toEventUpdateDto(): EventUpdateDto {
+    val (start, end) = eventDateFormatter(startTimestamp, endTimestamp, isAllDay)
+    return EventUpdateDto(
+        id = id,
+        summary = if (summary.isNullOrBlank()) null else summary,
+        description = if (description.isNullOrBlank()) null else description,
+        start = if (startTimestamp == 0L) null else start,
+        end = if (endTimestamp == 0L) null else end,
+        colorId = colorId.toString(),
+        status = status,
+    )
 }
 
 fun EventDto.toEventEntity(): EventEntity {
@@ -91,7 +117,7 @@ fun EventDto.toEventEntity(): EventEntity {
         startTimestamp = startTimestamp,
         endTimestamp = endTimestamp,
         isAllDay = isAllDay,
-        colorId = colorId,
+        colorId = colorId?.toInt() ?: 7,
         status = status,
         pendingAction = PendingActions.NONE,
         lastModified = parseIsoDate(updated),
