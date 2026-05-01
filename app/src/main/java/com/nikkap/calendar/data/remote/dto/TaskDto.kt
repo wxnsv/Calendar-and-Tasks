@@ -24,4 +24,3 @@ data class TaskDto(
     @field:Json(name = "deleted")
     val deleted: Boolean = false,
 )
-//TODO("reminders")

@@ -180,7 +180,7 @@ class CreateViewModel(
                 _state.update {
                     it.copy(
                         eventDraft = it.eventDraft.copy(
-                            colorHex = intent.color.toString()
+                            colorId = intent.color
                         )
                     )
                 }
@@ -242,7 +242,7 @@ class CreateViewModel(
             is CreateBirthdayIntent.UpdateColor -> _state.update {
                 it.copy(
                     birthdayDraft = it.birthdayDraft.copy(
-                        colorHex = intent.color
+                        colorId = intent.color
                     )
                 )
             }

@@ -1,5 +1,7 @@
 package com.nikkap.calendar.core.utils
 
+import androidx.compose.ui.graphics.Color
+
 /**
  * Removes the system suffix added by Google Event to birthday events
  * (e.g., "John Doe – Birthday" becomes "John Doe").

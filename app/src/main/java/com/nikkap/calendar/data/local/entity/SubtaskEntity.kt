@@ -23,4 +23,6 @@ data class SubtaskEntity(
     val isCompleted: Boolean,
     @ColumnInfo("taskListId")
     val taskListId: String,
+    @ColumnInfo("deadline")
+    val deadline: Long?,
 ) : SyncableEntity

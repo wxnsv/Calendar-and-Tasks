@@ -30,8 +30,8 @@ interface TaskDao {
     @Update
     suspend fun updateTask(taskEntity: TaskEntity)
 
-    @Delete
-    suspend fun deleteTask(taskEntity: TaskEntity)
+    @Query("DELETE FROM tasks WHERE :id = id")
+    suspend fun deleteTask(id: String)
 
     @Query("DELETE FROM tasklist WHERE id IN (:ids)")
     suspend fun deleteTaskListsByIds(ids: List<String>)
@@ -44,6 +44,9 @@ interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE pendingAction != 'NONE'")
     fun getPendingTasks(): Flow<List<TaskEntity>>
+
+    @Query("UPDATE tasks SET isCompleted = 1 WHERE id = :taskId")
+    suspend fun completeTask(taskId: String)
 
     /**
      * SUBTASKS
@@ -61,6 +64,9 @@ interface TaskDao {
     @Query("DELETE FROM subtasks WHERE id IN (:ids)")
     suspend fun deleteSubtasksByIds(ids: List<String>)
 
+    @Query("DELETE FROM subtasks WHERE parentId = :parentId")
+    suspend fun deleteSubtasksOfTask(parentId: String)
+
     @Query("SELECT * FROM subtasks WHERE pendingAction != 'DELETE'")
     fun getNonDeleteSubtasks(): Flow<List<SubtaskEntity>>
 
@@ -73,8 +79,11 @@ interface TaskDao {
     @Update
     suspend fun updateSubtask(subtaskEntity: SubtaskEntity)
 
-    @Delete
-    suspend fun deleteSubtask(subtaskEntity: SubtaskEntity)
+    @Query("DELETE FROM subtasks WHERE :id = id")
+    suspend fun deleteSubtask(id: String)
+
+    @Query("UPDATE subtasks SET isCompleted = 1 WHERE id = :subtaskId")
+    suspend fun completeSubtask(subtaskId: String)
 
     /**
      * TASKLISTS

@@ -3,6 +3,8 @@ package com.nikkap.calendar.data.remote.api
 import com.google.gson.annotations.SerializedName
 import com.nikkap.calendar.data.remote.dto.TaskDto
 import com.nikkap.calendar.data.remote.dto.TaskListDto
+import com.nikkap.calendar.data.remote.dto.update.TaskListUpdateDto
+import com.nikkap.calendar.data.remote.dto.update.TaskUpdateDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -29,11 +31,11 @@ interface TasksApi {
         @Body taskDto: TaskDto
     ): Response<TaskDto>
 
-    @PATCH("tasks/v1/lists/{tasklist}/tasks/{task}")
+    @PATCH("tasks/v1/lists/{tasklistId}/tasks/{taskId}")
     suspend fun updateTask(
         @Path("tasklist") taskListId: String = "@default",
         @Path("task") taskId: String,
-        @Body task: TaskDto
+        @Body task: TaskUpdateDto
     ): Response<TaskDto>
 
     @GET("tasks/v1/users/@me/lists")
@@ -57,8 +59,8 @@ interface TasksApi {
     @PUT("tasks/v1/users/@me/lists/{tasklist}")
     suspend fun updateTaskList(
         @Path("tasklist") taskListId: String,
-        @Body taskList: TaskListDto
-    ): Response<TaskListDto>
+        @Body taskList: TaskListUpdateDto
+    ): Response<TaskListUpdateDto>
 
     @DELETE("tasks/v1/users/@me/lists/{tasklist}")
     suspend fun deleteTaskList(
@@ -71,16 +73,16 @@ interface TasksApi {
         @Body subtask: TaskDto
     ): Response<TaskDto>
 
-    @PUT("lists/{tasklist}/tasks/{task}")
+    @PATCH("tasks/v1/lists/{tasklistId}/tasks/{taskId}")
     suspend fun updateSubtask(
-        @Path("tasklist") taskListId: String,
+        @Path("tasklist") taskListId: String = "@default",
         @Path("task") subtaskId: String,
-        @Body subtask: TaskDto
-    ): Response<TaskDto>
+        @Body subtask: TaskUpdateDto
+    ): Response<TaskUpdateDto>
 
     @DELETE("lists/{tasklist}/tasks/{task}")
     suspend fun deleteSubtask(
-        @Path("tasklist") taskListId: String,
+        @Path("tasklist") taskListId: String = "@default",
         @Path("task") subtaskId: String
     ): Response<Unit>
 

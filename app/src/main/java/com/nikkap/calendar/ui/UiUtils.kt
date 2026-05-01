@@ -48,7 +48,7 @@ fun showTimePicker(onClick: (Long) -> Unit, context: Context, calendar: Calendar
 
 fun setupSetColorRecyclerView(
     recyclerView: RecyclerView,
-    onSet: (String) -> Unit,
+    onSet: (Int) -> Unit,
     context: Context,
     resources: android.content.res.Resources
 ) {

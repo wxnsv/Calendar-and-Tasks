@@ -23,7 +23,6 @@ data class TaskEntity(
     @ColumnInfo("taskListId")
     val taskListId: String
 
-    // TODO(Reminders)
 ) : SyncableEntity
 
 enum class PendingActions { NONE, INSERT, UPDATE, DELETE }

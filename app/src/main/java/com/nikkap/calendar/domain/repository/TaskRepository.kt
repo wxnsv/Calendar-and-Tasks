@@ -13,4 +13,10 @@ interface TaskRepository {
     suspend fun getTask(id: String): Task
     suspend fun saveTask(task: Task)
     suspend fun updateTask(task: Task)
+    suspend fun updateSubtask(subtask: Subtask)
+    suspend fun updateTaskList(taskList: TaskList)
+    suspend fun deleteTask(id: String)
+    suspend fun deleteSubtask(id: String)
+    suspend fun completeSubtask(id: String)
+    suspend fun completeTask(id: String)
 }

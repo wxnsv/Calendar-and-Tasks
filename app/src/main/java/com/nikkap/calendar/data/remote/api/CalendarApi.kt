@@ -2,6 +2,7 @@ package com.nikkap.calendar.data.remote.api
 
 import com.nikkap.calendar.data.remote.dto.BirthdayDto
 import com.nikkap.calendar.data.remote.dto.EventDto
+import com.nikkap.calendar.data.remote.dto.update.EventUpdateDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -46,8 +47,8 @@ interface CalendarApi {
     suspend fun updateEvent(
         @Path("calendarId") calendarId: String = "primary",
         @Path("eventId") eventId: String,
-        @Body event: EventDto
-    ): Response<EventDto>
+        @Body event: EventUpdateDto
+    ): Response<EventUpdateDto>
 
     @PATCH("calendar/v3/calendars/{calendarId}/events/{eventId}")
     suspend fun updateBirthday(
