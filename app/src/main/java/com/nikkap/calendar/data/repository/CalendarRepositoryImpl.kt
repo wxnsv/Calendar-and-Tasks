@@ -80,17 +80,19 @@ class CalendarRepositoryImpl(
     }
 
     override suspend fun deleteEvent(id: String) {
-        dao.deleteEvent(id)
-        api.deleteItem(
+        dao.markAsDeleteEvent(id, System.currentTimeMillis())
+        val result = api.deleteItem(
             eventId = id
         )
+        if (result.isSuccessful) dao.deleteEvent(id)
     }
 
     override suspend fun deleteBirthday(id: String) {
-        dao.deleteBirthday(id)
-        api.deleteItem(
+        dao.markAsDeleteBirthday(id, System.currentTimeMillis())
+        val result = api.deleteItem(
             eventId = id
         )
+        if (result.isSuccessful) dao.deleteBirthday(id)
     }
 
     override suspend fun saveBirthday(birthday: Birthday) {
@@ -189,7 +191,7 @@ class CalendarRepositoryImpl(
 
 
     private suspend fun birthdaysPendingSync() {
-        val pendingEntities = dao.getNonDeleteBirthdays().first()
+        val pendingEntities = dao.getPendingBirthdays().first()
         coroutineScope {
             pendingEntities.map { entity ->
                 async {

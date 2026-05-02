@@ -45,8 +45,11 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE pendingAction != 'NONE'")
     fun getPendingTasks(): Flow<List<TaskEntity>>
 
-    @Query("UPDATE tasks SET isCompleted = 1 WHERE id = :taskId")
-    suspend fun completeTask(taskId: String)
+    @Query("UPDATE tasks SET isCompleted = 1, pendingAction = 'UPDATE', lastModified = :lastModified WHERE id = :taskId")
+    suspend fun completeTask(taskId: String, lastModified: Long)
+
+    @Query("UPDATE tasks SET pendingAction = 'DELETE', lastModified = :lastModified WHERE id = :id")
+    suspend fun markAsDeleteTask(id: String, lastModified: Long)
 
     /**
      * SUBTASKS
@@ -60,6 +63,9 @@ interface TaskDao {
 
     @Query("SELECT * from subtasks WHERE id = :id")
     suspend fun getSubtask(id: String): SubtaskEntity
+
+    @Query("SELECT * from subtasks")
+    suspend fun getAllSubtasks(): List<SubtaskEntity>
 
     @Query("DELETE FROM subtasks WHERE id IN (:ids)")
     suspend fun deleteSubtasksByIds(ids: List<String>)
@@ -82,8 +88,17 @@ interface TaskDao {
     @Query("DELETE FROM subtasks WHERE :id = id")
     suspend fun deleteSubtask(id: String)
 
-    @Query("UPDATE subtasks SET isCompleted = 1 WHERE id = :subtaskId")
-    suspend fun completeSubtask(subtaskId: String)
+    @Query("UPDATE subtasks SET isCompleted = 1, pendingAction = 'UPDATE', lastModified = :lastModified WHERE id = :subtaskId")
+    suspend fun completeSubtask(subtaskId: String, lastModified: Long)
+
+    @Query("UPDATE subtasks SET pendingAction = 'DELETE', lastModified = :lastModified WHERE id = :id")
+    suspend fun markAsDeleteSubtask(id: String, lastModified: Long)
+
+    @Query("UPDATE subtasks SET pendingAction = 'DELETE', lastModified = :lastModified WHERE parentId = :parentId")
+    suspend fun markAsDeleteSubtasksOfTask(parentId: String, lastModified: Long)
+
+    @Query("UPDATE subtasks SET isCompleted = 1, lastModified = :lastModified WHERE parentId = :parentId")
+    suspend fun markAsCompleteSubtasksOfTask(parentId: String, lastModified: Long)
 
     /**
      * TASKLISTS
@@ -105,5 +120,8 @@ interface TaskDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTaskList(taskList: TaskListEntity)
+
+    @Query("UPDATE tasklist SET pendingAction = 'DELETE', lastModified = :lastModified WHERE id = :id")
+    suspend fun markAsDeleteTaskList(id: String, lastModified: Long)
 
 }

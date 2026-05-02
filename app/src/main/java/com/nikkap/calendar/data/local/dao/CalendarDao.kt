@@ -20,14 +20,17 @@ interface CalendarDao {
     @Query("SELECT * FROM event WHERE pendingAction != 'DELETE'")
     fun getNonDeleteEvents(): Flow<List<EventEntity>>
 
+    @Query("SELECT * FROM event")
+    fun getAllEvents(): Flow<List<EventEntity>>
+
     @Query("SELECT * FROM event WHERE pendingAction != 'NONE'")
     fun getPendingEvents(): Flow<List<EventEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEvents(eventEntities: List<EventEntity>)
 
-    @Query("DELETE FROM birthday WHERE :id = id")
-    suspend fun deleteBirthday(id: String)
+    @Query("UPDATE event SET pendingAction = 'DELETE', lastModified = :lastModified WHERE id = :id")
+    suspend fun markAsDeleteEvent(id: String, lastModified: Long)
 
     @Query("DELETE FROM event WHERE :id = id")
     suspend fun deleteEvent(id: String)
@@ -50,6 +53,9 @@ interface CalendarDao {
 
     @Query("SELECT * FROM birthday WHERE pendingAction != 'DELETE'")
     fun getNonDeleteBirthdays(): Flow<List<BirthdayEntity>>
+
+    @Query("SELECT * FROM birthday")
+    fun getAllBirthdays(): Flow<List<BirthdayEntity>>
 
     @Query("SELECT * FROM birthday WHERE pendingAction != 'NONE'")
     fun getPendingBirthdays(): Flow<List<BirthdayEntity>>
@@ -75,4 +81,9 @@ interface CalendarDao {
     @Update
     suspend fun updateBirthday(birthdayEntity: BirthdayEntity)
 
+    @Query("DELETE FROM birthday WHERE :id = id")
+    suspend fun deleteBirthday(id: String)
+
+    @Query("UPDATE birthday SET pendingAction = 'DELETE', lastModified = :lastModified WHERE id = :id")
+    suspend fun markAsDeleteBirthday(id: String, lastModified: Long)
 }

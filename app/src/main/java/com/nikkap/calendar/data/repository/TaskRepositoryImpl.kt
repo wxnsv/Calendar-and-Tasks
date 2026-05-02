@@ -59,102 +59,174 @@ class TaskRepositoryImpl(
 
     override suspend fun saveTask(task: Task) {
         dao.insertTask(task.toTaskEntity().changePendingAction(PendingActions.INSERT))
-        api.createTask(taskDto = task.toTaskDto())
+        api.createTask(
+            taskDto = task.toTaskDto(),
+            taskListId = task.taskListId.ifBlank { "@default" }
+        )
+        //TODO // FIX SET TASKLIST
     }
 
     override suspend fun updateTask(task: Task) {
+        val entity = dao.getTask(task.id!!)
         dao.updateTask(task.toTaskEntity().changePendingAction(PendingActions.UPDATE))
         val result = api.updateTask(
             task = task.toTaskUpdateDto(),
-            taskId = task.id!!
-        ).body()
-        if (result != null) dao.updateTask(
-            result.toTaskEntity(task.taskListId).markAsSynchronized(parseIsoDate(result.updated))
+            taskListId = entity.taskListId.ifBlank { "@default" },
+            taskId = task.id
         )
+        if (result.isSuccessful) dao.updateTask(
+            result.body()!!.toTaskEntity(task.taskListId)
+                .markAsSynchronized(parseIsoDate(result.body()!!.updated))
+        ) else handleErrorCode(result.code())
     }
 
     override suspend fun updateSubtask(subtask: Subtask) {
-        dao.updateSubtask(subtask.toSubtaskEntity())
+        dao.updateSubtask(subtask.toSubtaskEntity().changePendingAction(PendingActions.UPDATE))
+        val entity = dao.getSubtask(subtask.id)
         val result = api.updateSubtask(
-            taskListId = subtask.taskListId,
+            taskListId = entity.taskListId,
             subtaskId = subtask.id,
             subtask = subtask.toTaskUpdateDto(),
-        ).body()
-        if (result != null) dao.updateSubtask(
-            result.toSubtaskEntity(subtask.taskListId)
-                .markAsSynchronized(parseIsoDate(result.updated))
         )
+        if (result.isSuccessful) dao.updateSubtask(
+            result.body()!!.toSubtaskEntity(entity.taskListId)
+                .markAsSynchronized(parseIsoDate(result.body()!!.updated))
+        ) else handleErrorCode(result.code())
     }
 
     override suspend fun updateTaskList(taskList: TaskList) {
-        dao.updateTasklist(taskList.toTaskListEntity())
+        dao.updateTasklist(taskList.toTaskListEntity().changePendingAction(PendingActions.UPDATE))
         val result = api.updateTaskList(
             taskListId = taskList.id,
             taskList = taskList.toTaskListUpdateDto(),
-        ).body()
-        if (result != null) dao.updateTasklist(
-            taskList.toTaskListEntity().markAsSynchronized(parseIsoDate(result.updated))
         )
+        if (result.isSuccessful) dao.updateTasklist(
+            taskList.toTaskListEntity().markAsSynchronized(parseIsoDate(result.body()!!.updated))
+        ) else handleErrorCode(result.code())
     }
 
     override suspend fun deleteTask(id: String) {
-        val deletedTask = dao.getTask(id)
-        dao.deleteTask(id)
-        dao.deleteSubtasksOfTask(id)
-        api.deleteTask(taskId = id)
-        deleteAllSubtasks(taskListId = deletedTask.taskListId, id)
+        val entity = dao.getTask(id)
+        dao.markAsDeleteTask(id, System.currentTimeMillis())
+        dao.markAsDeleteSubtasksOfTask(id, System.currentTimeMillis())
+        val resultTask = api.deleteTask(taskId = entity.id, taskListId = entity.taskListId)
+        val resultSubtasks = deleteAllSubtasks(
+            taskListId = entity.taskListId,
+            entity.id
+        )
+        if (resultTask.isSuccessful && resultSubtasks.isSuccess) {
+            dao.deleteTask(entity.id)
+            dao.deleteSubtasksOfTask(entity.id)
+        } else {
+            handleErrorCode(resultTask.code())
+        }
     }
 
     /**
-     * Deletes all subtask of parent Task
+     * Deletes all subtask of parent Task on remote
      */
-    suspend fun deleteAllSubtasks(taskListId: String, parentTaskId: String) {
-        try {
-            val subtaskIdsToDelete = allSubtasks.first()
+    private suspend fun deleteAllSubtasks(taskListId: String, parentTaskId: String): Result<Unit> {
+        return try {
+            var countOfSuccess = 0
+            val subtaskIdsToDelete = dao.getAllSubtasks()
                 .filter { it.parentId == parentTaskId }
                 .map { it.id }
-
+            dao.markAsDeleteSubtasksOfTask(parentTaskId, System.currentTimeMillis())
             coroutineScope {
                 subtaskIdsToDelete.forEach { subtaskId ->
                     launch {
-                        api.deleteSubtask(taskListId, subtaskId)
+                        val result = api.deleteSubtask(taskListId, subtaskId)
+                        if (result.isSuccessful) countOfSuccess++ else handleErrorCode(result.code())
                     }
                 }
             }
-        } catch (_: Exception) {
+            if (countOfSuccess == subtaskIdsToDelete.size) Result.success(Unit)
+            else Result.failure(
+                Exception("Not all subtasks delete correctly")
+            )
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+    }
 
+    /**
+     * Mark all subtask of parent Task completed on remote
+     */
+
+    private suspend fun completeAllSubtasks(
+        taskListId: String,
+        parentTaskId: String
+    ): Result<Unit> {
+        return try {
+            dao.markAsCompleteSubtasksOfTask(parentTaskId, System.currentTimeMillis())
+            var countOfSuccess = 0
+            val subtaskIdsToUpdate = dao.getAllSubtasks()
+                .filter { it.parentId == parentTaskId }
+                .map { it.id }
+            coroutineScope {
+                subtaskIdsToUpdate.forEach { subtaskId ->
+                    launch {
+                        val result = api.updateSubtask(
+                            taskListId,
+                            subtaskId,
+                            TaskUpdateDto(id = subtaskId, status = "completed")
+                        )
+                        if (result.isSuccessful) countOfSuccess++ else handleErrorCode(result.code())
+                    }
+                }
+            }
+            if (countOfSuccess == subtaskIdsToUpdate.size) Result.success(Unit)
+            else Result.failure(
+                Exception("Not all subtasks complete correctly")
+            )
+        } catch (e: Exception) {
+            return Result.failure(e)
         }
     }
 
     override suspend fun deleteSubtask(id: String) {
-        dao.deleteSubtask(id)
-        api.deleteSubtask(subtaskId = id)
+        val subtask = dao.getSubtask(id)
+        dao.markAsDeleteSubtask(id, System.currentTimeMillis())
+        val result = api.deleteSubtask(subtask.taskListId, subtaskId = id)
+        if (result.isSuccessful) {
+            dao.deleteSubtask(id)
+        } else handleErrorCode(result.code())
     }
 
     override suspend fun completeSubtask(id: String) {
-        dao.completeSubtask(id)
+        dao.completeSubtask(id, System.currentTimeMillis())
+        val subtask = dao.getSubtask(id)
         val result = api.updateSubtask(
             subtaskId = id,
+            taskListId = subtask.taskListId,
             subtask = TaskUpdateDto(id = id, status = "completed")
-        ).body()
-        if (result != null) {
+        )
+        if (result.isSuccessful) {
             val subtask = dao.getSubtask(id)
             dao.updateSubtask(
-                subtask.markAsSynchronized(parseIsoDate(result.updated))
+                subtask.markAsSynchronized(parseIsoDate(result.body()?.updated))
             )
-        }
+        } else handleErrorCode(result.code())
     }
 
     override suspend fun completeTask(id: String) {
-        dao.completeTask(id)
+        dao.completeTask(
+            id, System.currentTimeMillis()
+        )
+        val task = dao.getTask(id)
+        completeAllSubtasks(task.taskListId, id)
         val result =
-            api.updateTask(taskId = id, task = TaskUpdateDto(id = id, status = "completed")).body()
-        if (result != null) {
+            api.updateTask(
+                taskId = id,
+                task = TaskUpdateDto(id = id, status = "completed"),
+                taskListId = task.taskListId
+            )
+        if (result.isSuccessful) {
             val task = dao.getTask(id)
             dao.updateTask(
-                task.markAsSynchronized(parseIsoDate(result.updated))
+                task.markAsSynchronized(parseIsoDate(result.body()!!.updated))
             )
-        }
+        } else handleErrorCode(result.code())
     }
 
 
@@ -176,14 +248,6 @@ class TaskRepositoryImpl(
         if (listsPendingResult.isFailure) {
             return listsPendingResult
         }
-
-        val tasksPendingResult = tasksPendingSync()
-
-        if (tasksPendingResult.isFailure) {
-            return tasksPendingResult
-        }
-
-        subtasksPendingSync()
 
         val remoteTaskLists = getRemoteTaskLists(lastSyncTime = tasksSyncTime)
 
@@ -212,14 +276,14 @@ class TaskRepositoryImpl(
             return Result.failure(taskListsResult.exceptionOrNull()!!)
         }
 
-        val tasksAndIdsResult =
+        val tasksAndTaskListIdsResult =
             getTasksWithTaskListIds(remoteTaskLists = taskLists, tasksSyncTime)
 
-        if (tasksAndIdsResult.isFailure) {
-            return Result.failure(tasksAndIdsResult.exceptionOrNull()!!)
+        if (tasksAndTaskListIdsResult.isFailure) {
+            return Result.failure(tasksAndTaskListIdsResult.exceptionOrNull()!!)
         }
 
-        val tasksAndListIds = tasksAndIdsResult.getOrNull()!!
+        val tasksAndListIds = tasksAndTaskListIdsResult.getOrNull()!!
 
         if (tasksAndListIds.isEmpty()) {
             return Result.success(Unit)
@@ -291,10 +355,23 @@ class TaskRepositoryImpl(
                 try {
                     when (entity.pendingAction) {
                         PendingActions.DELETE -> {
-                            if (api.deleteTask(taskId = entity.id).isSuccessful) {
+                            val resultTask =
+                                api.deleteTask(
+                                    taskId = entity.id,
+                                    taskListId = entity.taskListId
+                                )
+                            val resultSubtasks = deleteAllSubtasks(
+                                taskListId = entity.taskListId,
+                                entity.id
+                            ).isSuccess
+                            if (resultTask.isSuccessful && resultSubtasks) {
                                 dao.deleteTask(entity.id)
+                                dao.deleteSubtasksOfTask(entity.id)
                                 true
-                            } else false
+                            } else {
+                                handleErrorCode(resultTask.code())
+                                false
+                            }
                         }
 
                         PendingActions.UPDATE -> {
@@ -303,20 +380,23 @@ class TaskRepositoryImpl(
                                 taskListId = entity.taskListId,
                                 task = entity.toTaskUpdateDto()
                             )
-                            if (result.isSuccessful
-                            ) {
+                            if (result.isSuccessful) {
                                 dao.updateTask(
                                     entity.markAsSynchronized(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
                                 true
-                            } else false
+                            } else {
+                                handleErrorCode(result.code())
+                                false
+                            }
                         }
 
                         PendingActions.INSERT -> {
                             val result = api.createTask(
-                                taskDto = entity.toTaskDto()
+                                taskDto = entity.toTaskDto(),
+                                taskListId = entity.taskListId
                             )
                             if (result.isSuccessful
                             ) {
@@ -326,7 +406,10 @@ class TaskRepositoryImpl(
                                     )
                                 )
                                 true
-                            } else false
+                            } else {
+                                handleErrorCode(result.code())
+                                false
+                            }
                         }
 
                         PendingActions.NONE -> {
@@ -353,9 +436,13 @@ class TaskRepositoryImpl(
                 async {
                     when (entity.pendingAction) {
                         PendingActions.DELETE -> {
-                            if (api.deleteTask(taskId = entity.id).isSuccessful) dao.deleteSubtask(
-                                entity.id
+                            val result = api.deleteSubtask(
+                                subtaskId = entity.id,
+                                taskListId = entity.taskListId
                             )
+                            if (result.isSuccessful) {
+                                dao.deleteSubtask(entity.id)
+                            } else handleErrorCode(result.code())
                         }
 
                         PendingActions.UPDATE -> {
@@ -370,7 +457,7 @@ class TaskRepositoryImpl(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
-                            }
+                            } else handleErrorCode(result.code())
                         }
 
                         PendingActions.INSERT -> {
@@ -378,14 +465,13 @@ class TaskRepositoryImpl(
                                 taskListId = entity.taskListId,
                                 subtask = entity.toTaskDto()
                             )
-                            if (result.isSuccessful
-                            ) {
+                            if (result.isSuccessful) {
                                 dao.insertSubtask(
                                     entity.markAsSynchronized(
                                         parseIsoDate(result.body()?.updated)
                                     )
                                 )
-                            }
+                            } else handleErrorCode(result.code())
                         }
 
                         PendingActions.NONE -> {}
@@ -402,10 +488,14 @@ class TaskRepositoryImpl(
                 try {
                     when (entity.pendingAction) {
                         PendingActions.DELETE -> {
-                            if (api.deleteTaskList(entity.id).isSuccessful) {
+                            val result = api.deleteTaskList(entity.id)
+                            if (result.isSuccessful) {
                                 dao.deleteTasklist(entity)
                                 true
-                            } else false
+                            } else {
+                                handleErrorCode(result.code())
+                                false
+                            }
                         }
 
                         PendingActions.UPDATE -> {
@@ -420,7 +510,10 @@ class TaskRepositoryImpl(
                                     )
                                 )
                                 true
-                            } else false
+                            } else {
+                                handleErrorCode(result.code())
+                                false
+                            }
                         }
 
                         PendingActions.INSERT -> {
@@ -433,7 +526,10 @@ class TaskRepositoryImpl(
                                     )
                                 )
                                 true
-                            } else false
+                            } else {
+                                handleErrorCode(result.code())
+                                false
+                            }
                         }
 
                         PendingActions.NONE -> {

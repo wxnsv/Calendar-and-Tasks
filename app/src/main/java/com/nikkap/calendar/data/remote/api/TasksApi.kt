@@ -27,14 +27,14 @@ interface TasksApi {
 
     @POST("tasks/v1/lists/{tasklist}/tasks")
     suspend fun createTask(
-        @Path("tasklist") taskListId: String = "@default",
+        @Path("tasklist") taskListId: String,
         @Body taskDto: TaskDto
     ): Response<TaskDto>
 
     @PATCH("tasks/v1/lists/{tasklistId}/tasks/{taskId}")
     suspend fun updateTask(
-        @Path("tasklist") taskListId: String = "@default",
-        @Path("task") taskId: String,
+        @Path("tasklistId") taskListId: String,
+        @Path("taskId") taskId: String,
         @Body task: TaskUpdateDto
     ): Response<TaskDto>
 
@@ -47,7 +47,7 @@ interface TasksApi {
 
     @DELETE("tasks/v1/lists/{taskListId}/tasks/{taskId}")
     suspend fun deleteTask(
-        @Path("taskListId") taskListId: String = "@default",
+        @Path("taskListId") taskListId: String,
         @Path("taskId") taskId: String
     ): Response<Unit>
 
@@ -73,16 +73,16 @@ interface TasksApi {
         @Body subtask: TaskDto
     ): Response<TaskDto>
 
-    @PATCH("tasks/v1/lists/{tasklistId}/tasks/{taskId}")
+    @PATCH("tasks/v1/lists/{tasklistId}/tasks/{subtaskId}")
     suspend fun updateSubtask(
-        @Path("tasklist") taskListId: String = "@default",
-        @Path("task") subtaskId: String,
+        @Path("tasklistId") taskListId: String,
+        @Path("subtaskId") subtaskId: String,
         @Body subtask: TaskUpdateDto
     ): Response<TaskUpdateDto>
 
     @DELETE("lists/{tasklist}/tasks/{task}")
     suspend fun deleteSubtask(
-        @Path("tasklist") taskListId: String = "@default",
+        @Path("tasklist") taskListId: String,
         @Path("task") subtaskId: String
     ): Response<Unit>
 
