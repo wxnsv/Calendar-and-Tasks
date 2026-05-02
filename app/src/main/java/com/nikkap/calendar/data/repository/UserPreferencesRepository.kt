@@ -99,7 +99,7 @@ class UserPreferencesRepository(
 
     suspend fun clearLastTaskSyncTime() {
         dataStore.edit { preferences ->
-            preferences.remove(Keys.CALENDAR_LAST_SYNC)
+            preferences.remove(Keys.TASK_LAST_SYNC)
         }
     }
 
