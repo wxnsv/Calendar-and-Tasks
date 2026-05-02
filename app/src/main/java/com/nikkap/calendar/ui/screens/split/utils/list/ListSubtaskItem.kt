@@ -18,13 +18,14 @@ import com.nikkap.calendar.domain.model.Subtask
 
 @Composable
 fun ListSubtaskItem(
+    modifier: Modifier,
     subtask: Subtask,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onCompleteClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(5.dp, end = 15.dp)
             .fillMaxWidth()
             .wrapContentHeight()
@@ -56,5 +57,7 @@ private fun Preview() {
         title = loremIpsum,
         deadline = 123543454312
     )
-    ListSubtaskItem(subtask, {}, {}, {})
+    ListSubtaskItem(
+        Modifier, subtask, { },
+        {}, {})
 }

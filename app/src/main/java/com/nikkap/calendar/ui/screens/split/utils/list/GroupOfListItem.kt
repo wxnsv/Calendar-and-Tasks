@@ -53,10 +53,10 @@ fun GroupOfListItem(
                     }
                     ListTaskItem(
                         entity,
-                        onEditClick = { onEditClick(entity.id, "TASK") },
-                        onCompleteClick = { onCompleteClick(entity.id, "TASK") },
+                        onEditClick = { id, type -> onEditClick(id, type) },
+                        onCompleteClick = { id, type -> onCompleteClick(id, type) },
                         subtasks = listOfSubtasks,
-                        onDeleteClick = { onDeleteClick(entity.id, "TASK") }
+                        onDeleteClick = { id, type -> onDeleteClick(id, type) }
                     )
                 }
 

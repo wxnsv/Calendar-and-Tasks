@@ -1,6 +1,10 @@
 package com.nikkap.calendar.ui.screens.split.utils.list
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,6 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,9 +44,9 @@ import com.nikkap.calendar.ui.screens.split.utils.SplitEntity
 @Composable
 fun ListTaskItem(
     item: SplitEntity.TaskItem,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    onCompleteClick: () -> Unit,
+    onEditClick: (String, String) -> Unit,
+    onDeleteClick: (String, String) -> Unit,
+    onCompleteClick: (String, String) -> Unit,
     subtasks: List<Subtask> = emptyList()
 ) {
     var isSubtasksVisible by remember { mutableStateOf(false) }
@@ -47,7 +54,6 @@ fun ListTaskItem(
         modifier = Modifier
             .padding(5.dp, end = 15.dp)
             .fillMaxWidth()
-//            .wrapContentHeight()
             .clickable {
                 isSubtasksVisible = !isSubtasksVisible
             }
@@ -64,9 +70,9 @@ fun ListTaskItem(
             )
             DropDownMenu(
                 completable = true,
-                onEditClick = onEditClick,
-                onDeleteClick = onDeleteClick,
-                onCompleteClick = onCompleteClick,
+                onEditClick = { onEditClick(item.id, "TASK") },
+                onDeleteClick = { onDeleteClick(item.id, "TASK") },
+                onCompleteClick = { onCompleteClick(item.id, "TASK") },
             )
         }
         Row {
@@ -105,31 +111,45 @@ fun ListTaskItem(
             )
         }
         if (subtasks.isNotEmpty()) {
+            val rotationAngle by animateFloatAsState(
+                targetValue = if (isSubtasksVisible) 180f else 0f,
+                animationSpec = tween(durationMillis = 300),
+                label = "RotationAnimation"
+            )
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-                Image(
-                    painter = painterResource(
-                        id = if (!isSubtasksVisible)
-                            R.drawable.arrow_drop_down
-                        else R.drawable.arrow_drop_up
-                    ),
-                    contentDescription = "Subtasks drop arrow icon",
-
-                    modifier = Modifier.size(25.dp),
+                Icon(
+                    painter = painterResource(R.drawable.arrow_drop_down),
+                    contentDescription = "Subtasks drop down icon",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .scale(3f)
+                        .rotate(rotationAngle),
+                    tint = Color.Black
                 )
             }
-        }
-    }
-    AnimatedVisibility(visible = isSubtasksVisible) {
-        LazyColumn(
-            modifier = Modifier.heightIn(max = 350.dp)
-        ) {
-            items(subtasks) { subtask ->
-                ListSubtaskItem(
-                    subtask,
-                    onEditClick = onEditClick,
-                    onDeleteClick = onDeleteClick,
-                    onCompleteClick = onCompleteClick
-                )
+            AnimatedVisibility(visible = isSubtasksVisible) {
+                LazyColumn(
+                    modifier = Modifier.heightIn(max = 350.dp)
+                ) {
+                    items(
+                        subtasks,
+                        key = { subtask -> subtask.id }) { subtask ->
+                        ListSubtaskItem(
+                            Modifier.animateItem(
+                                fadeInSpec = tween(durationMillis = 300),
+                                fadeOutSpec = tween(durationMillis = 300),
+                                placementSpec = spring(
+                                    dampingRatio = Spring.DampingRatioLowBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                )
+                            ),
+                            subtask,
+                            onEditClick = { onEditClick(subtask.id, "SUBTASK") },
+                            onDeleteClick = { onDeleteClick(subtask.id, "SUBTASK") },
+                            onCompleteClick = { onCompleteClick(subtask.id, "SUBTASK") },
+                        )
+                    }
+                }
             }
         }
     }
@@ -148,9 +168,10 @@ private fun WithoutNotes() {
     ListTaskItem(
         subtasks = emptyList(),
         item = taskItem,
-        onEditClick = { },
-        onDeleteClick = { },
-        onCompleteClick = { }
+        onEditClick = {
+        } as (String, String) -> Unit,
+        onDeleteClick = { } as (String, String) -> Unit,
+        onCompleteClick = { } as (String, String) -> Unit,
     )
 }
 
@@ -168,9 +189,9 @@ private fun WithDescription() {
     ListTaskItem(
         subtasks = emptyList(),
         item = taskItem,
-        onEditClick = { },
-        onDeleteClick = { },
-        onCompleteClick = { },
+        onEditClick = { } as (String, String) -> Unit,
+        onDeleteClick = { } as (String, String) -> Unit,
+        onCompleteClick = { } as (String, String) -> Unit,
     )
 }
 
@@ -186,18 +207,18 @@ private fun WithSubtasks() {
     )
     val subtasks = listOf(
         Subtask(
-            id = "",
+            id = "2",
             title = loremIpsum,
             deadline = 0L,
             parentId = "1"
         ),
         Subtask(
-            id = "",
+            id = "3",
             title = loremIpsum,
             deadline = 0L,
             parentId = "1"
         ), Subtask(
-            id = "",
+            id = "4",
             title = loremIpsum,
             deadline = 0L,
             parentId = "1"
@@ -236,10 +257,10 @@ private fun ListTaskItemWithSubtasks(
                     .fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd
             ) {
-//                DropDownMenu(
-//                    onEditClick = { },
-//                    onDeleteClick = { }
-//                )
+                DropDownMenu(
+                    onEditClick = { },
+                    onDeleteClick = { }
+                )
             }
         }
         Row {
@@ -279,21 +300,33 @@ private fun ListTaskItemWithSubtasks(
         }
         if (subtasks.isNotEmpty()) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-                Image(
-                    painter = painterResource(
-                        id = R.drawable.arrow_drop_down
-                    ),
+                Icon(
+                    painter = painterResource(id = R.drawable.arrow_drop_down),
                     contentDescription = "Subtasks drop down icon",
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier
+                        .size(20.dp)
+                        .scale(3f),
+                    tint = Color.Black // Тинт задается напрямую
                 )
             }
         }
         AnimatedVisibility(visible = true) {
             LazyColumn(
-                modifier = Modifier.heightIn(max = 350.dp)
+                modifier = Modifier.heightIn(max = 350.dp),
             ) {
-                items(subtasks) { subtask ->
+                items(
+                    subtasks,
+                    key = { subtask -> subtask.id }
+                ) { subtask ->
                     ListSubtaskItem(
+                        Modifier.animateItem(
+                            fadeInSpec = tween(durationMillis = 300),
+                            fadeOutSpec = tween(durationMillis = 300),
+                            placementSpec = spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        ),
                         subtask, onEditClick = { },
                         onDeleteClick = { },
                         onCompleteClick = { }

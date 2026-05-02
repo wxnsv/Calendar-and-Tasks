@@ -88,7 +88,7 @@ class MainViewModel(
             _navigationEvent.send(
                 NavEvent.SetRoot(
                     NavigationTarget.List
-                ) //TODO // FIX
+                )
             )
         }
 
@@ -110,7 +110,6 @@ class MainViewModel(
 
                 tasksDeferred.await()
                 calendarDeferred.await()
-
                 delay(3 * 60 * 1000L)
             }
         }
@@ -171,8 +170,8 @@ class MainViewModel(
     fun onCompleteListItemClicked(id: String, type: String) {
         viewModelScope.launch {
             when (type) {
-                "SUBTASK" -> tasksRepository.deleteSubtask(id)
-                "TASK" -> tasksRepository.deleteTask(id)
+                "SUBTASK" -> tasksRepository.completeSubtask(id)
+                "TASK" -> tasksRepository.completeTask(id)
             }
         }
     }
