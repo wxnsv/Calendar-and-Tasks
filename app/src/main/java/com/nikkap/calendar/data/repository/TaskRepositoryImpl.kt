@@ -328,6 +328,7 @@ class TaskRepositoryImpl(
 
             if (tasksResult.await().isSuccess && subtasksResult.await().isSuccess) {
                 userPrefRepository.updateTaskSyncTime()
+                pendingSync()
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("Failed to sync tasks"))
@@ -339,9 +340,14 @@ class TaskRepositoryImpl(
         Result.failure(e)
     }
 
+    private suspend fun pendingSync() {
+        tasksPendingSync()
+        subtasksPendingSync()
+    }
+
     private suspend fun handleErrorCode(code: Int) {
         when (code) {
-            410 -> userPrefRepository.clearLastTaskSyncTime()
+            in 1..999 -> userPrefRepository.clearLastTaskSyncTime()
 
             // TODO
 

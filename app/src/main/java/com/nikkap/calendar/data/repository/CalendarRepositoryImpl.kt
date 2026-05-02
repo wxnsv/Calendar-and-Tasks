@@ -109,12 +109,6 @@ class CalendarRepositoryImpl(
         val timeMin = userPrefRepository.calendarTimeMin.first()
 
         coroutineScope {
-            val eventPendingResult = async { eventsPendingSync() }
-            val birthdayPendingResult = async { birthdaysPendingSync() }
-
-            eventPendingResult.await()
-            birthdayPendingResult.await()
-
             val eventsResult = async {
 
                 val responseEvents = api.getEvents(
@@ -149,7 +143,7 @@ class CalendarRepositoryImpl(
                     updatedMin = calendarSyncTime,
                 )
 
-                if (responseBirthdays.code() != 200) {
+                if (!responseBirthdays.isSuccessful) {
                     handleErrorCode(responseBirthdays.code())
                     return@async Result.failure(Exception("Failed to sync events and birthdays"))
                 }
@@ -171,6 +165,7 @@ class CalendarRepositoryImpl(
 
             if (eventsResult.await().isSuccess && birthdayResult.await().isSuccess) {
                 userPrefRepository.updateEventSyncTime()
+                pendingSync()
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("Failed to sync events and birthdays"))
@@ -181,9 +176,14 @@ class CalendarRepositoryImpl(
         Result.failure(Exception("Failed to sync events and birthdays with ${e.message} message"))
     }
 
+    private suspend fun pendingSync() {
+        eventsPendingSync()
+        birthdaysPendingSync()
+    }
+
     private suspend fun handleErrorCode(code: Int) {
         when (code) {
-            410 -> userPrefRepository.clearLastCalendarSyncTime()
+            in 1..999 -> userPrefRepository.clearLastCalendarSyncTime()
             // TODO
 
         }

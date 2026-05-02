@@ -36,7 +36,7 @@ fun Task.toTaskEntity(currentTime: Long = System.currentTimeMillis()): TaskEntit
         notes = notes,
         deadline = deadline,
         isCompleted = isCompleted,
-        taskListId = taskListId,
+        taskListId = taskListId.ifBlank { "@default" },
         pendingAction = PendingActions.NONE,
         lastModified = currentTime,
     )
@@ -71,7 +71,7 @@ fun TaskDto.toTaskEntity(taskListId: String): TaskEntity {
         notes = notes,
         isCompleted = isCompleted,
         deadline = dateLong,
-        taskListId = taskListId,
+        taskListId = taskListId.ifBlank { "@default" },
         pendingAction = PendingActions.NONE,
         lastModified = parseIsoDate(updated)
     )
