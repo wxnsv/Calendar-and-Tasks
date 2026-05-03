@@ -25,7 +25,8 @@ fun TaskEntity.toTask(): Task {
         title = title ?: "(No title)",
         notes = notes,
         deadline = deadline,
-        isCompleted = isCompleted
+        isCompleted = isCompleted,
+        taskListId = taskListId
     )
 }
 

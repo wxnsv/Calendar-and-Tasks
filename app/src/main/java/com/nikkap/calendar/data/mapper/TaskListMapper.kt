@@ -71,3 +71,11 @@ fun TaskList.toTaskListUpdateDto(): TaskListUpdateDto {
         title = title.ifBlank { null }
     )
 }
+
+fun TaskList.toTaskListDto(): TaskListDto {
+    return TaskListDto(
+        id = id,
+        title = title,
+        updated = "",
+    )
+}
