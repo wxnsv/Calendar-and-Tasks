@@ -1,5 +1,6 @@
 package com.nikkap.calendar.ui.screens.list
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -107,6 +108,21 @@ class ListFragment : Fragment(R.layout.list_fragment) {
         if (lastState == isExpanded) return
 
         if (isExpanded) {
+            binding.createItemButton.animate()
+                .rotation(90f)
+                .setDuration(50)
+                .withEndAction {
+                    binding.createItemButton.setIconResource(R.drawable.close)
+                    binding.createItemButton.backgroundTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(requireContext(), R.color.red)
+                    )
+                    binding.createItemButton.animate()
+                        .rotation(180f)
+                        .setDuration(50)
+                        .start()
+                }
+                .start()
+
             binding.scrim.visibility = View.VISIBLE
             binding.scrim.animate().alpha(1f).setDuration(300).start()
 
@@ -114,35 +130,56 @@ class ListFragment : Fragment(R.layout.list_fragment) {
             expandGroup(binding.createEvent, 50L)
             expandGroup(binding.createBirthday, 100L)
         } else {
-            _binding?.scrim?.animate()?.alpha(0f)?.setDuration(300)?.withEndAction {
-                _binding?.scrim?.visibility = View.GONE
-            }?.start()
+            binding.createItemButton.animate()
+                .rotation(90f)
+                .setDuration(50)
+                .withEndAction {
+                    _binding?.createItemButton?.setIconResource(R.drawable.add)
+                    _binding?.createItemButton?.backgroundTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(requireContext(), R.color.purple_700)
+                    )
+                    _binding?.createItemButton?.animate()?.apply {
+                        rotation(180f)
+                        alpha(1f)
+                        setDuration(50)
+                        start()
+                    }
 
-            collapseGroup(binding.createTask)
-            collapseGroup(binding.createBirthday)
-            collapseGroup(binding.createEvent)
+                    _binding?.scrim?.animate()?.apply {
+                        alpha(0f)
+                        setDuration(300)
+                        withEndAction {
+                            _binding?.scrim?.visibility = View.GONE
+                        }.start()
+                    }
 
+                    collapseGroup(_binding?.createTask)
+                    collapseGroup(_binding?.createBirthday)
+                    collapseGroup(_binding?.createEvent)
+
+                }
         }
     }
+}
 
-    private fun expandGroup(view: View, delay: Long) {
-        view.visibility = View.VISIBLE
-        view.bringToFront()
-        view.animate()
-            .alpha(1f)
-            .translationY(0f)
-            .setStartDelay(delay)
-            .setInterpolator(OvershootInterpolator())
-            .setDuration(300)
-            .start()
-    }
+private fun expandGroup(view: View, delay: Long) {
+    view.visibility = View.VISIBLE
+    view.bringToFront()
+    view.animate()
+        .alpha(1f)
+        .translationY(0f)
+        .setStartDelay(delay)
+        .setInterpolator(OvershootInterpolator())
+        .setDuration(300)
+        .start()
+}
 
-    private fun collapseGroup(view: View) {
-        view.animate()
-            .alpha(0f)
-            .translationY(100f)
-            .setDuration(300)
-            .withEndAction { view.visibility = View.GONE }
-            .start()
+private fun collapseGroup(view: View?) {
+    view?.animate()?.apply {
+        alpha(0f)
+        translationY(100f)
+        setDuration(300)
+        withEndAction { view.visibility = View.GONE }
+        start()
     }
 }

@@ -1,11 +1,13 @@
 package com.nikkap.calendar.ui.screens.list
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -79,6 +81,9 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
             title.text = task.title
             itemType.text = "Task"
             itemIcon.setImageResource(R.drawable.task)
+            itemIcon.imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(itemView.context, R.color.teal_200)
+            )
             itemCheckBox.isChecked = task.isCompleted
             itemView.setOnClickListener {
                 onClick()
@@ -96,8 +101,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
         fun bind(event: Event, onClick: () -> Unit) {
             eventTitle.text = event.summary
             eventTime.text = event.startTimestamp.toListUiDate(event.isAllDay)
-            itemType.text =
-                itemView.context.getString(R.string.calendar_type_format, "Event")
+            itemType.text = "Event"
             itemIcon.setImageResource(R.drawable.event)
             itemView.setOnClickListener {
                 onClick()
@@ -114,9 +118,8 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
         fun bind(birthday: Birthday, onClick: () -> Unit) {
             birthdayName.text = birthday.name
             birthdayDate.text = birthday.date.toUiDate()
-            itemType.text =
-                itemView.context.getString(R.string.calendar_type_format, "Birthday")
-            itemIcon.setImageResource(R.drawable.event)
+            itemType.text = "Birthday"
+            itemIcon.setImageResource(R.drawable.birthday)
             itemView.setOnClickListener {
                 onClick()
             }

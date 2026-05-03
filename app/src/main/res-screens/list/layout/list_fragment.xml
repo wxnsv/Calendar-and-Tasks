@@ -32,10 +32,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="25dp"
+        android:layout_marginBottom="5dp"
         android:text="Task"
         android:textSize="20sp"
         android:visibility="gone"
         app:iconSize="40dp"
+        app:icon="@drawable/task"
         app:layout_constraintBottom_toTopOf="@+id/create_event"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -44,11 +46,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="25dp"
+        android:layout_marginBottom="5dp"
         android:text="Event"
         android:textSize="20sp"
         android:visibility="gone"
         app:iconSize="40dp"
-        app:icon="@drawable/ic_launcher_foreground"
+        app:icon="@drawable/event"
         app:layout_constraintBottom_toTopOf="@+id/create_birthday"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -57,18 +60,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="25dp"
+        android:layout_marginBottom="5dp"
         android:text="birthday"
         android:textSize="20sp"
         android:visibility="gone"
         app:iconSize="40dp"
-        app:icon="@drawable/ic_launcher_foreground"
+        app:icon="@drawable/birthday"
         app:layout_constraintBottom_toTopOf="@+id/create_item_button"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/create_item_button"
         android:layout_width="70dp"
-        android:layout_height="80dp"
+        android:layout_height="70dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.FloatingActionButton"
+        app:icon="@drawable/add"
+        app:iconSize="30dp"
+        android:scaleX="1.2"
+        android:scaleY="1.2"
         android:layout_margin="25dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
