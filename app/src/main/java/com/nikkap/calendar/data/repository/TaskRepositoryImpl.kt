@@ -58,12 +58,48 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun saveTask(task: Task) {
-        dao.insertTask(task.toTaskEntity().changePendingAction(PendingActions.INSERT))
-        api.createTask(
+        dao.insertTask(
+            task.toTaskEntity()
+                .changePendingAction(PendingActions.INSERT)
+        )
+        val result = api.createTask(
             taskDto = task.toTaskDto(),
             taskListId = task.taskListId.ifBlank {
                 userPrefRepository.defaultTasklistId.first() ?: ""
             }
+        )
+        if (result.isSuccessful) dao.updateTask(
+            task.toTaskEntity()
+                .markAsSynchronized(parseIsoDate(result.body()?.updated))
+        )
+    }
+
+    override suspend fun saveSubtask(subtask: Subtask) {
+        dao.insertSubtask(
+            subtask.toSubtaskEntity()
+                .changePendingAction(PendingActions.INSERT)
+        )
+        val result = api.createSubtask(
+            taskListId = subtask.taskListId,
+            subtask = subtask.toTaskUpdateDto()
+        )
+        if (result.isSuccessful) dao.updateSubtask(
+            subtask.toSubtaskEntity()
+                .markAsSynchronized(parseIsoDate(result.body()?.updated))
+        )
+    }
+
+    override suspend fun saveTasklist(taskList: TaskList) {
+        dao.insertTaskList(
+            taskList.toTaskListEntity()
+                .changePendingAction(PendingActions.INSERT)
+        )
+        val result = api.createTaskList(
+            taskList = taskList.toTaskListDto()
+        )
+        if (result.isSuccessful) dao.updateTasklist(
+            taskList.toTaskListEntity()
+                .markAsSynchronized(parseIsoDate(result.body()?.updated))
         )
     }
 
@@ -476,7 +512,7 @@ class TaskRepositoryImpl(
                         PendingActions.INSERT -> {
                             val result = api.createSubtask(
                                 taskListId = entity.taskListId,
-                                subtask = entity.toTaskDto()
+                                subtask = entity.toTaskUpdateDto()
                             )
                             if (result.isSuccessful) {
                                 dao.insertSubtask(

@@ -12,6 +12,8 @@ interface TaskRepository {
     val allTaskLists: Flow<List<TaskList>>
     suspend fun getTask(id: String): Task
     suspend fun saveTask(task: Task)
+    suspend fun saveSubtask(subtask: Subtask)
+    suspend fun saveTasklist(taskList: TaskList)
     suspend fun updateTask(task: Task)
     suspend fun updateSubtask(subtask: Subtask)
     suspend fun updateTaskList(taskList: TaskList)

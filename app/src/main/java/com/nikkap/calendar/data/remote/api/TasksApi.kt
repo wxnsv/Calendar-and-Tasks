@@ -75,8 +75,8 @@ interface TasksApi {
     @POST("lists/{tasklist}/tasks")
     suspend fun createSubtask(
         @Path("tasklist") taskListId: String,
-        @Body subtask: TaskDto
-    ): Response<TaskDto>
+        @Body subtask: TaskUpdateDto
+    ): Response<TaskUpdateDto>
 
     @PATCH("tasks/v1/lists/{tasklistId}/tasks/{subtaskId}")
     suspend fun updateSubtask(
