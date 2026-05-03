@@ -45,6 +45,11 @@ interface TasksApi {
         @Query("maxResults") maxResults: Int? = 100,
     ): Response<TaskListsResponse>
 
+    @GET("tasks/v1/users/@me/lists/{tasklistId}")
+    suspend fun getTasklist(
+        @Path("tasklistId") tasklistId: String = "@default"
+    ): Response<TaskListDto>
+
     @DELETE("tasks/v1/lists/{taskListId}/tasks/{taskId}")
     suspend fun deleteTask(
         @Path("taskListId") taskListId: String,

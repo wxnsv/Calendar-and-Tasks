@@ -30,6 +30,7 @@ class UserPreferencesRepository(
         val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
         val CALENDAR_LAST_SYNC = longPreferencesKey("event_last_sync")
         val TASK_LAST_SYNC = longPreferencesKey("task_last_sync")
+        val DEFAULT_TASKLIST_ID = stringPreferencesKey("default_tasklist_id")
         val CALENDAR_TIME_MIN = stringPreferencesKey("calendar_time_min")
     }
 
@@ -44,7 +45,8 @@ class UserPreferencesRepository(
                 taskLastSync = prefs[Keys.TASK_LAST_SYNC],
                 email = prefs[Keys.USER_EMAIL],
                 name = prefs[Keys.USER_NAME],
-                isFirstLaunch = prefs[Keys.IS_FIRST_LAUNCH] ?: true
+                isFirstLaunch = prefs[Keys.IS_FIRST_LAUNCH] ?: true,
+                defaultTasklistId = prefs[Keys.DEFAULT_TASKLIST_ID]
             )
         }
 
@@ -68,6 +70,14 @@ class UserPreferencesRepository(
         .map { prefs ->
             prefs[Keys.CALENDAR_TIME_MIN]
         }
+
+    val defaultTasklistId = dataStore.data.catch { exception ->
+        if (exception is IOException) emit(emptyPreferences()) else throw exception
+    }
+        .map { prefs ->
+            prefs[Keys.DEFAULT_TASKLIST_ID]
+        }
+
 
     suspend fun authorizeSession(email: String, name: String, photoUri: String) {
         dataStore.edit { prefs ->
@@ -100,6 +110,12 @@ class UserPreferencesRepository(
     suspend fun clearLastTaskSyncTime() {
         dataStore.edit { preferences ->
             preferences.remove(Keys.TASK_LAST_SYNC)
+        }
+    }
+
+    suspend fun setDefaultTasklistId(id: String) {
+        dataStore.edit { prefs ->
+            prefs[Keys.DEFAULT_TASKLIST_ID] = id
         }
     }
 

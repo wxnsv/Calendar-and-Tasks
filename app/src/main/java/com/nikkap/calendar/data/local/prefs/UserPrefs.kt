@@ -8,4 +8,5 @@ data class UserPrefs(
     val email: String? = null,
     val name: String? = null,
     val isFirstLaunch: Boolean = true,
+    val defaultTasklistId: String? = null
 )

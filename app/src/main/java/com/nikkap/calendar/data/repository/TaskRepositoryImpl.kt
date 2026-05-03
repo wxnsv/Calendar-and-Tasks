@@ -61,9 +61,10 @@ class TaskRepositoryImpl(
         dao.insertTask(task.toTaskEntity().changePendingAction(PendingActions.INSERT))
         api.createTask(
             taskDto = task.toTaskDto(),
-            taskListId = task.taskListId.ifBlank { "@default" }
+            taskListId = task.taskListId.ifBlank {
+                userPrefRepository.defaultTasklistId.first() ?: ""
+            }
         )
-        //TODO // FIX SET TASKLIST
     }
 
     override suspend fun updateTask(task: Task) {
