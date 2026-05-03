@@ -14,7 +14,7 @@
 
     <fragment
         android:id="@+id/createFragment"
-        android:name="com.nikkap.calendar.ui.screens.create.CreateFragment"
+        android:name="com.nikkap.calendar.ui.screens.create.fragments.CreateFragment"
         android:label="CreateFragment">
         <argument
             android:name="type"

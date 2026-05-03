@@ -1,4 +1,4 @@
-package com.nikkap.calendar.ui.screens.create
+package com.nikkap.calendar.ui.screens.create.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,9 +19,10 @@ import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.CalendarEntry
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.Task
-import com.nikkap.calendar.ui.screens.create.birthday.CreateBirthdayFragment
-import com.nikkap.calendar.ui.screens.create.event.CreateEventFragment
-import com.nikkap.calendar.ui.screens.create.task.CreateTaskFragment
+import com.nikkap.calendar.ui.screens.create.CreateFragmentArgs
+import com.nikkap.calendar.ui.screens.create.CreateIntent
+import com.nikkap.calendar.ui.screens.create.CreateState
+import com.nikkap.calendar.ui.screens.create.CreateViewModel
 import com.nikkap.calendar.ui.screens.main.MainViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -157,4 +158,3 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
         }
     }
 }
-

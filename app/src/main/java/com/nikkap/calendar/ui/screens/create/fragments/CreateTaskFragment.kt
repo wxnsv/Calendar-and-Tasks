@@ -1,4 +1,4 @@
-package com.nikkap.calendar.ui.screens.create.task
+package com.nikkap.calendar.ui.screens.create.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -55,7 +55,7 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
             }
             popup.show()
         }
-        binding.createTaskDetailsEditText.doAfterTextChanged {
+        binding.createTaskDescriptionEditText.doAfterTextChanged {
             viewModel.onTaskIntent(CreateTaskIntent.UpdateDescription(it.toString()))
         }
         binding.createTaskDeadlineButton.setOnClickListener {
@@ -89,8 +89,8 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
 
     private fun updateUi(state: CreateState) {
         val task = state.taskDraft
-        if (binding.createTaskDetailsEditText.text.toString() != task.notes) {
-            binding.createTaskDetailsEditText.setText(task.notes)
+        if (binding.createTaskDescriptionEditText.text.toString() != task.notes) {
+            binding.createTaskDescriptionEditText.setText(task.notes)
         }
 
         if (binding.createTaskSetListButton.text.toString() != state.selectedTaskList?.title) {

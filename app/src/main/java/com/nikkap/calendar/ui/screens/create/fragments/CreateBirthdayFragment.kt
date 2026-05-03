@@ -1,4 +1,4 @@
-package com.nikkap.calendar.ui.screens.create.birthday
+package com.nikkap.calendar.ui.screens.create.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater

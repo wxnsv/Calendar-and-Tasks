@@ -37,11 +37,11 @@
 
 
     <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/create_task_details_edit_text"
+        android:id="@+id/create_task_description_edit_text"
         style="@style/Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Add details"
+        android:hint="Add description"
         app:counterEnabled="true"
         app:counterMaxLength="8192"
         app:layout_constraintTop_toBottomOf="@+id/create_task_repeat_button" />
@@ -50,7 +50,7 @@
         style="@style/Divider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/create_task_details_edit_text" />
+        app:layout_constraintTop_toBottomOf="@id/create_task_description_edit_text" />
 
 
     <com.google.android.material.button.MaterialButton
@@ -59,39 +59,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="My tasks"
-        app:layout_constraintTop_toBottomOf="@+id/create_task_details_edit_text" />
+        app:layout_constraintTop_toBottomOf="@+id/create_task_description_edit_text" />
 
     <View
         style="@style/Divider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/create_task_set_list_button" />
-
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/create_task_description_edit_text"
-        style="@style/Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Add description"
-        android:textColor="@color/black"
-        app:layout_constraintTop_toBottomOf="@+id/create_task_set_list_button" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/create_task_set_color_rv"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:clipToPadding="false"
-        android:paddingStart="160dp"
-        android:paddingEnd="160dp"
-        app:layout_constraintTop_toBottomOf="@+id/create_task_description_edit_text" />
-
-    <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_launcher_foreground"
-        app:layout_constraintBottom_toTopOf="@+id/create_task_set_color_rv"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
