@@ -244,11 +244,6 @@ class TaskRepositoryImpl(
 
     override suspend fun syncAllTasks(): Result<Unit> = try {
         val tasksSyncTime = userPrefRepository.taskSyncTime.first()?.toIsoDateWithoutSeconds()
-        val listsPendingResult = tasklistsPendingSync()
-
-        if (listsPendingResult.isFailure) {
-            return listsPendingResult
-        }
 
         val remoteTaskLists = getRemoteTaskLists(lastSyncTime = tasksSyncTime)
 
@@ -275,6 +270,17 @@ class TaskRepositoryImpl(
 
         if (taskListsResult.isFailure) {
             return Result.failure(taskListsResult.exceptionOrNull()!!)
+        }
+
+        val listsPendingResult = tasklistsPendingSync()
+
+        if (listsPendingResult.isFailure) {
+            return listsPendingResult
+        }
+
+        if (userPrefRepository.defaultTasklistId.first() == null) {
+            val result = api.getTasklist()
+            if (result.isSuccessful) userPrefRepository.setDefaultTasklistId(result.body()!!.id)
         }
 
         val tasksAndTaskListIdsResult =
