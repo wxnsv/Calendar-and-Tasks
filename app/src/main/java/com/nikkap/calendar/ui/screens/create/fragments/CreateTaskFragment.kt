@@ -5,13 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ListPopupWindow
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.widget.doAfterTextChanged
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nikkap.calendar.R
 import com.nikkap.calendar.core.utils.toUiDate
 import com.nikkap.calendar.databinding.CreateTaskFragmentBinding
@@ -22,6 +26,7 @@ import com.nikkap.calendar.ui.screens.create.CreateViewModel
 import com.nikkap.calendar.ui.showDatePicker
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.UUID
 
 class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
 
@@ -105,18 +110,23 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
 
     private fun showTaskListMenu(anchor: View, taskLists: List<TaskList>) {
         setTaskListPopup = ListPopupWindow(requireContext()).apply {
+            val showTaskList =
+                (taskLists + TaskList(id = "", "Create new task list")).toMutableList()
             setAdapter(
                 ArrayAdapter(
                     requireContext(),
                     android.R.layout.simple_list_item_1,
-                    taskLists.map { it.title })
-            )
+                    showTaskList.map { it.title }
+                ))
             anchorView = anchor
 
             isModal = true
 
             setOnItemClickListener { _, _, position, _ ->
-                val selectedList = taskLists[position]
+                if (position == taskLists.size) {
+                    showCreateTaskListDialog()
+                }
+                val selectedList = showTaskList[position]
 
                 dismiss()
 
@@ -124,6 +134,36 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
             }
         }
         setTaskListPopup?.show()
+    }
+
+    private fun showCreateTaskListDialog() {
+        val input = EditText(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("New task list")
+            .setView(input)
+            .setPositiveButton("Create") { _, _ -> }
+            .setNegativeButton("Cancel", null)
+            .show()
+
+        val createButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        createButton.isEnabled = false
+
+        input.doOnTextChanged { text, _, _, _ ->
+            createButton.isEnabled = !text.isNullOrBlank()
+        }
+
+        createButton.setOnClickListener {
+            val title = input.text.toString()
+            viewModel.onTaskIntent(
+                CreateTaskIntent.UpdateList(
+                    TaskList(
+                        id = UUID.randomUUID().toString().replace("-", ""),
+                        title = title
+                    )
+                )
+            )
+            dialog.dismiss()
+        }
     }
 
     override fun onDestroyView() {

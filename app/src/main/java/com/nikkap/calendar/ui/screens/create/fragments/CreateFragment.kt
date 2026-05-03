@@ -19,7 +19,6 @@ import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.CalendarEntry
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.Task
-import com.nikkap.calendar.ui.screens.create.CreateFragmentArgs
 import com.nikkap.calendar.ui.screens.create.CreateIntent
 import com.nikkap.calendar.ui.screens.create.CreateState
 import com.nikkap.calendar.ui.screens.create.CreateViewModel

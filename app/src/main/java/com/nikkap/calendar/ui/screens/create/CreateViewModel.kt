@@ -3,6 +3,7 @@ package com.nikkap.calendar.ui.screens.create
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nikkap.calendar.core.utils.toTimeLong
+import com.nikkap.calendar.data.repository.UserPreferencesRepository
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.CalendarEntry
 import com.nikkap.calendar.domain.model.Event
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -22,7 +24,8 @@ import java.util.UUID
 
 class CreateViewModel(
     private val taskRepository: TaskRepository,
-    private val calendarRepository: CalendarRepository
+    private val calendarRepository: CalendarRepository,
+    private val userPrefRepository: UserPreferencesRepository
 ) : ViewModel() {
     private val taskListsFlow = taskRepository.allTaskLists
     private val _state = MutableStateFlow(CreateState.initial())
@@ -30,11 +33,12 @@ class CreateViewModel(
         _state,
         taskListsFlow
     ) { state, taskLists ->
-        val defaultList = taskLists.firstOrNull()
 
         state.copy(
             taskLists = taskLists,
-            selectedTaskList = state.selectedTaskList ?: defaultList
+            selectedTaskList = state.selectedTaskList
+                ?: taskLists.find { it.id == state.taskDraft.taskListId }
+                ?: taskLists.find { it.id == userPrefRepository.defaultTasklistId.first() }
         )
     }.stateIn(
         scope = viewModelScope,
@@ -120,13 +124,23 @@ class CreateViewModel(
 
             is CreateTaskIntent.SaveTask -> {
                 viewModelScope.launch {
-                    val task = state.value.taskDraft
+                    val state = state.value
+                    val task = state.taskDraft
+
                     val taskToSave = task.copy(
                         id = task.id ?: UUID.randomUUID().toString().replace("-", ""),
-                        title = state.value.title,
+                        title = state.title,
+                        taskListId = state.selectedTaskList!!.id
                     )
+
                     _state.update { it.copy(isLoading = true) }
-                    if (state.value.isEditing) taskRepository.updateTask(taskToSave)
+                    if (!state.taskLists.contains(state.selectedTaskList))
+                        launch {
+                            taskRepository.saveTasklist(
+                                state.selectedTaskList
+                            )
+                        }
+                    if (state.isEditing) taskRepository.updateTask(taskToSave)
                     else taskRepository.saveTask(taskToSave)
                     _state.update { it.copy(isLoading = false) }
                 }
