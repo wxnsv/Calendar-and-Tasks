@@ -1,10 +1,13 @@
 package com.nikkap.calendar.ui.screens.create.fragments
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -129,6 +132,12 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
         }
     }
 
+    private fun doInactive(button: Button) {
+        button.isEnabled = false
+        button.backgroundTintList =
+            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.light_gray))
+    }
+
     private fun initial() {
         val createType = args.type
         val itemId = args.id
@@ -155,5 +164,8 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
         if (currentEntry != state.activeType) {
             updateNestedFragment(currentEntry)
         }
+        if (state.isEditing && state.activeType !is Task) doInactive(binding.createTaskButton)
+        if (state.isEditing && state.activeType !is Event) doInactive(binding.createEventButton)
+        if (state.isEditing && state.activeType !is Birthday) doInactive(binding.createBirthdayButton)
     }
 }

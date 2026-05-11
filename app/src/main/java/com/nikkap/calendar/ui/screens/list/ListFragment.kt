@@ -1,11 +1,9 @@
 package com.nikkap.calendar.ui.screens.list
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -34,7 +32,6 @@ class ListFragment : Fragment(R.layout.list_fragment) {
         _binding = null
     }
 
-    private var lastState: Boolean? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -69,24 +66,6 @@ class ListFragment : Fragment(R.layout.list_fragment) {
         binding.listSwipeRef.setOnRefreshListener {
             viewModel.refreshData(requireContext())
         }
-
-        binding.scrim.setOnClickListener { viewModel.toggleMenu() }
-
-        binding.createTask.setOnClickListener {
-            viewModel.toggleMenu()
-            sharedViewModel.toCreateTask()
-        }
-        binding.createEvent.setOnClickListener {
-            viewModel.toggleMenu()
-            sharedViewModel.toCreateEvent()
-        }
-        binding.createBirthday.setOnClickListener {
-            viewModel.toggleMenu()
-            sharedViewModel.toCreateBirthday()
-        }
-        binding.createItemButton.setOnClickListener {
-            viewModel.toggleMenu()
-        }
     }
 
     private fun observeState(adapter: ListAdapter) {
@@ -98,88 +77,10 @@ class ListFragment : Fragment(R.layout.list_fragment) {
                     state.errorMessage?.let { message ->
                         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                     }
-                    renderMenu(state.isMenuExpanded)
                 }
             }
         }
     }
-
-    private fun renderMenu(isExpanded: Boolean) {
-        if (lastState == isExpanded) return
-
-        if (isExpanded) {
-            binding.createItemButton.animate()
-                .rotation(90f)
-                .setDuration(50)
-                .withEndAction {
-                    binding.createItemButton.setIconResource(R.drawable.close)
-                    binding.createItemButton.backgroundTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(requireContext(), R.color.red)
-                    )
-                    binding.createItemButton.animate()
-                        .rotation(180f)
-                        .setDuration(50)
-                        .start()
-                }
-                .start()
-
-            binding.scrim.visibility = View.VISIBLE
-            binding.scrim.animate().alpha(1f).setDuration(300).start()
-
-            expandGroup(binding.createTask, 0L)
-            expandGroup(binding.createEvent, 50L)
-            expandGroup(binding.createBirthday, 100L)
-        } else {
-            binding.createItemButton.animate()
-                .rotation(90f)
-                .setDuration(50)
-                .withEndAction {
-                    _binding?.createItemButton?.setIconResource(R.drawable.add)
-                    _binding?.createItemButton?.backgroundTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(requireContext(), R.color.purple_700)
-                    )
-                    _binding?.createItemButton?.animate()?.apply {
-                        rotation(180f)
-                        alpha(1f)
-                        setDuration(50)
-                        start()
-                    }
-
-                    _binding?.scrim?.animate()?.apply {
-                        alpha(0f)
-                        setDuration(300)
-                        withEndAction {
-                            _binding?.scrim?.visibility = View.GONE
-                        }.start()
-                    }
-
-                    collapseGroup(_binding?.createTask)
-                    collapseGroup(_binding?.createBirthday)
-                    collapseGroup(_binding?.createEvent)
-
-                }
-        }
-    }
 }
 
-private fun expandGroup(view: View, delay: Long) {
-    view.visibility = View.VISIBLE
-    view.bringToFront()
-    view.animate()
-        .alpha(1f)
-        .translationY(0f)
-        .setStartDelay(delay)
-        .setInterpolator(OvershootInterpolator())
-        .setDuration(300)
-        .start()
-}
 
-private fun collapseGroup(view: View?) {
-    view?.animate()?.apply {
-        alpha(0f)
-        translationY(100f)
-        setDuration(300)
-        withEndAction { view.visibility = View.GONE }
-        start()
-    }
-}

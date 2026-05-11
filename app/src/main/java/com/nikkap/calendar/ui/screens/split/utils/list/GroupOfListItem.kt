@@ -1,25 +1,18 @@
 package com.nikkap.calendar.ui.screens.split.utils.list
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import com.nikkap.calendar.core.utils.toDisplayDate
-import com.nikkap.calendar.core.utils.toLocalDate
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.ui.screens.split.utils.SplitEntity
-import java.time.YearMonth
 
-
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GroupOfListItem(
     list: List<SplitEntity>,
@@ -27,21 +20,7 @@ fun GroupOfListItem(
     onDeleteClick: (String, String) -> Unit,
     onCompleteClick: (String, String) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Color.Gray)
-        )
-        {
-            val currentMonth = remember { YearMonth.now() }
-            val itemDate = remember { list[0].date.toLocalDate().year }
-            Text(
-                list[0].date.toLocalDate().toDisplayDate(
-                    currentMonth.year != itemDate
-                )
-            )
-        }
+    Column(modifier = Modifier.fillMaxSize()) {
         list.filter { it !is SplitEntity.SubtaskItem }.forEach { entity ->
             when (entity) {
                 is SplitEntity.TaskItem -> {

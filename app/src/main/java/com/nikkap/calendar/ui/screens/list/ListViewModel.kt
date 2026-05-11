@@ -69,10 +69,6 @@ class ListViewModel(
         initialValue = ListState()
     )
 
-    fun toggleMenu() {
-        _state.update { it.copy(isMenuExpanded = !it.isMenuExpanded) }
-    }
-
     fun refreshData(context: Context) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }

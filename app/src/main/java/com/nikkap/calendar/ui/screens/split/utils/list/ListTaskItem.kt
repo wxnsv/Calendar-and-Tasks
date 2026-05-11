@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,7 +38,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nikkap.calendar.R
+import com.nikkap.calendar.core.utils.CalendarColors
 import com.nikkap.calendar.core.utils.loremIpsum
+import com.nikkap.calendar.core.utils.toColor
 import com.nikkap.calendar.domain.model.Subtask
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.ui.screens.split.utils.SplitEntity
@@ -66,7 +70,8 @@ fun ListTaskItem(
                     .weight(1f),
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.Black
+                color = Color.Black,
+                autoSize = TextAutoSize.StepBased(minFontSize = 20.sp, maxFontSize = 30.sp)
             )
             DropDownMenu(
                 completable = true,
@@ -84,7 +89,8 @@ fun ListTaskItem(
                         .weight(3f),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    color = Color.Black
+                    color = Color.Black,
+                    autoSize = TextAutoSize.StepBased(minFontSize = 15.sp, maxFontSize = 20.sp)
                 )
             }
             Box(
@@ -96,8 +102,10 @@ fun ListTaskItem(
                 Image(
                     painter = painterResource(id = R.drawable.task),
                     contentDescription = "Task icon",
-
-                    modifier = Modifier.size(25.dp)
+                    modifier = Modifier.size(25.dp),
+                    colorFilter = ColorFilter.tint(
+                        color = CalendarColors.getTaskColor().toColor()
+                    )
                 )
             }
             Text(
@@ -106,8 +114,7 @@ fun ListTaskItem(
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .width(60.dp),
-//                    .padding(5.dp)
-                color = Color.Black
+                color = Color.Black,
             )
         }
         if (subtasks.isNotEmpty()) {

@@ -1,7 +1,5 @@
 package com.nikkap.calendar.core.utils
 
-import androidx.compose.ui.graphics.Color
-
 /**
  * Removes the system suffix added by Google Event to birthday events
  * (e.g., "John Doe – Birthday" becomes "John Doe").
@@ -20,18 +18,6 @@ fun String.trimBirthdaySuffix(): String {
     } else {
         this
     }
-}
-
-fun String.toColor(): Color {
-    val cleanHex = this.replace("#", "").replace("0x", "")
-
-    val alphaHex = if (cleanHex.length == 6) {
-        "FF$cleanHex"
-    } else {
-        cleanHex
-    }
-
-    return Color(java.lang.Long.parseLong(alphaHex, 16))
 }
 
 const val loremIpsum =

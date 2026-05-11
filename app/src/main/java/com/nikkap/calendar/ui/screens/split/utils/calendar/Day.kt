@@ -37,14 +37,20 @@ fun Day(
             )
             .padding(top = 1.dp, start = 1.dp)
             .clickable(
-                enabled = day.position == DayPosition.MonthDate,
+                enabled = day.position == DayPosition.MonthDate && colorsList.isNotEmpty(),
                 onClick = { onClick() }
             )
             .background(color = Color.Gray)
     ) {
+        val dayPositionColor = when (day.position) {
+            DayPosition.InDate -> Color.Red
+            DayPosition.MonthDate -> Color.Black
+            DayPosition.OutDate -> Color.DarkGray
+        }
+
         Text(
             text = day.date.dayOfMonth.toString(),
-            color = if (day.position == DayPosition.MonthDate) Color.Black else Color.Red,
+            color = dayPositionColor,
             modifier = Modifier.align(Alignment.TopEnd)
         )
         Column(
@@ -60,7 +66,8 @@ fun Day(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(5.dp)
-                        .background(color),
+                        .background(color)
+                        .border(0.3F.dp, color = Color.Black),
                 )
             }
         }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nikkap.calendar.R
 import com.nikkap.calendar.core.utils.loremIpsum
+import com.nikkap.calendar.core.utils.toColor
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.ui.screens.split.utils.SplitEntity
 
@@ -39,7 +41,7 @@ fun ListBirthdayItem(
         Row {
             Text(
                 item.title,
-                fontSize = 30.sp,
+                fontSize = 35.sp,
                 modifier = Modifier
                     .weight(6f),
                 maxLines = 1,
@@ -61,8 +63,10 @@ fun ListBirthdayItem(
                 Image(
                     painter = painterResource(id = R.drawable.birthday),
                     contentDescription = "Birthday icon",
-
-                    modifier = Modifier.size(25.dp)
+                    modifier = Modifier.size(25.dp),
+                    colorFilter = ColorFilter.tint(
+                        color = item.colorHex.toColor()
+                    )
                 )
             }
 

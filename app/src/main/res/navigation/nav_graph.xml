@@ -2,14 +2,11 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/listFragment">
+    app:startDestination="@id/splitFragment">
     <fragment
         android:id="@+id/listFragment"
         android:name="com.nikkap.calendar.ui.screens.list.ListFragment"
         android:label="ListFragment">
-        <action
-            android:id="@+id/action_listFragment_to_createFragment"
-            app:destination="@id/createFragment" />
     </fragment>
 
     <fragment
@@ -31,18 +28,24 @@
         android:name="com.nikkap.calendar.ui.screens.auth.AuthFragment"
         android:label="AuthFragment">
         <action
-            android:id="@+id/action_authFragment_to_listFragment"
+            android:id="@+id/action_authFragment_to_mainPager"
             app:popUpTo="@id/authFragment"
             app:popUpToInclusive="true"
-            app:destination="@id/listFragment" />
+            app:destination="@id/mainPagerFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/splitFragment"
         android:name="com.nikkap.calendar.ui.screens.split.SplitFragment"
-        android:label="SplitFragment">
+        android:label="SplitFragment"></fragment>
+
+    <fragment
+        android:id="@+id/mainPagerFragment"
+        android:name="com.nikkap.calendar.ui.screens.mainpager.MainPagerFragment"
+        android:label="Main Calendar">
+
         <action
-            android:id="@+id/action_splitFragment_to_createFragment"
+            android:id="@+id/action_mainPager_to_createFragment"
             app:destination="@id/createFragment" />
     </fragment>
 </navigation>

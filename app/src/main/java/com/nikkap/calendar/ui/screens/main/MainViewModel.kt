@@ -87,7 +87,7 @@ class MainViewModel(
             } else if (isAuthorized) syncData(context)
             _navigationEvent.send(
                 NavEvent.SetRoot(
-                    NavigationTarget.List
+                    NavigationTarget.Pager
                 )
             )
         }
@@ -120,7 +120,7 @@ class MainViewModel(
             userPrefRepository.completeFirstLaunch()
             _navigationEvent.send(
                 NavEvent.NavigateTo(
-                    NavigationTarget.List
+                    NavigationTarget.Pager
                 )
             )
 

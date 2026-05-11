@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/mainToggleGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="40dp"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnView"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View"
+                app:cornerRadius="10dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCompose"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Compose"
+                app:cornerRadius="10dp" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/mainViewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/create_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="230dp"
+        android:text="Task"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:icon="@drawable/task"
+        app:iconSize="40dp"
+        app:layout_anchor="@id/create_event"
+        app:layout_anchorGravity="top|end" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/create_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="165dp"
+        android:layout_marginEnd="25dp"
+        android:text="Event"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:icon="@drawable/event"
+        app:iconSize="40dp"
+        app:layout_anchor="@id/create_birthday"
+        app:layout_anchorGravity="top|end" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/create_birthday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="100dp"
+        android:text="birthday"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:icon="@drawable/birthday"
+        app:iconSize="40dp"
+        app:layout_anchor="@id/create_item_button"
+        app:layout_anchorGravity="top|end" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/create_item_button"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="25dp"
+        android:scaleX="1.2"
+        android:scaleY="1.2"
+        app:icon="@drawable/add"
+        app:iconSize="30dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.FloatingActionButton" />
+
+    <View
+        android:id="@+id/scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

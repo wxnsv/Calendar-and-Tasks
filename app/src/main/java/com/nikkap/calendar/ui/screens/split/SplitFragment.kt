@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
@@ -40,10 +42,15 @@ class SplitFragment : Fragment() {
     @Composable
     private fun SplitScreen() {
         val state = viewModel.state.collectAsState().value
-
+        val listState = rememberLazyListState()
         CalendarTheme {
             Column {
-                Calendar(state.items)
+                Calendar(
+                    state.items,
+                    listState,
+                    state
+                ) { viewModel.onIntent(SplitIntent.UpdateSelectedDate(it)) }
+                HorizontalDivider()
                 List(
                     state.items,
                     onEditClick = { id, type ->
@@ -55,6 +62,7 @@ class SplitFragment : Fragment() {
                     onCompleteClick = { id, type ->
                         sharedViewModel.onCompleteListItemClicked(id, type)
                     },
+                    listState = listState
                 )
             }
         }

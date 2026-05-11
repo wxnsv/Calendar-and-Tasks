@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nikkap.calendar.R
 import com.nikkap.calendar.core.utils.loremIpsum
+import com.nikkap.calendar.core.utils.toColor
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.ui.screens.split.utils.SplitEntity
 
@@ -40,10 +42,10 @@ fun ListEventItem(
         Row {
             Text(
                 item.title,
-                fontSize = 20.sp,
+                fontSize = 25.sp,
                 modifier = Modifier
                     .weight(1f),
-                maxLines = 3,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 color = Color.Black
             )
@@ -56,7 +58,7 @@ fun ListEventItem(
             if (item.event.description?.isBlank() == false) {
                 Text(
                     item.event.description,
-                    fontSize = 15.sp,
+                    fontSize = 18.sp,
                     modifier = Modifier
                         .weight(6f)
                         .fillMaxWidth(),
@@ -74,8 +76,10 @@ fun ListEventItem(
                 Image(
                     painter = painterResource(id = R.drawable.event),
                     contentDescription = "Event icon",
-
-                    modifier = Modifier.size(25.dp)
+                    modifier = Modifier.size(25.dp),
+                    colorFilter = ColorFilter.tint(
+                        item.colorHex.toColor()
+                    )
                 )
             }
 

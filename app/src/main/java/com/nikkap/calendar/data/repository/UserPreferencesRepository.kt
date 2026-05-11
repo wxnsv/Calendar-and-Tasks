@@ -32,6 +32,7 @@ class UserPreferencesRepository(
         val TASK_LAST_SYNC = longPreferencesKey("task_last_sync")
         val DEFAULT_TASKLIST_ID = stringPreferencesKey("default_tasklist_id")
         val CALENDAR_TIME_MIN = stringPreferencesKey("calendar_time_min")
+        val IS_LIST_SCREEN_LAST = booleanPreferencesKey("is_list_screen_last")
     }
 
     val userStateFlow: Flow<UserPrefs> = dataStore.data
@@ -46,7 +47,8 @@ class UserPreferencesRepository(
                 email = prefs[Keys.USER_EMAIL],
                 name = prefs[Keys.USER_NAME],
                 isFirstLaunch = prefs[Keys.IS_FIRST_LAUNCH] ?: true,
-                defaultTasklistId = prefs[Keys.DEFAULT_TASKLIST_ID]
+                defaultTasklistId = prefs[Keys.DEFAULT_TASKLIST_ID],
+                isListScreenLast = prefs[Keys.IS_LIST_SCREEN_LAST] ?: true
             )
         }
 
@@ -71,6 +73,13 @@ class UserPreferencesRepository(
             prefs[Keys.CALENDAR_TIME_MIN]
         }
 
+    val isListScreenLast = dataStore.data.catch { exception ->
+        if (exception is IOException) emit(emptyPreferences()) else throw exception
+    }
+        .map { prefs ->
+            prefs[Keys.IS_LIST_SCREEN_LAST] ?: true
+        }
+
     val defaultTasklistId = dataStore.data.catch { exception ->
         if (exception is IOException) emit(emptyPreferences()) else throw exception
     }
@@ -92,6 +101,12 @@ class UserPreferencesRepository(
     suspend fun updateTaskSyncTime() {
         dataStore.edit { prefs ->
             prefs[Keys.TASK_LAST_SYNC] = System.currentTimeMillis()
+        }
+    }
+
+    suspend fun updateIsListScreenLast(boolean: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_LIST_SCREEN_LAST] = boolean
         }
     }
 

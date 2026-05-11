@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 class SplitViewModel(
     private val tasksRepository: TaskRepository,
@@ -68,5 +69,12 @@ class SplitViewModel(
         initialValue = SplitState()
     )
 
+    fun onIntent(intent: SplitIntent) {
+        when (intent) {
+            is SplitIntent.UpdateSelectedDate -> {
+                _state.update { it.copy(selectedDate = intent.date) }
+            }
+        }
+    }
 
 }

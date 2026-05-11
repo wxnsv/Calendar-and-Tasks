@@ -33,7 +33,7 @@ fun ListSubtaskItem(
         Row {
             Text(
                 subtask.title ?: "No title",
-                fontSize = 15.sp,
+                fontSize = 25.sp,
                 modifier = Modifier
                     .weight(1f),
                 maxLines = 2,
