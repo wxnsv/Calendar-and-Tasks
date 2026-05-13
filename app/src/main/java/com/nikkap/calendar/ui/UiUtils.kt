@@ -3,7 +3,9 @@ package com.nikkap.calendar.ui
 import android.app.TimePickerDialog
 import android.content.Context
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.LinearLayout
+import androidx.core.view.isNotEmpty
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
@@ -125,4 +127,16 @@ fun renderCreateDateTime(
         startParams.weight = 2f
         dateButton.layoutParams = startParams
     }
+}
+
+inline fun RecyclerView.onFirstDraw(crossinline action: () -> Unit) {
+    viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+        override fun onPreDraw(): Boolean {
+            if (isNotEmpty()) {
+                viewTreeObserver.removeOnPreDrawListener(this)
+                action()
+            }
+            return true
+        }
+    })
 }

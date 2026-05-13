@@ -6,4 +6,5 @@ data class MainState(
     val userState: UserPrefs = UserPrefs(),
     val errorMessage: String? = null,
     val isLoading: Boolean = true,
+    val isScreensReady: Boolean = false
 )

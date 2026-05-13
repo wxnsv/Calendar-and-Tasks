@@ -42,22 +42,27 @@ class MainViewModel(
 
     private val _navigationEvent = Channel<NavEvent>()
     val navigationEvent = _navigationEvent.receiveAsFlow()
+
+
     private val _prefsFlow = userPrefRepository.userStateFlow.map<UserPrefs, UserPrefs?> { it }
         .onStart { emit(null) }
+    private val _isListReady = MutableStateFlow(false)
+    private val _isSplitReady = MutableStateFlow(false)
+    private val _isMainReady = MutableStateFlow(false)
     private val _state = MutableStateFlow(MainState())
     val state: StateFlow<MainState> = combine(
         _state,
         _prefsFlow,
-    ) { state, prefs ->
+        _isListReady,
+        _isSplitReady,
+        _isMainReady
+    ) { state, prefs, isListReady, isSplitReady, isMainReady ->
+        val isReady = isMainReady && isListReady && isSplitReady
 
-        if (prefs == null) {
-            state.copy(isLoading = true)
-        } else {
-            state.copy(
-                userState = prefs,
-                isLoading = false,
-            )
-        }
+        if (prefs != null) {
+            setIsMainReadyTrue()
+            state.copy(userState = prefs, isScreensReady = isReady)
+        } else state.copy(isScreensReady = isReady)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -72,9 +77,22 @@ class MainViewModel(
         }
     }
 
+    fun setListReady() {
+        _isListReady.value = true
+    }
+
+    fun setSplitReady() {
+        _isSplitReady.value = true
+    }
+
+    fun setIsMainReadyTrue() {
+        _isMainReady.value = true
+    }
+
+
     fun checkAuthAndNavigate(context: Context) {
         viewModelScope.launch {
-            state.first { !it.isLoading }
+            _isMainReady.first { it }
             val prefs = state.value.userState
             val isFirst = prefs.isFirstLaunch
             val isAuthorized = prefs.isAuthorized
@@ -90,6 +108,7 @@ class MainViewModel(
                     NavigationTarget.Pager
                 )
             )
+
         }
 
     }
@@ -199,16 +218,6 @@ class MainViewModel(
     }
 
     fun toCreateBirthday(id: String = "") {
-        viewModelScope.launch {
-            _navigationEvent.send(
-                NavEvent.NavigateTo(
-                    NavigationTarget.Create("BIRTHDAY", id)
-                )
-            )
-        }
-    }
-
-    fun toCreateSubtask(id: String = "") {
         viewModelScope.launch {
             _navigationEvent.send(
                 NavEvent.NavigateTo(

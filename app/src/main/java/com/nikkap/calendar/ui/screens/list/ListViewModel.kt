@@ -61,7 +61,8 @@ class ListViewModel(
 
         state.copy(
             items = mixedList,
-            errorMessage = null
+            errorMessage = null,
+            isLoading = false
         )
     }.stateIn(
         scope = viewModelScope,

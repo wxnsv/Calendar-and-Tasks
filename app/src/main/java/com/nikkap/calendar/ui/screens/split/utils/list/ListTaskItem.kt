@@ -313,7 +313,7 @@ private fun ListTaskItemWithSubtasks(
                     modifier = Modifier
                         .size(20.dp)
                         .scale(3f),
-                    tint = Color.Black // Тинт задается напрямую
+                    tint = Color.Black
                 )
             }
         }

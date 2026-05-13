@@ -109,7 +109,7 @@ val appModule = module {
     viewModel { AuthViewModel(get(), get(), get()) }
     viewModel { SplitViewModel(get(), get()) }
     viewModel { ListViewModel(get(), get()) }
-    viewModel { MainPagerViewModel(get(), get(), get()) }
+    viewModel { MainPagerViewModel(get()) }
     viewModelOf(::CreateViewModel)
     viewModel { MainViewModel(get(), get(), get()) }
 }

@@ -66,6 +66,7 @@ class SplitFragment : Fragment() {
                 )
             }
         }
+        sharedViewModel.setSplitReady()
     }
 }
 

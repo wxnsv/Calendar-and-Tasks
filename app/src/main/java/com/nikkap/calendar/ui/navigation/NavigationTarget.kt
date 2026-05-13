@@ -7,5 +7,5 @@ sealed class NavigationTarget {
 
     object Pager : NavigationTarget()
 
-    data class Create(val type: String, val itemId: String? = null) : NavigationTarget()
+    data class Create(val type: String, val itemId: String = "") : NavigationTarget()
 }

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nikkap.calendar.R
 import com.nikkap.calendar.databinding.ListFragmentBinding
+import com.nikkap.calendar.ui.onFirstDraw
 import com.nikkap.calendar.ui.screens.main.MainViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -43,11 +44,11 @@ class ListFragment : Fragment(R.layout.list_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val adapter = ListAdapter { id, type -> sharedViewModel.onEditListItemClicked(id, type) }
-
         setupRecyclerView(adapter)
         setupListeners()
         observeState(adapter)
     }
+
 
     private fun setupRecyclerView(adapter: ListAdapter) {
         val dividerItemDecoration = DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
@@ -73,7 +74,11 @@ class ListFragment : Fragment(R.layout.list_fragment) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
                     binding.listSwipeRef.isRefreshing = state.isLoading
-                    adapter.updateList(state.items) // fun updateUi
+                    if (state.items.isEmpty() && !state.isLoading) sharedViewModel.setListReady()
+                    else binding.listRV.onFirstDraw {
+                        sharedViewModel.setListReady()
+                    }
+                    adapter.updateList(state.items)
                     state.errorMessage?.let { message ->
                         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                     }

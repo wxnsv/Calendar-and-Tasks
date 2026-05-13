@@ -19,6 +19,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import com.nikkap.calendar.R
 import com.nikkap.calendar.databinding.MainPagerFragmentBinding
 import com.nikkap.calendar.ui.screens.main.MainViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.math.abs
@@ -29,6 +30,7 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
     private val binding get() = _binding!!
     private val viewModel: MainPagerViewModel by viewModel()
     private val sharedViewModel: MainViewModel by activityViewModels()
+    private lateinit var viewPager: ViewPager2
 
     private var lastState: Boolean? = null
 
@@ -47,10 +49,10 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        observeState()
-        setupListeners()
         setupPager(view)
+        observeState()
+        observeMainState()
+        setupListeners()
     }
 
     private fun observeState() {
@@ -63,19 +65,41 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
         }
     }
 
-    private fun setupPager(view: View) {
-        val state = viewModel.state.value
-        val viewPager = view.findViewById<ViewPager2>(R.id.mainViewPager)
-        val toggleGroup = view.findViewById<MaterialButtonToggleGroup>(R.id.mainToggleGroup)
-        val transformer = CompositePageTransformer().apply {
-            addTransformer(MarginPageTransformer(40))
-            addTransformer { page, position ->
-                page.alpha = 0.5f + (1 - abs(position)) * 0.5f
+    private fun observeMainState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                sharedViewModel.state.collect { state ->
+                    if (state.isLoading && !state.userState.isFirstLaunch) {
+                        val pos = if (state.userState.isListScreenLast) 0 else 1
+                        async { viewPager.setCurrentItem(pos, false) }.await()
+
+                        setupTransition()
+                    }
+                }
             }
         }
-        viewPager.setPageTransformer(transformer)
+    }
+
+    private fun setupTransition() {
+        viewPager.post {
+            val transformer = CompositePageTransformer().apply {
+                addTransformer(MarginPageTransformer(40))
+                addTransformer { page, position ->
+                    page.alpha = 0.5f + (1 - abs(position)) * 0.5f
+                }
+            }
+            viewPager.setPageTransformer(transformer)
+
+            viewPager.requestTransform()
+        }
+    }
+
+    private fun setupPager(view: View) {
+        viewPager = binding.mainViewPager
         viewPager.adapter = MainPagerAdapter(this)
         viewPager.offscreenPageLimit = 1
+        val toggleGroup = view.findViewById<MaterialButtonToggleGroup>(R.id.mainToggleGroup)
+
         toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 val pos = if (checkedId == R.id.btnView) 0 else 1
@@ -94,22 +118,24 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
                 }
             }
         })
+
+
     }
 
     private fun setupListeners() {
         binding.scrim.setOnClickListener { viewModel.toggleMenu() }
 
         binding.createTask.setOnClickListener {
-            viewModel.toggleMenu()
             sharedViewModel.toCreateTask()
+            viewModel.toggleMenu()
         }
         binding.createEvent.setOnClickListener {
-            viewModel.toggleMenu()
             sharedViewModel.toCreateEvent()
+            viewModel.toggleMenu()
         }
         binding.createBirthday.setOnClickListener {
-            viewModel.toggleMenu()
             sharedViewModel.toCreateBirthday()
+            viewModel.toggleMenu()
         }
         binding.createItemButton.setOnClickListener {
             viewModel.toggleMenu()
