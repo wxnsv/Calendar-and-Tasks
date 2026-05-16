@@ -50,49 +50,68 @@ fun showTimePicker(onClick: (Long) -> Unit, context: Context, calendar: Calendar
 
 fun setupSetColorRecyclerView(
     recyclerView: RecyclerView,
+    initialColorId: Int? = null,
     onSet: (Int) -> Unit,
     context: Context,
-    resources: android.content.res.Resources
+    resources: android.content.res.Resources,
+    snapHelper: LinearSnapHelper
 ) {
+    val allColors = CalendarColors.entries
 
-    val snapHelper = LinearSnapHelper()
-    snapHelper.attachToRecyclerView(recyclerView)
-    val colorAdapter = ColorPickerAdapter()
+    if (recyclerView.tag == null) {
+        snapHelper.attachToRecyclerView(recyclerView)
 
-    recyclerView.apply {
-        adapter = colorAdapter
-        layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+        val colorAdapter = ColorPickerAdapter()
+        recyclerView.apply {
+            adapter = colorAdapter
+            layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+
+            if (itemDecorationCount == 0) {
+                addItemDecoration(ColorPickerFadeDecoration())
+            }
+
+            val density = resources.displayMetrics.density
+            val itemWidth = (60 * density).toInt()
+            val padding = (resources.displayMetrics.widthPixels / 2) - (itemWidth / 2)
+
+            setPadding(padding, 0, padding, 0)
+            clipToPadding = false
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        val lm = layoutManager as? LinearLayoutManager ?: return
+                        val centerView = snapHelper.findSnapView(lm)
+
+                        centerView?.let { view ->
+                            val position = getChildAdapterPosition(view)
+                            if (position != RecyclerView.NO_POSITION) {
+                                onSet(allColors[position].id)
+                            }
+                        }
+                    }
+                }
+            })
+        }
+        colorAdapter.submitList(allColors)
+        recyclerView.tag = "READY"
     }
 
-    fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
+    if (initialColorId != null) {
+        val targetPosition = allColors.indexOfFirst { it.id == initialColorId }.let {
+            if (it != -1) it else 6
+        }
 
-    colorAdapter.submitList(CalendarColors.entries)
-    val displayMetrics = resources.displayMetrics
-    val screenWidth = displayMetrics.widthPixels
-    val middlePosition = 6
-    recyclerView.scrollToPosition(middlePosition)
-    val itemWidth = 60.dpToPx()
-    val padding = (screenWidth / 2) - (itemWidth / 2)
-    recyclerView.addItemDecoration(ColorPickerFadeDecoration())
-    recyclerView.setPadding(padding, 0, padding, 0)
-    recyclerView.clipToPadding = false
-    recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            super.onScrollStateChanged(recyclerView, newState)
+        recyclerView.post {
+            val lm = recyclerView.layoutManager as? LinearLayoutManager
+            val centerView = snapHelper.findSnapView(lm)
+            val currentPos = centerView?.let { lm?.getPosition(it) } ?: -1
 
-            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                val centerView = snapHelper.findSnapView(recyclerView.layoutManager)
-                if (centerView != null) {
-                    val position = recyclerView.getChildAdapterPosition(centerView)
-
-                    val actualColors = CalendarColors.entries
-                    val selectedColor = actualColors[position % actualColors.size]
-
-                    onSet(selectedColor.id)
-                }
+            if (currentPos != targetPosition) {
+                lm?.scrollToPositionWithOffset(targetPosition, 0)
             }
         }
-    })
+    }
 }
 
 fun renderCreateDateTime(
@@ -140,3 +159,4 @@ inline fun RecyclerView.onFirstDraw(crossinline action: () -> Unit) {
         }
     })
 }
+

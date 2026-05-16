@@ -1,14 +1,13 @@
 package com.nikkap.calendar.ui.screens.create
 
-import com.nikkap.calendar.domain.model.CalendarEntry
 import com.nikkap.calendar.domain.model.TaskList
 
 sealed interface CreateIntent {
     data class UpdateTitle(val title: String) : CreateIntent
 
-    data class UpdateShowFragment(val type: CalendarEntry) : CreateIntent
+    data class UpdateShowFragment(val type: String) : CreateIntent
 
-    data class UpdateItem(val type: String, val id: String) : CreateIntent
+    data class UpdateItem(val type: String, val id: String? = null) : CreateIntent
 }
 
 sealed interface CreateTaskIntent {

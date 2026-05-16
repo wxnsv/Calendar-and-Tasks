@@ -1,18 +1,27 @@
 package com.nikkap.calendar.ui.screens.create.fragments
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.isGone
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.nikkap.calendar.R
+import com.nikkap.calendar.core.utils.CalendarColors
 import com.nikkap.calendar.core.utils.toCalendar
+import com.nikkap.calendar.core.utils.toOnlyDateLong
+import com.nikkap.calendar.core.utils.toTimeLong
 import com.nikkap.calendar.core.utils.toUiDate
 import com.nikkap.calendar.core.utils.toUiTime
 import com.nikkap.calendar.databinding.CreateEventFragmentBinding
@@ -33,13 +42,15 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
     private val binding get() = _binding!!
 
     private val viewModel: CreateViewModel by viewModel(
-        ownerProducer = { requireParentFragment() }
+        ownerProducer = { parentFragment ?: this }
     )
+
+    private val snapHelper = LinearSnapHelper()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupListeners()
         observeState()
+        setupListeners()
     }
 
     override fun onCreateView(
@@ -97,6 +108,7 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
             showTimePicker(
                 onClick = {
                     viewModel.onEventIntent(CreateEventIntent.UpdateStartTime(it))
+                    viewModel.onEventIntent(CreateEventIntent.UpdateStartDate(viewModel.state.value.eventDraft.startTimestamp))
                 },
                 requireContext(),
                 viewModel.state.value.eventStartTime.toCalendar()
@@ -121,9 +133,15 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
         }
         setupSetColorRecyclerView(
             recyclerView = binding.createEventSetColorRv,
-            onSet = { viewModel.onEventIntent(CreateEventIntent.UpdateColor(it)) },
+            initialColorId = CalendarColors.getEventColor(
+                viewModel.state.value.eventDraft.colorId
+            ).id,
+            onSet = {
+                viewModel.onEventIntent(CreateEventIntent.UpdateColor(it))
+            },
             context = requireContext(),
-            resources = resources
+            resources = resources,
+            snapHelper = snapHelper
         )
     }
 
@@ -132,6 +150,7 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
                     updateUi(state)
+                    renderColorPicker(state)
                 }
             }
         }
@@ -140,9 +159,86 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
 
     private fun updateUi(state: CreateState) {
         val event = state.eventDraft
+        val currentTimestamp = System.currentTimeMillis()
+        val currentDate = currentTimestamp.toOnlyDateLong()
+        val currentTime = currentTimestamp.toTimeLong()
         if (binding.createEventStartDateButton.text != event.startTimestamp.toUiDate() && event.startTimestamp != 0L) {
             binding.createEventStartDateButton.text = event.startTimestamp.toUiDate()
         }
+        /**
+         * if start date earlier than today do text red
+         */
+        if (state.eventStartDate < currentDate) {
+            binding.createEventStartDateButton.setTextColor(
+                ColorStateList.valueOf(Color.Red.toArgb())
+            )
+        } else {
+            binding.createEventStartDateButton.setTextColor(
+                ColorStateList.valueOf(Color.Black.toArgb())
+            )
+        }
+        /**
+         * if end date earlier than today do text red
+         */
+        if (state.eventEndDate < currentDate) {
+            binding.createEventEndDateButton.setTextColor(
+                ColorStateList.valueOf(Color.Red.toArgb())
+            )
+        } else {
+            binding.createEventEndDateButton.setTextColor(
+                ColorStateList.valueOf(Color.Black.toArgb())
+            )
+        }
+        /**
+         * if start time earlier than now do text red
+         */
+        if (state.eventStartTime < currentTime) {
+            binding.createEventStartTimeButton.setTextColor(
+                ColorStateList.valueOf(Color.Red.toArgb())
+            )
+        } else {
+            binding.createEventStartTimeButton.setTextColor(
+                ColorStateList.valueOf(Color.Black.toArgb())
+            )
+        }
+        /**
+         * if end time earlier than now do text red
+         */
+        if (state.eventEndTime < currentTime) {
+            binding.createEventEndTimeButton.setTextColor(
+                ColorStateList.valueOf(Color.Red.toArgb())
+            )
+        } else {
+            binding.createEventEndTimeButton.setTextColor(
+                ColorStateList.valueOf(Color.Black.toArgb())
+            )
+        }
+        /**
+         * if end time earlier than start time in one day do text red
+         */
+        if (state.eventStartDate == state.eventEndDate && state.eventStartTime > state.eventEndTime) {
+            binding.createEventEndTimeButton.setTextColor(
+                ColorStateList.valueOf(Color.Red.toArgb())
+            )
+        } else {
+            binding.createEventEndTimeButton.setTextColor(
+                ColorStateList.valueOf(Color.Black.toArgb())
+            )
+        }
+        /**
+         * if end date earlier than start date do text red
+         */
+        if (state.eventStartDate > state.eventEndDate) {
+            binding.createEventEndDateButton.setTextColor(
+                ColorStateList.valueOf(Color.Red.toArgb())
+            )
+        } else {
+            binding.createEventEndDateButton.setTextColor(
+                ColorStateList.valueOf(Color.Black.toArgb())
+            )
+        }
+
+
         if (binding.createEventStartTimeButton.text != state.eventStartTime.toUiTime()) {
             binding.createEventStartTimeButton.text = state.eventStartTime.toUiTime()
         }
@@ -191,6 +287,26 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
                 isAllDay = event.isAllDay
             )
         }
+    }
 
+    private fun renderColorPicker(state: CreateState) {
+        val allColors = CalendarColors.entries
+        val targetPosition = allColors.indexOfFirst { it.id == state.eventDraft.colorId }
+        if (targetPosition == -1) return
+
+        val layoutManager =
+            binding.createEventSetColorRv.layoutManager as? LinearLayoutManager ?: return
+
+        val centerView = snapHelper.findSnapView(layoutManager)
+        val currentCenterPos = centerView?.let { layoutManager.getPosition(it) } ?: -1
+
+        if (currentCenterPos != targetPosition && binding.createEventSetColorRv.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
+
+            binding.createEventSetColorRv.post {
+                if (binding.createEventSetColorRv.isAttachedToWindow) {
+                    layoutManager.scrollToPositionWithOffset(targetPosition, 0)
+                }
+            }
+        }
     }
 }

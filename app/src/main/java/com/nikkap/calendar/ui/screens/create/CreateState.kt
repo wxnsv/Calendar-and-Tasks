@@ -1,16 +1,16 @@
 package com.nikkap.calendar.ui.screens.create
 
 import android.icu.util.Calendar
+import com.nikkap.calendar.core.utils.toOnlyDateLong
 import com.nikkap.calendar.core.utils.toTimeLong
 import com.nikkap.calendar.domain.model.Birthday
-import com.nikkap.calendar.domain.model.CalendarEntry
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.model.TaskList
 
 data class CreateState(
     val title: String? = "",
-    val activeType: CalendarEntry = Task(),
+    val activeType: String = "TASK",
 
     val taskDraft: Task = Task(),
     val eventDraft: Event = Event(),
@@ -24,24 +24,35 @@ data class CreateState(
 
     val eventStartTime: Long = 0L,
     val eventEndTime: Long = 0L,
+    val eventStartDate: Long = 0L,
+    val eventEndDate: Long = 0L,
 ) {
     companion object {
         fun initial(): CreateState {
             val startTimestamp = Calendar.getInstance().apply {
                 add(Calendar.HOUR_OF_DAY, 1)
                 set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
             }.timeInMillis
 
             val endTimestamp = Calendar.getInstance().apply {
                 add(Calendar.HOUR_OF_DAY, 2)
                 set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
             }.timeInMillis
+
+            val eventStartDate = Calendar.getInstance().timeInMillis.toOnlyDateLong()
+
+            val eventEndDate = Calendar.getInstance().timeInMillis.toOnlyDateLong()
 
             return CreateState(
                 eventStartTime = startTimestamp.toTimeLong(),
                 eventEndTime = endTimestamp.toTimeLong(),
 
-                eventDraft = Event(startTimestamp = startTimestamp, endTimestamp = endTimestamp),
+                eventStartDate = eventStartDate,
+                eventEndDate = eventEndDate,
                 taskDraft = Task(deadline = startTimestamp)
             )
         }

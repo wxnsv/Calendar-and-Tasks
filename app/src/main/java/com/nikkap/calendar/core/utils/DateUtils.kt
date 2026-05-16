@@ -12,6 +12,10 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
+import java.util.Calendar.HOUR_OF_DAY
+import java.util.Calendar.MILLISECOND
+import java.util.Calendar.MINUTE
+import java.util.Calendar.SECOND
 import java.util.Locale
 
 /**
@@ -37,6 +41,15 @@ fun Long.toTimeLong(): Long {
     val offsetMillis = ZoneId.of("UTC").rules.getOffset(instant).totalSeconds * 1000L
 
     return (this + offsetMillis) % millisInDay
+}
+
+fun Long.toOnlyDateLong(): Long {
+    return this.toCalendar().apply {
+        set(HOUR_OF_DAY, 0)
+        set(MINUTE, 0)
+        set(SECOND, 0)
+        set(MILLISECOND, 0)
+    }.timeInMillis
 }
 
 fun parseIsoDate(dateStr: String?, isAllDay: Boolean = false): Long {

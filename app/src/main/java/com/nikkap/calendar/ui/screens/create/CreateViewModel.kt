@@ -38,7 +38,11 @@ class CreateViewModel(
             taskLists = taskLists,
             selectedTaskList = state.selectedTaskList
                 ?: taskLists.find { it.id == state.taskDraft.taskListId }
-                ?: taskLists.find { it.id == userPrefRepository.defaultTasklistId.first() }
+                ?: taskLists.find { it.id == userPrefRepository.defaultTasklistId.first() },
+            eventDraft = state.eventDraft.copy(
+                startTimestamp = if (!state.eventDraft.isAllDay) state.eventStartDate + state.eventStartTime else state.eventStartDate,
+                endTimestamp = if (!state.eventDraft.isAllDay) state.eventEndDate + state.eventEndTime else state.eventEndDate
+            )
         )
     }.stateIn(
         scope = viewModelScope,
@@ -60,19 +64,21 @@ class CreateViewModel(
             }
 
             is CreateIntent.UpdateItem -> {
-                _state.update { it.copy(isEditing = true) }
+                _state.update { it.copy(isEditing = true, isLoading = true) }
                 val intentEntry: CalendarEntry = when (intent.type) {
                     "TASK" -> Task()
                     "EVENT" -> Event()
                     else -> Birthday()
                 }
+                if (intent.id.isNullOrBlank()) return
                 when (intentEntry) {
                     is Task -> viewModelScope.launch {
                         val task = taskRepository.getTask(intent.id)
                         _state.update {
                             it.copy(
                                 taskDraft = task,
-                                title = task.title
+                                title = task.title,
+                                isLoading = false
                             )
                         }
                     }
@@ -82,7 +88,8 @@ class CreateViewModel(
                         _state.update {
                             it.copy(
                                 birthdayDraft = birthday,
-                                title = birthday.name
+                                title = birthday.name,
+                                isLoading = false
                             )
                         }
                     }
@@ -94,12 +101,12 @@ class CreateViewModel(
                                 eventDraft = event,
                                 eventStartTime = event.startTimestamp.toTimeLong(),
                                 eventEndTime = event.endTimestamp.toTimeLong(),
-                                title = event.summary
+                                title = event.summary,
+                                isLoading = false
                             )
                         }
                     }
                 }
-
             }
         }
     }
@@ -168,19 +175,11 @@ class CreateViewModel(
                 viewModelScope.launch {
                     val event = state.value.eventDraft
 
-                    val startTimestamp =
-                        if (!event.isAllDay) state.value.eventDraft.startTimestamp + state.value.eventStartTime
-                        else state.value.eventDraft.startTimestamp
-
-                    val endTimestamp =
-                        if (!event.isAllDay) state.value.eventDraft.endTimestamp + state.value.eventEndTime
-                        else state.value.eventDraft.endTimestamp
-
                     val eventToSave = event.copy(
                         id = event.id ?: UUID.randomUUID().toString().replace("-", ""),
                         summary = state.value.title,
-                        startTimestamp = startTimestamp,
-                        endTimestamp = endTimestamp
+                        startTimestamp = event.startTimestamp,
+                        endTimestamp = event.endTimestamp
                     )
                     _state.update { it.copy(isLoading = true) }
                     if (state.value.isEditing) calendarRepository.updateEvent(eventToSave)
@@ -192,6 +191,7 @@ class CreateViewModel(
 
             is CreateEventIntent.UpdateColor ->
                 _state.update {
+                    if (state.value.isLoading) return
                     it.copy(
                         eventDraft = it.eventDraft.copy(
                             colorId = intent.color
@@ -217,21 +217,19 @@ class CreateViewModel(
                     )
                 }
 
-            is CreateEventIntent.UpdateStartDate -> _state.update {
-                it.copy(
-                    eventDraft = it.eventDraft.copy(
-                        startTimestamp = intent.startDate
+            is CreateEventIntent.UpdateStartDate ->
+                _state.update {
+                    it.copy(
+                        eventStartDate = intent.startDate
                     )
-                )
-            }
+                }
 
-            is CreateEventIntent.UpdateEndDate -> _state.update {
-                it.copy(
-                    eventDraft = it.eventDraft.copy(
-                        endTimestamp = intent.endDate
+            is CreateEventIntent.UpdateEndDate ->
+                _state.update {
+                    it.copy(
+                        eventEndDate = intent.endDate
                     )
-                )
-            }
+                }
 
             is CreateEventIntent.UpdateEndTime -> {
                 _state.update {
@@ -288,7 +286,7 @@ class CreateViewModel(
     fun saveItemResult(): Result<Unit> {
         val state = state.value
         when (state.activeType) {
-            is Task -> {
+            "TASK" -> {
                 val task = state.taskDraft
                 if (state.title == null || state.title == "") {
                     viewModelScope.launch {
@@ -312,7 +310,7 @@ class CreateViewModel(
                 }
             }
 
-            is Event -> {
+            "EVENT" -> {
                 val event = state.eventDraft
                 if (state.title == null || state.title == "") {
                     viewModelScope.launch {
@@ -342,7 +340,7 @@ class CreateViewModel(
                 }
             }
 
-            is Birthday -> {
+            "BIRTHDAY" -> {
                 if (state.title == null || state.title == "") {
                     viewModelScope.launch {
                         _errorEvents.send("Name cant be empty")

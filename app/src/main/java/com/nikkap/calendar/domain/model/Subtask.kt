@@ -8,4 +8,4 @@ data class Subtask(
     val position: String = "",
     val isCompleted: Boolean = false,
     val taskListId: String = "",
-) : CalendarEntry()
+)

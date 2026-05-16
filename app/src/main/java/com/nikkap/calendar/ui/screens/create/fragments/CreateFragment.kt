@@ -70,19 +70,19 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
         val fragment = when (item) {
             is Task -> {
                 binding.createEditText.hint = "Add title"
-                viewModel.onIntent(CreateIntent.UpdateShowFragment(Task()))
+                viewModel.onIntent(CreateIntent.UpdateShowFragment("TASK"))
                 CreateTaskFragment()
             }
 
             is Event -> {
                 binding.createEditText.hint = "Add title"
-                viewModel.onIntent(CreateIntent.UpdateShowFragment(Event()))
+                viewModel.onIntent(CreateIntent.UpdateShowFragment("EVENT"))
                 CreateEventFragment()
             }
 
             is Birthday -> {
                 binding.createEditText.hint = "Add name"
-                viewModel.onIntent(CreateIntent.UpdateShowFragment(Birthday()))
+                viewModel.onIntent(CreateIntent.UpdateShowFragment("BIRTHDAY"))
                 CreateBirthdayFragment()
             }
 
@@ -99,15 +99,12 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
     private fun setupListeners() {
         binding.createTaskButton.setOnClickListener {
             updateNestedFragment(viewModel.state.value.taskDraft)
-            viewModel.onIntent(CreateIntent.UpdateShowFragment(Task()))
         }
         binding.createEventButton.setOnClickListener {
             updateNestedFragment(viewModel.state.value.eventDraft)
-            viewModel.onIntent(CreateIntent.UpdateShowFragment(Event()))
         }
         binding.createBirthdayButton.setOnClickListener {
             updateNestedFragment(viewModel.state.value.birthdayDraft)
-            viewModel.onIntent(CreateIntent.UpdateShowFragment(Birthday()))
         }
         binding.createEditText.doAfterTextChanged {
             viewModel.onIntent(CreateIntent.UpdateTitle(it.toString()))
@@ -139,33 +136,26 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
     }
 
     private fun initial() {
+        viewModel.onIntent(CreateIntent.UpdateShowFragment(args.type))
         val createType = args.type
+        viewModel.onIntent(CreateIntent.UpdateShowFragment(createType))
         val itemId = args.id
         if (itemId != "") {
             viewModel.onIntent(CreateIntent.UpdateItem(type = createType, id = itemId))
-        }
+        } else viewModel.onIntent(CreateIntent.UpdateItem(type = createType))
         when (createType) {
             "TASK" -> updateNestedFragment(viewModel.state.value.taskDraft)
             "EVENT" -> updateNestedFragment(viewModel.state.value.eventDraft)
             "BIRTHDAY" -> updateNestedFragment(viewModel.state.value.birthdayDraft)
         }
+        if (itemId.isNotEmpty() && createType != "TASK") doInactive(binding.createTaskButton)
+        if (itemId.isNotEmpty() && createType != "EVENT") doInactive(binding.createEventButton)
+        if (itemId.isNotEmpty() && createType != "BIRTHDAY") doInactive(binding.createBirthdayButton)
     }
 
     private fun updateUi(state: CreateState) {
-        val currentFragment = childFragmentManager.findFragmentById(R.id.create_fcv)
-        val currentEntry = when (currentFragment) {
-            is CreateTaskFragment -> state.taskDraft
-            is CreateEventFragment -> state.eventDraft
-            else -> state.birthdayDraft
-        }
         if (binding.createEditText.text.toString() != state.title) {
             binding.createEditText.setText(state.title)
         }
-        if (currentEntry != state.activeType) {
-            updateNestedFragment(currentEntry)
-        }
-        if (state.isEditing && state.activeType !is Task) doInactive(binding.createTaskButton)
-        if (state.isEditing && state.activeType !is Event) doInactive(binding.createEventButton)
-        if (state.isEditing && state.activeType !is Birthday) doInactive(binding.createBirthdayButton)
     }
 }

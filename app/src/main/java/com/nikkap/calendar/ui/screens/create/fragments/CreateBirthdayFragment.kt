@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearSnapHelper
 import com.nikkap.calendar.R
+import com.nikkap.calendar.core.utils.CalendarColors
 import com.nikkap.calendar.core.utils.toUiDate
 import com.nikkap.calendar.databinding.CreateBirthdayFragmentBinding
 import com.nikkap.calendar.ui.screens.create.CreateBirthdayIntent
@@ -29,13 +31,19 @@ class CreateBirthdayFragment : Fragment(R.layout.create_birthday_fragment) {
         ownerProducer = { requireParentFragment() }
     )
 
+    private val snapHelper = LinearSnapHelper()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupSetColorRecyclerView(
             recyclerView = binding.createBirthdaySetColorRv,
             onSet = { viewModel.onBirthdayIntent(CreateBirthdayIntent.UpdateColor(it)) },
             context = requireContext(),
-            resources = resources
+            resources = resources,
+            snapHelper = snapHelper,
+            initialColorId = CalendarColors.getBirthdayColor(
+                viewModel.state.value.birthdayDraft.colorId
+            ).id
         )
         setupListeners()
         observeState()
