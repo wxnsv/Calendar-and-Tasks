@@ -58,9 +58,3 @@ data class CreateState(
         }
     }
 }
-
-sealed class ShowFragment {
-    object Task : ShowFragment()
-    object Event : ShowFragment()
-    object Birthday : ShowFragment()
-}

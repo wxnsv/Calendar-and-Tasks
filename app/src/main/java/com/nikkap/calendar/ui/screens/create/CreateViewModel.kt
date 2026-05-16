@@ -2,6 +2,7 @@ package com.nikkap.calendar.ui.screens.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nikkap.calendar.core.utils.toOnlyDateLong
 import com.nikkap.calendar.core.utils.toTimeLong
 import com.nikkap.calendar.data.repository.UserPreferencesRepository
 import com.nikkap.calendar.domain.model.Birthday
@@ -33,7 +34,6 @@ class CreateViewModel(
         _state,
         taskListsFlow
     ) { state, taskLists ->
-
         state.copy(
             taskLists = taskLists,
             selectedTaskList = state.selectedTaskList
@@ -99,6 +99,8 @@ class CreateViewModel(
                         _state.update {
                             it.copy(
                                 eventDraft = event,
+                                eventStartDate = event.startTimestamp.toOnlyDateLong(),
+                                eventEndDate = event.endTimestamp.toOnlyDateLong(),
                                 eventStartTime = event.startTimestamp.toTimeLong(),
                                 eventEndTime = event.endTimestamp.toTimeLong(),
                                 title = event.summary,

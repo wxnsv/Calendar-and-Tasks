@@ -228,13 +228,9 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
         /**
          * if end date earlier than start date do text red
          */
-        if (state.eventStartDate > state.eventEndDate) {
+        if (state.eventStartDate > state.eventEndDate && !state.eventDraft.isAllDay) {
             binding.createEventEndDateButton.setTextColor(
                 ColorStateList.valueOf(Color.Red.toArgb())
-            )
-        } else {
-            binding.createEventEndDateButton.setTextColor(
-                ColorStateList.valueOf(Color.Black.toArgb())
             )
         }
 
