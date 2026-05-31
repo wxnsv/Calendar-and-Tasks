@@ -6,8 +6,14 @@ data class UserPrefs(
     val birthdayLastSync: Long? = null,
     val taskLastSync: Long? = null,
     val email: String? = null,
+    val photoPath: String? = null,
     val name: String? = null,
     val isFirstLaunch: Boolean = true,
     val defaultTasklistId: String? = null,
-    val isListScreenLast: Boolean = true
+    val isListScreenLast: Boolean = true,
+    val isLastOpenedSelected: Boolean = true,
+    val isSystemTheme: Boolean = true,
+    val isLightTheme: Boolean = true,
+    val isMondayFirstDay: Boolean = true,
+    val isSystemFirstDay: Boolean = true
 )

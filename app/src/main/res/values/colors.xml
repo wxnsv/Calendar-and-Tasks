@@ -9,4 +9,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#FF0000</color>
     <color name="light_gray">#ADADAD</color>
+    <color name="md_theme_light_primary">@color/purple_500</color>
+    <color name="md_theme_light_surface">#FBFDFA</color>
+    <color name="md_theme_light_onSurface">#191C1B</color>
+    <color name="md_theme_light_onSurfaceVariant">#444746</color>
+    <color name="md_theme_light_outline">#747775</color>
 </resources>

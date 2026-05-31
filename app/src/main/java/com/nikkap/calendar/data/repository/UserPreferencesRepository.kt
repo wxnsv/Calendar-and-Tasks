@@ -26,13 +26,18 @@ class UserPreferencesRepository(
         val IS_AUTHORIZED = booleanPreferencesKey("is_authorized")
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_NAME = stringPreferencesKey("user_name")
-        val USER_PHOTO = stringPreferencesKey("user_photo")
+        val USER_PHOTO_PATH = stringPreferencesKey("user_photo_path")
         val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
         val CALENDAR_LAST_SYNC = longPreferencesKey("event_last_sync")
         val TASK_LAST_SYNC = longPreferencesKey("task_last_sync")
         val DEFAULT_TASKLIST_ID = stringPreferencesKey("default_tasklist_id")
         val CALENDAR_TIME_MIN = stringPreferencesKey("calendar_time_min")
         val IS_LIST_SCREEN_LAST = booleanPreferencesKey("is_list_screen_last")
+        val IS_LAST_OPENED_SCREEN = booleanPreferencesKey("is_last_opened_screen")
+        val IS_SYSTEM_THEME = booleanPreferencesKey("is_system_theme")
+        val IS_LIGHT_THEME = booleanPreferencesKey("is_light_theme")
+        val IS_MONDAY_FIRST_DAY = booleanPreferencesKey("is_monday_first_day")
+        val IS_SYSTEM_FIRST_DAY = booleanPreferencesKey("is_system_first_day")
     }
 
     val userStateFlow: Flow<UserPrefs> = dataStore.data
@@ -46,9 +51,15 @@ class UserPreferencesRepository(
                 taskLastSync = prefs[Keys.TASK_LAST_SYNC],
                 email = prefs[Keys.USER_EMAIL],
                 name = prefs[Keys.USER_NAME],
+                photoPath = prefs[Keys.USER_PHOTO_PATH],
                 isFirstLaunch = prefs[Keys.IS_FIRST_LAUNCH] ?: true,
                 defaultTasklistId = prefs[Keys.DEFAULT_TASKLIST_ID],
-                isListScreenLast = prefs[Keys.IS_LIST_SCREEN_LAST] ?: true
+                isListScreenLast = prefs[Keys.IS_LIST_SCREEN_LAST] ?: true,
+                isLastOpenedSelected = prefs[Keys.IS_LAST_OPENED_SCREEN] ?: false,
+                isSystemTheme = prefs[Keys.IS_SYSTEM_THEME] ?: true,
+                isLightTheme = prefs[Keys.IS_LIGHT_THEME] ?: true,
+                isMondayFirstDay = prefs[Keys.IS_MONDAY_FIRST_DAY] ?: true,
+                isSystemFirstDay = prefs[Keys.IS_SYSTEM_FIRST_DAY] ?: true,
             )
         }
 
@@ -73,13 +84,6 @@ class UserPreferencesRepository(
             prefs[Keys.CALENDAR_TIME_MIN]
         }
 
-    val isListScreenLast = dataStore.data.catch { exception ->
-        if (exception is IOException) emit(emptyPreferences()) else throw exception
-    }
-        .map { prefs ->
-            prefs[Keys.IS_LIST_SCREEN_LAST] ?: true
-        }
-
     val defaultTasklistId = dataStore.data.catch { exception ->
         if (exception is IOException) emit(emptyPreferences()) else throw exception
     }
@@ -87,26 +91,18 @@ class UserPreferencesRepository(
             prefs[Keys.DEFAULT_TASKLIST_ID]
         }
 
-
-    suspend fun authorizeSession(email: String, name: String, photoUri: String) {
+    suspend fun authorizeSession(email: String, name: String) {
         dataStore.edit { prefs ->
             prefs[Keys.USER_EMAIL] = email
             prefs[Keys.IS_AUTHORIZED] = true
             prefs[Keys.IS_FIRST_LAUNCH] = false
             prefs[Keys.USER_NAME] = name
-            prefs[Keys.USER_PHOTO] = photoUri
         }
     }
 
     suspend fun updateTaskSyncTime() {
         dataStore.edit { prefs ->
             prefs[Keys.TASK_LAST_SYNC] = System.currentTimeMillis()
-        }
-    }
-
-    suspend fun updateIsListScreenLast(boolean: Boolean) {
-        dataStore.edit { prefs ->
-            prefs[Keys.IS_LIST_SCREEN_LAST] = boolean
         }
     }
 
@@ -143,9 +139,52 @@ class UserPreferencesRepository(
             prefs[Keys.IS_FIRST_LAUNCH] = false
             prefs[Keys.CALENDAR_TIME_MIN] = Clock.System.now()
                 .minus(1, DateTimeUnit.YEAR, TimeZone.UTC)
-                .toEpochMilliseconds().toIsoDateWithoutSeconds()!!
+                .toEpochMilliseconds().toIsoDateWithoutSeconds()
         }
     }
 
+    suspend fun saveUserPhoto(photoPath: String) {
+        dataStore.edit { prefs ->
+            prefs[Keys.USER_PHOTO_PATH] = photoPath
+        }
+    }
+
+    suspend fun updateIsLastOpenedScreen(isLastOpenedScreen: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_LAST_OPENED_SCREEN] = isLastOpenedScreen
+        }
+    }
+
+    suspend fun updateIsSystemTheme(isSystemTheme: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_SYSTEM_THEME] = isSystemTheme
+        }
+    }
+
+    suspend fun updateIsLightTheme(isLightTheme: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_LIGHT_THEME] = isLightTheme
+            prefs[Keys.IS_SYSTEM_THEME] = false
+        }
+    }
+
+    suspend fun updateIsMondayFirstDay(isMondayFirstDay: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_MONDAY_FIRST_DAY] = isMondayFirstDay
+            prefs[Keys.IS_SYSTEM_FIRST_DAY] = false
+        }
+    }
+
+    suspend fun updateIsSystemFirstDay(isSystemFirstDay: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_SYSTEM_FIRST_DAY] = isSystemFirstDay
+        }
+    }
+
+    suspend fun updateIsListScreenLast(boolean: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_LIST_SCREEN_LAST] = boolean
+        }
+    }
 
 }

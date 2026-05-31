@@ -21,7 +21,8 @@ class AuthViewModel(
 
     private val _state = MutableStateFlow<AuthState>(AuthState.Loading)
     val state = _state.asStateFlow()
-
+    private val _photoUri = MutableStateFlow("")
+    val photoUri = _photoUri.asStateFlow()
     fun startAuth(authIntent: () -> Unit) {
         viewModelScope.launch {
             val userInfo = authentificationManager.authenticate()
@@ -29,10 +30,16 @@ class AuthViewModel(
                 userPrefRepository.authorizeSession(
                     userInfo.email,
                     userInfo.displayName ?: "",
-                    userInfo.photoUri.toString()
                 )
+                _photoUri.value = userInfo.photoUri ?: ""
                 authIntent()
             }
+        }
+    }
+
+    fun saveUserPhotoPath(path: String) {
+        viewModelScope.launch {
+            userPrefRepository.saveUserPhoto(path)
         }
     }
 

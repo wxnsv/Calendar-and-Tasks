@@ -2,11 +2,6 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph">
-    <fragment
-        android:id="@+id/listFragment"
-        android:name="com.nikkap.calendar.ui.screens.list.ListFragment"
-        android:label="ListFragment">
-    </fragment>
 
     <fragment
         android:id="@+id/createFragment"
@@ -40,7 +35,23 @@
 
         <action
             android:id="@+id/action_mainPager_to_createFragment"
-            android:hardwareAccelerated="true"
             app:destination="@id/createFragment" />
+        <action
+            android:id="@+id/action_mainPager_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.nikkap.calendar.ui.screens.about.AboutFragment"
+        android:label="AboutFragment" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.nikkap.calendar.ui.screens.settings.SettingsFragment"
+        android:label="SettingsFragment">
+        <action
+            android:id="@+id/action_settingsFragment_to_aboutFragment"
+            app:destination="@id/aboutFragment" />
     </fragment>
 </navigation>

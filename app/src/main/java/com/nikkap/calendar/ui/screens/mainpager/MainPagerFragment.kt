@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -37,6 +38,7 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        viewPager.adapter = null
     }
 
     override fun onCreateView(
@@ -49,10 +51,26 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        postponeEnterTransition()
+
         setupPager(view)
         observeState()
-        observeMainState()
+
+        (view.parent as? ViewGroup)?.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
+
         setupListeners()
+        observeMainState()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (viewPager.adapter == null) {
+            viewPager.adapter = MainPagerAdapter(this)
+        }
     }
 
     private fun observeState() {
@@ -96,8 +114,9 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
 
     private fun setupPager(view: View) {
         viewPager = binding.mainViewPager
-        viewPager.adapter = MainPagerAdapter(this)
         viewPager.offscreenPageLimit = 1
+        viewPager.adapter = MainPagerAdapter(this@MainPagerFragment)
+
         val toggleGroup = view.findViewById<MaterialButtonToggleGroup>(R.id.mainToggleGroup)
 
         toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
@@ -105,8 +124,8 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
                 val pos = if (checkedId == R.id.btnView) 0 else 1
                 if (viewPager.currentItem != pos) {
                     viewPager.setCurrentItem(pos, true)
+                    viewModel.switchScreen(pos)
                 }
-                viewModel.switchScreen(pos)
             }
         }
 
@@ -118,8 +137,6 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
                 }
             }
         })
-
-
     }
 
     private fun setupListeners() {
@@ -139,6 +156,9 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
         }
         binding.createItemButton.setOnClickListener {
             viewModel.toggleMenu()
+        }
+        binding.settingsButton.setOnClickListener {
+            sharedViewModel.toSettingsScreen()
         }
     }
 

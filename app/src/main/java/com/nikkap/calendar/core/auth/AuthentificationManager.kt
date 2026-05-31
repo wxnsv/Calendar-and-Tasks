@@ -36,7 +36,7 @@ class AuthentificationManager(private val context: Context) {
                 UserInfo(
                     email = googleIdToken.id,
                     displayName = googleIdToken.displayName,
-                    photoUri = googleIdToken.profilePictureUri
+                    photoUri = googleIdToken.profilePictureUri.toString()
                 )
             } else {
                 null

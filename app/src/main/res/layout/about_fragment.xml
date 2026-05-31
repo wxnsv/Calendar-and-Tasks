@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://tools.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/aboutTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:backgroundTint="?attr/colorSurface"
+        android:fitsSystemWindows="true"
+        app:liftOnScroll="true">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/aboutToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/white"
+            android:backgroundTint="?attr/colorSurface"
+            app:layout_anchor="@+id/aboutTopBar"
+            app:layout_anchorGravity="center"
+            app:navigationIcon="@drawable/back"
+            app:navigationIconTint="@color/black"
+            app:title="About"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingVertical="24dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/aboutAppIcon"
+                    android:layout_width="88dp"
+                    android:layout_height="88dp"
+                    android:src="@mipmap/ic_launcher"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/calendar"
+                    android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/aboutVersionTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    tools:text="Version 1.0.0" />
+            </LinearLayout>
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/OutlinedCardViewTitle"
+                android:text="@string/open_source" />
+
+            <com.google.android.material.card.MaterialCardView style="@style/OutlinedCardViewCardView">
+
+                <RelativeLayout
+                    android:id="@+id/aboutGithubButton"
+                    style="@style/OutlinedCardViewRelativeLayout">
+
+                    <ImageView
+                        android:id="@+id/aboutGithubIcon"
+                        style="@style/OutlinedCardViewImageView"
+                        android:contentDescription="@string/github"
+                        android:src="@drawable/github" />
+
+                    <TextView
+                        style="@style/OutlinedCardViewTextView"
+                        android:layout_toEndOf="@id/aboutGithubIcon"
+                        android:text="@string/github" />
+
+                    <ImageView
+                        style="@style/OutlinedCardViewImageView"
+                        android:layout_alignParentEnd="true"
+                        android:contentDescription="@string/chevron"
+                        android:src="@drawable/chevron_right" />
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/OutlinedCardViewTitle"
+                android:text="@string/feedback" />
+
+            <com.google.android.material.card.MaterialCardView style="@style/OutlinedCardViewCardView">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:id="@+id/aboutRateButton"
+                        style="@style/OutlinedCardViewRelativeLayout">
+
+
+                        <ImageView
+                            android:id="@+id/aboutRateIcon"
+                            style="@style/OutlinedCardViewImageView"
+                            android:contentDescription="@string/rate_in_play_store"
+                            android:src="@drawable/star" />
+
+                        <TextView
+                            style="@style/OutlinedCardViewTextView"
+                            android:layout_toEndOf="@id/aboutRateIcon"
+                            android:text="@string/rate_in_play_store" />
+
+                        <ImageView
+                            style="@style/OutlinedCardViewImageView"
+                            android:layout_alignParentEnd="true"
+                            android:contentDescription="@string/chevron"
+                            android:src="@drawable/chevron_right" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/aboutReportButton"
+                        style="@style/OutlinedCardViewRelativeLayout">
+
+
+                        <ImageView
+                            android:id="@+id/aboutReportIcon"
+                            style="@style/OutlinedCardViewImageView"
+                            android:contentDescription="@string/bug_report"
+                            android:src="@drawable/bug_report" />
+
+                        <TextView
+                            style="@style/OutlinedCardViewTextView"
+                            android:layout_toEndOf="@id/aboutReportIcon"
+                            android:text="@string/bug_report" />
+
+                        <ImageView
+                            style="@style/OutlinedCardViewImageView"
+                            android:contentDescription="@string/chevron"
+                            android:layout_alignParentEnd="true"
+                            android:src="@drawable/chevron_right" />
+                    </RelativeLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/OutlinedCardViewTitle"
+                android:text="@string/legal_information" />
+
+            <com.google.android.material.card.MaterialCardView style="@style/OutlinedCardViewCardView">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+
+                    <RelativeLayout
+                        android:id="@+id/aboutPolicyButton"
+                        style="@style/OutlinedCardViewRelativeLayout">
+
+
+                        <ImageView
+                            android:id="@+id/aboutPrivacyIcon"
+                            style="@style/OutlinedCardViewImageView"
+                            android:contentDescription="@string/privacy_policy"
+                            android:src="@drawable/privacy_policy" />
+
+                        <TextView
+                            android:layout_toEndOf="@id/aboutPrivacyIcon"
+                            android:text="@string/privacy_policy"
+                            style="@style/OutlinedCardViewTextView" />
+
+                        <ImageView
+                            style="@style/OutlinedCardViewImageView"
+                            android:layout_alignParentEnd="true"
+                            android:contentDescription="@string/chevron"
+                            android:src="@drawable/chevron_right" />
+                    </RelativeLayout>
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="8dp" />
+
+                    <RelativeLayout
+                        android:id="@+id/aboutLicenseButton"
+                        style="@style/OutlinedCardViewRelativeLayout">
+
+
+                        <ImageView
+                            android:id="@+id/aboutLicenseIcon"
+                            android:contentDescription="@string/license"
+                            android:src="@drawable/license"
+                            style="@style/OutlinedCardViewImageView" />
+
+                        <TextView
+                            style="@style/OutlinedCardViewTextView"
+                            android:layout_toEndOf="@id/aboutLicenseIcon"
+                            android:text="@string/license" />
+
+                        <ImageView
+                            style="@style/OutlinedCardViewImageView"
+                            android:layout_alignParentEnd="true"
+                            android:contentDescription="@string/chevron"
+                            android:src="@drawable/chevron_right" />
+                    </RelativeLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

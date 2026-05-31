@@ -10,31 +10,51 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/mainToggleGroup"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingTop="40dp"
-            app:selectionRequired="true"
-            app:singleSelection="true">
+            android:paddingTop="40dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnView"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/mainToggleGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="View"
-                app:cornerRadius="10dp" />
+                android:layout_gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnView"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/list"
+                    app:cornerRadius="10dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCompose"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/split"
+                    app:cornerRadius="10dp" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCompose"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
+                android:id="@+id/settings_button"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:text="Compose"
-                app:cornerRadius="10dp" />
-        </com.google.android.material.button.MaterialButtonToggleGroup>
+                app:icon="@drawable/more_vert"
+                android:backgroundTint="@color/white"
+                android:theme="@style/Widget.Material3.Button.IconButton"
+                app:iconTint="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/mainViewPager"
@@ -49,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="25dp"
         android:layout_marginBottom="230dp"
-        android:text="Task"
+        android:text="@string/task"
         android:textSize="20sp"
         android:visibility="gone"
         app:icon="@drawable/task"
@@ -61,9 +81,9 @@
         android:id="@+id/create_event"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="165dp"
         android:layout_marginEnd="25dp"
-        android:text="Event"
+        android:layout_marginBottom="165dp"
+        android:text="@string/event"
         android:textSize="20sp"
         android:visibility="gone"
         app:icon="@drawable/event"
@@ -77,7 +97,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="25dp"
         android:layout_marginBottom="100dp"
-        android:text="birthday"
+        android:text="@string/birthday"
         android:textSize="20sp"
         android:visibility="gone"
         app:icon="@drawable/birthday"
