@@ -26,6 +26,8 @@ data class CreateState(
     val eventEndTime: Long = 0L,
     val eventStartDate: Long = 0L,
     val eventEndDate: Long = 0L,
+
+    val birthdayDate: Long = 0L
 ) {
     companion object {
         fun initial(): CreateState {
@@ -47,13 +49,17 @@ data class CreateState(
 
             val eventEndDate = Calendar.getInstance().timeInMillis.toOnlyDateLong()
 
+            val birthdayStartDate = Calendar.getInstance().timeInMillis.toOnlyDateLong()
+
             return CreateState(
                 eventStartTime = startTimestamp.toTimeLong(),
                 eventEndTime = endTimestamp.toTimeLong(),
 
                 eventStartDate = eventStartDate,
                 eventEndDate = eventEndDate,
-                taskDraft = Task(deadline = startTimestamp)
+                taskDraft = Task(deadline = startTimestamp),
+
+                birthdayDate = birthdayStartDate
             )
         }
     }

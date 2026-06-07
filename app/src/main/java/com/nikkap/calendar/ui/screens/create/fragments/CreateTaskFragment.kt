@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ListPopupWindow
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -17,13 +16,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nikkap.calendar.R
-import com.nikkap.calendar.core.utils.toUiDate
+import com.nikkap.calendar.core.utils.toShortUiDate
 import com.nikkap.calendar.databinding.CreateTaskFragmentBinding
 import com.nikkap.calendar.domain.model.TaskList
 import com.nikkap.calendar.ui.screens.create.CreateState
 import com.nikkap.calendar.ui.screens.create.CreateTaskIntent
 import com.nikkap.calendar.ui.screens.create.CreateViewModel
-import com.nikkap.calendar.ui.showDatePicker
+import com.nikkap.calendar.ui.utils.showDatePicker
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.UUID
@@ -50,16 +49,6 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
     }
 
     private fun setupListeners() {
-        binding.createTaskRepeatButton.setOnClickListener { view ->
-            val popup = PopupMenu(view.context, view)
-            popup.menuInflater.inflate(R.menu.create_task_event_notification_menu, popup.menu)
-            popup.setOnMenuItemClickListener { item ->
-                binding.createTaskRepeatButton.text = item.title
-                viewModel.onTaskIntent(CreateTaskIntent.UpdateRepeat(item.title.toString()))
-                true
-            }
-            popup.show()
-        }
         binding.createTaskDescriptionEditText.doAfterTextChanged {
             viewModel.onTaskIntent(CreateTaskIntent.UpdateDescription(it.toString()))
         }
@@ -102,8 +91,8 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
             binding.createTaskSetListButton.text = state.selectedTaskList?.title
         }
 
-        if (state.taskDraft.deadline != null && binding.createTaskDeadlineButton.text != state.taskDraft.deadline.toUiDate()) {
-            binding.createTaskDeadlineButton.text = state.taskDraft.deadline.toUiDate()
+        if (state.taskDraft.deadline != null && binding.createTaskDeadlineButton.text != state.taskDraft.deadline.toShortUiDate()) {
+            binding.createTaskDeadlineButton.text = state.taskDraft.deadline.toShortUiDate()
         }
 
     }

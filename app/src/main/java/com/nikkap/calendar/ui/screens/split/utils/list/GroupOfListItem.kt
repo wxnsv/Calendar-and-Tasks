@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,7 +54,7 @@ fun GroupOfListItem(
 
                 else -> {}
             }
-            HorizontalDivider()
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline)
         }
     }
 }

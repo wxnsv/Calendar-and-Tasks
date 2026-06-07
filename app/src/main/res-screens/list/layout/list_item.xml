@@ -1,82 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/list_item"
     android:layout_width="match_parent"
     android:layout_height="75dp"
-    android:background="?attr/selectableItemBackground"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="16dp"
     android:clickable="true"
-    android:focusable="true"
-    android:id="@+id/list_item">
+    android:focusable="true">
 
-    <FrameLayout
-        android:id="@+id/checkboxFL"
-        android:layout_width="54dp"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="?attr/colorSurface"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="10dp">
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/checkBox"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_margin="15dp"
-            android:button="@drawable/checkbox_round_selector"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:useMaterialThemeColors="false"
+            android:button="@drawable/checkbox_round_selector"
+            android:checked="false"
             app:buttonTint="@null"
-            android:checked="false" />
-    </FrameLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:useMaterialThemeColors="false" />
 
-    <TextView
-        android:id="@+id/itemText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:textSize="15sp"
-        android:textColor="@color/black"
-        android:text="@string/item_text_sample"
-        app:layout_constraintStart_toEndOf="@+id/checkboxFL"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/itemText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:text="@string/item_text_sample"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/checkBox"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/item_timestamp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:text="@string/today"
-        android:textColor="@color/black"
-        android:textSize="15sp"
-        app:layout_constraintStart_toEndOf="@+id/checkboxFL"
-        app:layout_constraintTop_toBottomOf="@+id/itemText" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/list_item_type_container"
-        android:layout_width="90dp"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        <TextView
+            android:id="@+id/item_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:text="@string/today"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/checkBox"
+            app:layout_constraintTop_toBottomOf="@+id/itemText" />
 
         <TextView
             android:id="@+id/list_item_type_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:text="@string/inbox"
-            android:textSize="15sp"
             android:layout_marginEnd="5dp"
+            android:text="@string/birthday"
+            android:textSize="20sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/list_item_type_icon" />
 
         <ImageView
             android:id="@+id/list_item_type_icon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginBottom="10dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@drawable/task"
+            android:layout_marginEnd="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

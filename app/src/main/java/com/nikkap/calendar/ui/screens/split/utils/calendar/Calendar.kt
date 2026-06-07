@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kizitonwose.calendar.compose.HorizontalCalendar
@@ -29,6 +28,7 @@ import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.ui.screens.split.SplitState
 import com.nikkap.calendar.ui.screens.split.utils.SplitEntity
+import com.nikkap.calendar.ui.theme.CalendarTheme
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -37,31 +37,33 @@ import java.time.YearMonth
 @Preview
 @Composable
 private fun Preview() {
-    val list = listOf(
-        SplitEntity.TaskItem(
-            Task(
-                id = "1",
-                title = "Task",
-                deadline = 1777075200000
-            )
-        ),
-        SplitEntity.EventItem(
-            Event(
-                id = "2",
-                summary = "Event",
-                startTimestamp = 1777075200000
-            )
-        ),
-        SplitEntity.BirthdayItem(
-            Birthday(
-                id = "3",
-                name = "Birthday",
-                date = 1777075200000
+    CalendarTheme {
+        val list = listOf(
+            SplitEntity.TaskItem(
+                Task(
+                    id = "1",
+                    title = "Task",
+                    deadline = 1777075200000
+                )
+            ),
+            SplitEntity.EventItem(
+                Event(
+                    id = "2",
+                    summary = "Event",
+                    startTimestamp = 1777075200000
+                )
+            ),
+            SplitEntity.BirthdayItem(
+                Birthday(
+                    id = "3",
+                    name = "Birthday",
+                    date = 1777075200000
+                )
             )
         )
-    )
-    val listState = rememberLazyListState()
-    Calendar(list, listState, SplitState(), {})
+        val listState = rememberLazyListState()
+        Calendar(list, listState, SplitState(), {})
+    }
 }
 
 
@@ -133,14 +135,13 @@ fun Calendar(
     )
     CalendarTitle(
         modifier = Modifier
-            .background(Color.Gray)
             .padding(horizontal = 8.dp, vertical = 12.dp),
         currentMonth = listEventMonth ?: currentMonth,
     )
     HorizontalCalendar(
         modifier = Modifier
             .wrapContentWidth()
-            .background(Color.Black),
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.outline),
         state = calendarState,
         monthHeader = {
             WeekDaysTitle(daysOfWeek = daysOfWeek)

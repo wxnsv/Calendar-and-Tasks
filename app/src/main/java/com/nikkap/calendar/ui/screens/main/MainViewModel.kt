@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
@@ -49,20 +50,31 @@ class MainViewModel(
     private val _isListReady = MutableStateFlow(false)
     private val _isSplitReady = MutableStateFlow(false)
     private val _isMainReady = MutableStateFlow(false)
+    private val _isAuthReady = MutableStateFlow(false)
     private val _state = MutableStateFlow(MainState())
     val state: StateFlow<MainState> = combine(
         _state,
         _prefsFlow,
         _isListReady,
         _isSplitReady,
-        _isMainReady
-    ) { state, prefs, isListReady, isSplitReady, isMainReady ->
-        val isReady = isMainReady && isListReady && isSplitReady
+        _isMainReady,
+        _isAuthReady
+    ) { arrayOfFlows ->
+        val state = arrayOfFlows[0] as MainState
+        val prefs = arrayOfFlows[1] as? UserPrefs
+        val isListReady = arrayOfFlows[2] as Boolean
+        val isSplitReady = arrayOfFlows[3] as Boolean
+        val isMainReady = arrayOfFlows[4] as Boolean
+        val isAuthReady = arrayOfFlows[5] as Boolean
+
 
         if (prefs != null) {
+            val isReady =
+                isMainReady && isListReady && isSplitReady && !prefs.isFirstLaunch || isAuthReady
+            if (prefs.isFirstLaunch) setAuthorizeScreensReady()
             setIsMainReadyTrue()
             state.copy(userState = prefs, isScreensReady = isReady)
-        } else state.copy(isScreensReady = isReady)
+        } else state.copy(isScreensReady = false)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -87,6 +99,15 @@ class MainViewModel(
 
     fun setIsMainReadyTrue() {
         _isMainReady.value = true
+    }
+
+    fun setIsAuthReadyTrue() {
+        _isAuthReady.value = true
+    }
+
+    private fun setAuthorizeScreensReady() {
+        _isSplitReady.value = true
+        _isListReady.value = true
     }
 
 
@@ -134,9 +155,26 @@ class MainViewModel(
         }
     }
 
+    fun toAboutScreen() {
+        viewModelScope.launch {
+            _navigationEvent.send(
+                NavEvent.NavigateTo(NavigationTarget.About)
+            )
+        }
+    }
+
+    fun toSettingsScreen() {
+        viewModelScope.launch {
+            _navigationEvent.send(
+                NavEvent.NavigateTo(NavigationTarget.Settings)
+            )
+        }
+    }
+
     fun authorizeSuccess(context: Context) {
         viewModelScope.launch {
             userPrefRepository.completeFirstLaunch()
+
             _navigationEvent.send(
                 NavEvent.NavigateTo(
                     NavigationTarget.Pager
@@ -160,7 +198,7 @@ class MainViewModel(
                 .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                "PeriodicSync",
+                "AuthorizePeriodicSync",
                 ExistingPeriodicWorkPolicy.KEEP,
                 syncRequest
             )
@@ -236,7 +274,9 @@ class MainViewModel(
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance(context).enqueue(
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "OneTimeSyncWorker",
+            ExistingWorkPolicy.KEEP,
             syncRequest
         )
         // TODO (exceptions)

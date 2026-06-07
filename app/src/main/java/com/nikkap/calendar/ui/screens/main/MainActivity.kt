@@ -70,15 +70,18 @@ class MainActivity : AppCompatActivity() {
                             val resId = when (event.route) {
                                 is NavigationTarget.Auth -> R.id.authFragment
                                 is NavigationTarget.Create -> R.id.createFragment
-                                else -> R.id.mainPagerFragment
+                                is NavigationTarget.Pager -> R.id.mainPagerFragment
+                                is NavigationTarget.About -> R.id.action_settingsFragment_to_aboutFragment
+                                is NavigationTarget.Settings -> R.id.action_mainPager_to_settingsFragment
                             }
+                            var bundle: Bundle? = null
                             if (event.route is NavigationTarget.Create) {
-                                val bundle = Bundle().apply {
+                                bundle = Bundle().apply {
                                     putString("type", event.route.type)
                                     putString("id", event.route.itemId)
                                 }
-                                navController.navigate(resId, bundle, options)
-                            } else navController.navigate(resId, options)
+                            }
+                            navController.navigate(resId, bundle, options)
 
                         }
 

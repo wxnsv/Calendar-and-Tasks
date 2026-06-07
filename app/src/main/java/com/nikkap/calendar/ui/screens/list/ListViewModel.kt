@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -73,12 +74,12 @@ class ListViewModel(
     fun refreshData(context: Context) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            withContext(Dispatchers.IO) { syncAll(context) }
+            withContext(Dispatchers.IO) { syncAll(context) } // TODO 4/5
             _state.update { it.copy(isLoading = false) }
         }
     }
 
-    suspend fun syncAll(context: Context) = coroutineScope {
+    private suspend fun syncAll(context: Context) = coroutineScope {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -87,7 +88,9 @@ class ListViewModel(
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance(context).enqueue(
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "OneTimeSyncWorker",
+            ExistingWorkPolicy.KEEP,
             syncRequest
         )
     }

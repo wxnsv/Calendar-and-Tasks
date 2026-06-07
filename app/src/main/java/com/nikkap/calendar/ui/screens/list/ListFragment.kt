@@ -5,19 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.nikkap.calendar.R
 import com.nikkap.calendar.databinding.ListFragmentBinding
-import com.nikkap.calendar.ui.onFirstDraw
 import com.nikkap.calendar.ui.screens.main.MainViewModel
+import com.nikkap.calendar.ui.utils.onFirstDraw
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -51,15 +48,9 @@ class ListFragment : Fragment(R.layout.list_fragment) {
 
 
     private fun setupRecyclerView(adapter: ListAdapter) {
-        val dividerItemDecoration = DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
-
-        ContextCompat.getDrawable(requireContext(), R.drawable.list_divider)?.let {
-            dividerItemDecoration.setDrawable(it)
-        }
         binding.listRV.apply {
             this.adapter = adapter
             layoutManager = LinearLayoutManager(requireView().context)
-            addItemDecoration(dividerItemDecoration)
         }
     }
 
@@ -78,7 +69,7 @@ class ListFragment : Fragment(R.layout.list_fragment) {
                     else binding.listRV.onFirstDraw {
                         sharedViewModel.setListReady()
                     }
-                    adapter.updateList(state.items)
+                    adapter.submitList(state.items)
                     state.errorMessage?.let { message ->
                         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                     }

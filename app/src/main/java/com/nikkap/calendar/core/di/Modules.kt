@@ -15,11 +15,13 @@ import com.nikkap.calendar.data.repository.UserPreferencesRepository
 import com.nikkap.calendar.data.worker.SyncWorker
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
+import com.nikkap.calendar.ui.screens.about.AboutViewModel
 import com.nikkap.calendar.ui.screens.auth.AuthViewModel
 import com.nikkap.calendar.ui.screens.create.CreateViewModel
 import com.nikkap.calendar.ui.screens.list.ListViewModel
 import com.nikkap.calendar.ui.screens.main.MainViewModel
 import com.nikkap.calendar.ui.screens.mainpager.MainPagerViewModel
+import com.nikkap.calendar.ui.screens.settings.SettingsViewModel
 import com.nikkap.calendar.ui.screens.split.SplitViewModel
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -112,4 +114,6 @@ val appModule = module {
     viewModel { MainPagerViewModel(get()) }
     viewModelOf(::CreateViewModel)
     viewModel { MainViewModel(get(), get(), get()) }
+    viewModel { SettingsViewModel(get()) }
+    viewModel { AboutViewModel() }
 }

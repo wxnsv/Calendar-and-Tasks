@@ -71,6 +71,8 @@ android {
 }
 
 dependencies {
+// Coil
+    implementation(libs.coil)
 // Work
     implementation(libs.androidx.work.runtime.ktx)
 // Preferences

@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Calendar" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+    <style name="Base.Theme.Calendar" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
+
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="android:colorBackgroundFloating">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/md_theme_light_outline</item>
+        <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
+
+        <item name="android:fontFamily">@font/app_font</item>
+        <item name="fontFamily">@font/app_font</item>
+    </style>
+
+    <style name="Theme.Calendar" parent="Base.Theme.Calendar" />
 
     <style name="Theme.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#FFFFFF</item>
@@ -16,13 +37,13 @@
 
     <style name="Divider">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">2dp</item>
-        <item name="android:background">?android:attr/listDivider</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?attr/colorOutline</item>
     </style>
 
     <style name="Button" parent="Widget.MaterialComponents.Button.TextButton.Icon">
         <item name="textAllCaps">false</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="elevation">0dp</item>
         <item name="android:gravity">start</item>
         <item name="android:insetTop">0dp</item>

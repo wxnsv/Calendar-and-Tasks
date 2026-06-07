@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
@@ -44,13 +47,13 @@ class SplitFragment : Fragment() {
         val state = viewModel.state.collectAsState().value
         val listState = rememberLazyListState()
         CalendarTheme {
-            Column {
+            Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
                 Calendar(
                     state.items,
                     listState,
                     state
                 ) { viewModel.onIntent(SplitIntent.UpdateSelectedDate(it)) }
-                HorizontalDivider()
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 List(
                     state.items,
                     onEditClick = { id, type ->

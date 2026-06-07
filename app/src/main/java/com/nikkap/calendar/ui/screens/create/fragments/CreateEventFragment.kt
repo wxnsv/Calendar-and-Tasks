@@ -5,9 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.PopupMenu
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.isGone
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -21,17 +18,18 @@ import com.nikkap.calendar.R
 import com.nikkap.calendar.core.utils.CalendarColors
 import com.nikkap.calendar.core.utils.toCalendar
 import com.nikkap.calendar.core.utils.toOnlyDateLong
+import com.nikkap.calendar.core.utils.toShortUiDate
 import com.nikkap.calendar.core.utils.toTimeLong
-import com.nikkap.calendar.core.utils.toUiDate
 import com.nikkap.calendar.core.utils.toUiTime
 import com.nikkap.calendar.databinding.CreateEventFragmentBinding
-import com.nikkap.calendar.ui.renderCreateDateTime
 import com.nikkap.calendar.ui.screens.create.CreateEventIntent
 import com.nikkap.calendar.ui.screens.create.CreateState
 import com.nikkap.calendar.ui.screens.create.CreateViewModel
-import com.nikkap.calendar.ui.setupSetColorRecyclerView
-import com.nikkap.calendar.ui.showDatePicker
-import com.nikkap.calendar.ui.showTimePicker
+import com.nikkap.calendar.ui.utils.getColorFromAttr
+import com.nikkap.calendar.ui.utils.renderCreateDateTime
+import com.nikkap.calendar.ui.utils.setupSetColorRecyclerView
+import com.nikkap.calendar.ui.utils.showDatePicker
+import com.nikkap.calendar.ui.utils.showTimePicker
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -68,15 +66,6 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
     }
 
     private fun setupListeners() {
-        binding.createEventRepeatButton.setOnClickListener { view ->
-            val popup = PopupMenu(view.context, view)
-            popup.menuInflater.inflate(R.menu.create_task_event_notification_menu, popup.menu)
-            popup.setOnMenuItemClickListener { item ->
-                binding.createEventRepeatButton.text = item.title
-                true
-            }
-            popup.show()
-        }
         binding.createEventDescriptionEditText.doAfterTextChanged {
             viewModel.onEventIntent(CreateEventIntent.UpdateDescription(it.toString()))
         }
@@ -162,19 +151,27 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
         val currentTimestamp = System.currentTimeMillis()
         val currentDate = currentTimestamp.toOnlyDateLong()
         val currentTime = currentTimestamp.toTimeLong()
-        if (binding.createEventStartDateButton.text != event.startTimestamp.toUiDate() && event.startTimestamp != 0L) {
-            binding.createEventStartDateButton.text = event.startTimestamp.toUiDate()
+        if (binding.createEventStartDateButton.text != event.startTimestamp.toShortUiDate() && event.startTimestamp != 0L) {
+            binding.createEventStartDateButton.text = event.startTimestamp.toShortUiDate()
         }
         /**
          * if start date earlier than today do text red
          */
         if (state.eventStartDate < currentDate) {
             binding.createEventStartDateButton.setTextColor(
-                ColorStateList.valueOf(Color.Red.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorErrorContainer
+                    )
+                )
             )
         } else {
             binding.createEventStartDateButton.setTextColor(
-                ColorStateList.valueOf(Color.Black.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorOnSurface
+                    )
+                )
             )
         }
         /**
@@ -182,11 +179,19 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
          */
         if (state.eventEndDate < currentDate) {
             binding.createEventEndDateButton.setTextColor(
-                ColorStateList.valueOf(Color.Red.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorErrorContainer
+                    )
+                )
             )
         } else {
             binding.createEventEndDateButton.setTextColor(
-                ColorStateList.valueOf(Color.Black.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorOnSurface
+                    )
+                )
             )
         }
         /**
@@ -194,11 +199,19 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
          */
         if (state.eventStartTime < currentTime) {
             binding.createEventStartTimeButton.setTextColor(
-                ColorStateList.valueOf(Color.Red.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorErrorContainer
+                    )
+                )
             )
         } else {
             binding.createEventStartTimeButton.setTextColor(
-                ColorStateList.valueOf(Color.Black.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorOnSurface
+                    )
+                )
             )
         }
         /**
@@ -206,11 +219,19 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
          */
         if (state.eventEndTime < currentTime) {
             binding.createEventEndTimeButton.setTextColor(
-                ColorStateList.valueOf(Color.Red.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorErrorContainer
+                    )
+                )
             )
         } else {
             binding.createEventEndTimeButton.setTextColor(
-                ColorStateList.valueOf(Color.Black.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorOnSurface
+                    )
+                )
             )
         }
         /**
@@ -218,11 +239,19 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
          */
         if (state.eventStartDate == state.eventEndDate && state.eventStartTime > state.eventEndTime) {
             binding.createEventEndTimeButton.setTextColor(
-                ColorStateList.valueOf(Color.Red.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorErrorContainer
+                    )
+                )
             )
         } else {
             binding.createEventEndTimeButton.setTextColor(
-                ColorStateList.valueOf(Color.Black.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorOnSurface
+                    )
+                )
             )
         }
         /**
@@ -230,7 +259,11 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
          */
         if (state.eventStartDate > state.eventEndDate && !state.eventDraft.isAllDay) {
             binding.createEventEndDateButton.setTextColor(
-                ColorStateList.valueOf(Color.Red.toArgb())
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorErrorContainer
+                    )
+                )
             )
         }
 
@@ -261,8 +294,8 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
                 isAllDay = event.isAllDay
             )
         }
-        if (binding.createEventEndDateButton.text != event.endTimestamp.toUiDate() && event.endTimestamp != 0L) {
-            binding.createEventEndDateButton.text = event.endTimestamp.toUiDate()
+        if (binding.createEventEndDateButton.text != event.endTimestamp.toShortUiDate() && event.endTimestamp != 0L) {
+            binding.createEventEndDateButton.text = event.endTimestamp.toShortUiDate()
         }
         if (binding.createEventDescriptionEditText.text.toString() != event.description) {
             binding.createEventDescriptionEditText.setText(event.description)

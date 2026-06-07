@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
-import androidx.core.content.ContextCompat
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -19,6 +19,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import com.nikkap.calendar.R
 import com.nikkap.calendar.databinding.MainPagerFragmentBinding
 import com.nikkap.calendar.ui.screens.main.MainViewModel
+import com.nikkap.calendar.ui.utils.getColorFromAttr
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -37,6 +38,7 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        viewPager.adapter = null
     }
 
     override fun onCreateView(
@@ -49,10 +51,26 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        postponeEnterTransition()
+
         setupPager(view)
         observeState()
-        observeMainState()
+
+        (view.parent as? ViewGroup)?.doOnPreDraw {
+            startPostponedEnterTransition()
+        }
+
         setupListeners()
+        observeMainState()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (viewPager.adapter == null) {
+            viewPager.adapter = MainPagerAdapter(this)
+        }
     }
 
     private fun observeState() {
@@ -96,8 +114,9 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
 
     private fun setupPager(view: View) {
         viewPager = binding.mainViewPager
-        viewPager.adapter = MainPagerAdapter(this)
         viewPager.offscreenPageLimit = 1
+        viewPager.adapter = MainPagerAdapter(this@MainPagerFragment)
+
         val toggleGroup = view.findViewById<MaterialButtonToggleGroup>(R.id.mainToggleGroup)
 
         toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
@@ -105,8 +124,8 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
                 val pos = if (checkedId == R.id.btnView) 0 else 1
                 if (viewPager.currentItem != pos) {
                     viewPager.setCurrentItem(pos, true)
+                    viewModel.switchScreen(pos)
                 }
-                viewModel.switchScreen(pos)
             }
         }
 
@@ -118,8 +137,6 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
                 }
             }
         })
-
-
     }
 
     private fun setupListeners() {
@@ -140,6 +157,9 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
         binding.createItemButton.setOnClickListener {
             viewModel.toggleMenu()
         }
+        binding.mainPagerSettingsBtn.setOnClickListener {
+            sharedViewModel.toSettingsScreen()
+        }
     }
 
     private fun renderMenu(isExpanded: Boolean) {
@@ -152,7 +172,9 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
                 .withEndAction {
                     binding.createItemButton.setIconResource(R.drawable.close)
                     binding.createItemButton.backgroundTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(requireContext(), R.color.red)
+                        requireContext().getColorFromAttr(
+                            com.google.android.material.R.attr.colorErrorContainer
+                        )
                     )
                     binding.createItemButton.animate()
                         .rotation(180f)
@@ -174,7 +196,9 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
                 .withEndAction {
                     _binding?.createItemButton?.setIconResource(R.drawable.add)
                     _binding?.createItemButton?.backgroundTintList = ColorStateList.valueOf(
-                        ContextCompat.getColor(requireContext(), R.color.purple_700)
+                        requireContext().getColorFromAttr(
+                            com.google.android.material.R.attr.colorPrimaryContainer
+                        )
                     )
                     _binding?.createItemButton?.animate()?.apply {
                         rotation(180f)
