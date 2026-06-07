@@ -1,10 +1,13 @@
-package com.nikkap.calendar.ui
+package com.nikkap.calendar.ui.utils
 
 import android.app.TimePickerDialog
 import android.content.Context
+import android.content.res.Resources
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.LinearLayout
+import androidx.annotation.AttrRes
 import androidx.core.view.isNotEmpty
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,7 +56,7 @@ fun setupSetColorRecyclerView(
     initialColorId: Int? = null,
     onSet: (Int) -> Unit,
     context: Context,
-    resources: android.content.res.Resources,
+    resources: Resources,
     snapHelper: LinearSnapHelper
 ) {
     val allColors = CalendarColors.entries
@@ -67,11 +70,11 @@ fun setupSetColorRecyclerView(
             layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
 
             if (itemDecorationCount == 0) {
-                addItemDecoration(ColorPickerFadeDecoration())
+                addItemDecoration(ColorPickerFadeDecoration(context))
             }
 
             val density = resources.displayMetrics.density
-            val itemWidth = (60 * density).toInt()
+            val itemWidth = (40 * density).toInt()
             val padding = (resources.displayMetrics.widthPixels / 2) - (itemWidth / 2)
 
             setPadding(padding, 0, padding, 0)
@@ -103,13 +106,9 @@ fun setupSetColorRecyclerView(
         }
 
         recyclerView.post {
-            val lm = recyclerView.layoutManager as? LinearLayoutManager
-            val centerView = snapHelper.findSnapView(lm)
-            val currentPos = centerView?.let { lm?.getPosition(it) } ?: -1
+            val lm = recyclerView.layoutManager as? LinearLayoutManager ?: return@post
 
-            if (currentPos != targetPosition) {
-                lm?.scrollToPositionWithOffset(targetPosition, 0)
-            }
+            lm.scrollToPositionWithOffset(targetPosition, 0)
         }
     }
 }
@@ -120,7 +119,6 @@ fun renderCreateDateTime(
     container: LinearLayout,
     isAllDay: Boolean
 ) {
-
 
     val containerHeight = container.height
 
@@ -158,5 +156,11 @@ inline fun RecyclerView.onFirstDraw(crossinline action: () -> Unit) {
             return true
         }
     })
+}
+
+fun Context.getColorFromAttr(@AttrRes attrColor: Int): Int {
+    val typedValue = TypedValue()
+    theme.resolveAttribute(attrColor, typedValue, true)
+    return typedValue.data
 }
 

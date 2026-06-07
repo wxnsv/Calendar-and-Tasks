@@ -10,15 +10,18 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
+import com.nikkap.calendar.ui.theme.CalendarTheme
 import java.time.LocalDate
 
 @Composable
@@ -31,27 +34,30 @@ fun Day(
     Box(
         modifier = Modifier
             .aspectRatio(1f)
-            .border(
-                width = if (isSelected) 1.dp else 0.dp,
-                color = if (isSelected) Color.White else Color.Transparent,
-            )
             .padding(top = 1.dp, start = 1.dp)
             .clickable(
                 enabled = day.position == DayPosition.MonthDate && colorsList.isNotEmpty(),
                 onClick = { onClick() }
             )
-            .background(color = Color.Gray)
+            .background(color = MaterialTheme.colorScheme.background)
+            .border(
+                width = if (isSelected) 2.dp else 0.dp,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+            )
     ) {
         val dayPositionColor = when (day.position) {
-            DayPosition.InDate -> Color.Red
-            DayPosition.MonthDate -> Color.Black
-            DayPosition.OutDate -> Color.DarkGray
+            DayPosition.InDate -> MaterialTheme.colorScheme.error
+            DayPosition.MonthDate -> MaterialTheme.colorScheme.onBackground
+            DayPosition.OutDate -> MaterialTheme.colorScheme.secondary
         }
 
         Text(
             text = day.date.dayOfMonth.toString(),
             color = dayPositionColor,
-            modifier = Modifier.align(Alignment.TopEnd)
+            fontWeight = FontWeight.Normal,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 2.dp, end = 4.dp),
         )
         Column(
             modifier = Modifier
@@ -66,8 +72,8 @@ fun Day(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(5.dp)
-                        .background(color)
-                        .border(0.3F.dp, color = Color.Black),
+                        .background(color.copy(alpha = 0.5f))
+//                        .border(0.3F.dp, color = Color.Black),
                 )
             }
         }
@@ -77,24 +83,26 @@ fun Day(
 @Preview
 @Composable
 private fun Preview() {
-    val day = CalendarDay(
-        LocalDate.of(2026, 4, 20),
-        position = DayPosition.MonthDate,
-    )
-    Day(
-        day = day,
-        onClick = {},
-        isSelected = false
-    )
-    Day(
-        day = day,
-        onClick = {},
-        isSelected = true
-    )
-    Day(
-        day = day,
-        onClick = {},
-        isSelected = false,
-        colorsList = listOf(Color.DarkGray, Color.Gray, Color.Magenta)
-    )
+    CalendarTheme {
+        val day = CalendarDay(
+            LocalDate.of(2026, 4, 20),
+            position = DayPosition.MonthDate,
+        )
+        Day(
+            day = day,
+            onClick = {},
+            isSelected = false
+        )
+        Day(
+            day = day,
+            onClick = {},
+            isSelected = true
+        )
+        Day(
+            day = day,
+            onClick = {},
+            isSelected = false,
+            colorsList = listOf(Color.DarkGray, Color.Gray, Color.Magenta)
+        )
+    }
 }

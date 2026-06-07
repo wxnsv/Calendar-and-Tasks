@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://tools.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorSurface">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/aboutTopBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:backgroundTint="?attr/colorSurface"
         android:fitsSystemWindows="true"
         app:liftOnScroll="true">
 
@@ -19,13 +15,13 @@
             android:id="@+id/aboutToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/white"
-            android:backgroundTint="?attr/colorSurface"
+            android:background="?attr/colorSurface"
             app:layout_anchor="@+id/aboutTopBar"
             app:layout_anchorGravity="center"
             app:navigationIcon="@drawable/back"
-            app:navigationIconTint="@color/black"
+            app:navigationIconTint="?attr/colorOnSurfaceVariant"
             app:title="About"
+            app:titleTextColor="?attr/colorOnSurface"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge" />
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -58,18 +54,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:textSize="22sp"
                     android:text="@string/calendar"
-                    android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+                    android:textColor="?attr/colorOnBackground"
+                    android:fontFamily="@font/inter_bold"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/aboutVersionTV"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/inter_regular"
+                    android:textSize="16sp"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="Version 1.0.0" />
+                    android:text="@string/version_of_app" />
             </LinearLayout>
 
             <com.google.android.material.textview.MaterialTextView
@@ -135,10 +134,15 @@
                             android:src="@drawable/chevron_right" />
                     </RelativeLayout>
 
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="8dp"
+                        app:dividerColor="?attr/colorOutline" />
+
                     <RelativeLayout
                         android:id="@+id/aboutReportButton"
                         style="@style/OutlinedCardViewRelativeLayout">
-
 
                         <ImageView
                             android:id="@+id/aboutReportIcon"
@@ -198,7 +202,8 @@
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="8dp" />
+                        android:layout_marginHorizontal="8dp"
+                        app:dividerColor="?attr/colorOutline" />
 
                     <RelativeLayout
                         android:id="@+id/aboutLicenseButton"
@@ -225,7 +230,6 @@
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

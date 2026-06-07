@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +19,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,9 +32,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,22 +59,24 @@ fun ListTaskItem(
     var isSubtasksVisible by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
-            .padding(5.dp, end = 15.dp)
+            .background(color = MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
             .clickable {
                 isSubtasksVisible = !isSubtasksVisible
             }
     ) {
-        Row {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 5.dp)
+        ) {
             Text(
                 item.title,
-                fontSize = 20.sp,
-                modifier = Modifier
-                    .weight(1f),
+                fontSize = 16.sp,
+                modifier = Modifier.weight(1f),
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.Black,
-                autoSize = TextAutoSize.StepBased(minFontSize = 20.sp, maxFontSize = 30.sp)
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Normal
             )
             DropDownMenu(
                 completable = true,
@@ -84,13 +89,15 @@ fun ListTaskItem(
             if (item.task.notes?.isBlank() == false) {
                 Text(
                     item.task.notes,
-                    fontSize = 15.sp,
+                    fontSize = 13.sp,
                     modifier = Modifier
-                        .weight(3f),
+                        .weight(3f)
+                        .padding(horizontal = 8.dp),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    color = Color.Black,
-                    autoSize = TextAutoSize.StepBased(minFontSize = 15.sp, maxFontSize = 20.sp)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    autoSize = TextAutoSize.StepBased(minFontSize = 15.sp, maxFontSize = 20.sp),
+                    fontWeight = FontWeight.Normal
                 )
             }
             Box(
@@ -113,8 +120,10 @@ fun ListTaskItem(
                 fontSize = 25.sp,
                 textAlign = TextAlign.End,
                 modifier = Modifier
-                    .width(60.dp),
-                color = Color.Black,
+                    .width(60.dp)
+                    .padding(end = 5.dp),
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Normal
             )
         }
         if (subtasks.isNotEmpty()) {
@@ -129,9 +138,9 @@ fun ListTaskItem(
                     contentDescription = "Subtasks drop down icon",
                     modifier = Modifier
                         .size(20.dp)
-                        .scale(3f)
+                        .scale(2f)
                         .rotate(rotationAngle),
-                    tint = Color.Black
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             AnimatedVisibility(visible = isSubtasksVisible) {
@@ -141,6 +150,10 @@ fun ListTaskItem(
                     items(
                         subtasks,
                         key = { subtask -> subtask.id }) { subtask ->
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                         ListSubtaskItem(
                             Modifier.animateItem(
                                 fadeInSpec = tween(durationMillis = 300),
@@ -244,7 +257,7 @@ private fun ListTaskItemWithSubtasks(
 ) {
     Column(
         modifier = Modifier
-            .padding(5.dp, end = 15.dp)
+            .padding(5.dp)
             .fillMaxWidth()
 //            .wrapContentHeight()
     ) {
@@ -256,7 +269,7 @@ private fun ListTaskItemWithSubtasks(
                     .weight(1f),
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
             Box(
                 modifier = Modifier
@@ -279,7 +292,7 @@ private fun ListTaskItemWithSubtasks(
                         .weight(3f),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Box(
@@ -301,8 +314,7 @@ private fun ListTaskItemWithSubtasks(
                 textAlign = TextAlign.End,
                 modifier = Modifier
                     .width(60.dp),
-//                    .padding(5.dp)
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
         if (subtasks.isNotEmpty()) {
@@ -313,7 +325,7 @@ private fun ListTaskItemWithSubtasks(
                     modifier = Modifier
                         .size(20.dp)
                         .scale(3f),
-                    tint = Color.Black
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

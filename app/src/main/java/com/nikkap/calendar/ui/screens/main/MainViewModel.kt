@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
@@ -197,7 +198,7 @@ class MainViewModel(
                 .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                "PeriodicSync",
+                "AuthorizePeriodicSync",
                 ExistingPeriodicWorkPolicy.KEEP,
                 syncRequest
             )
@@ -273,7 +274,9 @@ class MainViewModel(
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance(context).enqueue(
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "OneTimeSyncWorker",
+            ExistingWorkPolicy.KEEP,
             syncRequest
         )
         // TODO (exceptions)

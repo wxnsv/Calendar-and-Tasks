@@ -32,7 +32,7 @@ interface CalendarDao {
     @Query("UPDATE event SET pendingAction = 'DELETE', lastModified = :lastModified WHERE id = :id")
     suspend fun markAsDeleteEvent(id: String, lastModified: Long)
 
-    @Query("DELETE FROM event WHERE :id = id")
+    @Query("DELETE FROM event WHERE id = :id")
     suspend fun deleteEvent(id: String)
 
     @Query("SELECT * from event WHERE id = :id")
@@ -81,7 +81,7 @@ interface CalendarDao {
     @Update
     suspend fun updateBirthday(birthdayEntity: BirthdayEntity)
 
-    @Query("DELETE FROM birthday WHERE :id = id")
+    @Query("DELETE FROM birthday WHERE id = :id")
     suspend fun deleteBirthday(id: String)
 
     @Query("UPDATE birthday SET pendingAction = 'DELETE', lastModified = :lastModified WHERE id = :id")

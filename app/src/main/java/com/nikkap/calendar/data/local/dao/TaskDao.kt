@@ -22,7 +22,10 @@ interface TaskDao {
     suspend fun insertTasks(tasks: List<TaskEntity>)
 
     @Query("SELECT * from tasks WHERE id = :id")
-    suspend fun getTask(id: String): TaskEntity
+    suspend fun getTask(
+        id: String
+    )
+            : TaskEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(taskEntity: TaskEntity)
@@ -30,7 +33,7 @@ interface TaskDao {
     @Update
     suspend fun updateTask(taskEntity: TaskEntity)
 
-    @Query("DELETE FROM tasks WHERE :id = id")
+    @Query("DELETE FROM tasks WHERE id = :id")
     suspend fun deleteTask(id: String)
 
     @Query("DELETE FROM tasklist WHERE id IN (:ids)")
@@ -85,7 +88,7 @@ interface TaskDao {
     @Update
     suspend fun updateSubtask(subtaskEntity: SubtaskEntity)
 
-    @Query("DELETE FROM subtasks WHERE :id = id")
+    @Query("DELETE FROM subtasks WHERE id = :id")
     suspend fun deleteSubtask(id: String)
 
     @Query("UPDATE subtasks SET isCompleted = 1, pendingAction = 'UPDATE', lastModified = :lastModified WHERE id = :subtaskId")

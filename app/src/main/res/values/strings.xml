@@ -45,4 +45,14 @@
     <string name="task">Task</string>
     <string name="event">Event</string>
     <string name="birthday">Birthday</string>
+    <string name="version_of_app">Version: 1.0</string>
+    <string name="general">General</string>
+    <string name="create_event_description_hint">Add description</string>
+    <string name="set_color">Set color</string>
+    <string name="save">Save</string>
+    <string name="add_deadline">Add deadline</string>
+    <string name="add_description">Add description</string>
+    <string name="my_tasks">My tasks</string>
+    <string name="jan_27">Jan 27</string>
+    <string name="all_day">All-day</string>
 </resources>

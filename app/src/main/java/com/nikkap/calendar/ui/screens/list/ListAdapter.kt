@@ -7,11 +7,12 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.nikkap.calendar.R
+import com.nikkap.calendar.core.utils.CalendarColors
 import com.nikkap.calendar.core.utils.toListUiDate
 import com.nikkap.calendar.core.utils.toUiDate
 import com.nikkap.calendar.domain.model.Birthday
@@ -21,7 +22,6 @@ import com.nikkap.calendar.domain.model.Task
 
 class ListAdapter(private val onItemClick: (String, String) -> Unit) :
     ListAdapter<ListItem, RecyclerView.ViewHolder>(ListDiffCallback()) {
-    var items: List<ListItem> = emptyList()
 
     companion object {
         private const val TYPE_TASK = 0
@@ -31,7 +31,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (items[position]) {
+        return when (getItem(position)) {
             is ListItem.TaskItem -> TYPE_TASK
             is ListItem.EventItem -> TYPE_EVENT
             is ListItem.BirthdayItem -> TYPE_BIRTHDAY
@@ -82,7 +82,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
             itemType.text = "Task"
             itemIcon.setImageResource(R.drawable.task)
             itemIcon.imageTintList = ColorStateList.valueOf(
-                ContextCompat.getColor(itemView.context, R.color.teal_200)
+                "#3F51B5".toColorInt()
             )
             itemCheckBox.isChecked = task.isCompleted
             itemView.setOnClickListener {
@@ -99,6 +99,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
         val itemIcon: ImageView = view.findViewById(R.id.list_item_type_icon)
 
         fun bind(event: Event, onClick: () -> Unit) {
+            val color = CalendarColors.getBirthdayColor(event.colorId).hex.toColorInt()
             eventTitle.text = event.summary
             eventTime.text = event.startTimestamp.toListUiDate(event.isAllDay)
             itemType.text = "Event"
@@ -106,6 +107,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
             itemView.setOnClickListener {
                 onClick()
             }
+            itemIcon.imageTintList = ColorStateList.valueOf(color)
         }
     }
 
@@ -116,6 +118,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
         val itemIcon: ImageView = view.findViewById(R.id.list_item_type_icon)
 
         fun bind(birthday: Birthday, onClick: () -> Unit) {
+            val color = CalendarColors.getBirthdayColor(birthday.colorId).hex.toColorInt()
             birthdayName.text = birthday.name
             birthdayDate.text = birthday.date.toUiDate()
             itemType.text = "Birthday"
@@ -123,6 +126,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
             itemView.setOnClickListener {
                 onClick()
             }
+            itemIcon.imageTintList = ColorStateList.valueOf(color)
         }
     }
 
@@ -137,8 +141,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = items[position]
-        when (item) {
+        when (val item = getItem(position)) {
             is ListItem.TaskItem -> {
                 (holder as TaskViewHolder).bind(item.task, onClick = {
                     onItemClick(item.task.id!!, "TASK")
@@ -173,12 +176,5 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
         override fun areContentsTheSame(oldItem: ListItem, newItem: ListItem): Boolean {
             return oldItem == newItem
         }
-    }
-
-    override fun getItemCount() = items.size
-
-    fun updateList(newList: List<ListItem>) {
-        this.items = newList
-        notifyDataSetChanged()
     }
 }

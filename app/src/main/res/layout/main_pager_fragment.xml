@@ -10,51 +10,67 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/mainPagerTopBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="40dp">
 
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/mainToggleGroup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:selectionRequired="true"
-                app:singleSelection="true">
+            android:background="?attr/colorSurface"
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnView"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:liftOnScroll="true"
+            android:fitsSystemWindows="true">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/mainPagerSettingsBtn"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+
+                app:layout_anchor="@+id/settingsTopBar"
+                app:layout_anchorGravity="center"
+
+                app:navigationIcon="@drawable/more_vert"
+                app:navigationIconTint="?attr/colorOnSurfaceVariant"
+
+                app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge">
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/mainToggleGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/list"
-                    app:cornerRadius="10dp" />
+                    android:layout_gravity="center"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCompose"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/split"
-                    app:cornerRadius="10dp" />
-            </com.google.android.material.button.MaterialButtonToggleGroup>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnView"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/list"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="16sp"
+                        android:fontFamily="@font/inter_medium"
+                        app:cornerRadius="10dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/settings_button"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                app:icon="@drawable/more_vert"
-                android:backgroundTint="@color/white"
-                android:theme="@style/Widget.Material3.Button.IconButton"
-                app:iconTint="@color/black"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCompose"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/split"
+                        android:textColor="?attr/colorOnSurface"
+                        app:cornerRadius="10dp" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.appbar.MaterialToolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+
+        <com.google.android.material.divider.MaterialDivider style="@style/Divider" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/mainViewPager"
@@ -71,6 +87,7 @@
         android:layout_marginBottom="230dp"
         android:text="@string/task"
         android:textSize="20sp"
+        android:fontFamily="@font/inter_regular"
         android:visibility="gone"
         app:icon="@drawable/task"
         app:iconSize="40dp"
@@ -84,6 +101,7 @@
         android:layout_marginEnd="25dp"
         android:layout_marginBottom="165dp"
         android:text="@string/event"
+        android:fontFamily="@font/inter_regular"
         android:textSize="20sp"
         android:visibility="gone"
         app:icon="@drawable/event"
@@ -99,6 +117,7 @@
         android:layout_marginBottom="100dp"
         android:text="@string/birthday"
         android:textSize="20sp"
+        android:fontFamily="@font/inter_regular"
         android:visibility="gone"
         app:icon="@drawable/birthday"
         app:iconSize="40dp"

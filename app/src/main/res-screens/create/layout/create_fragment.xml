@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="40dp"
-    android:theme="@style/Theme.Material3.Dark.NoActionBar">
+    android:paddingTop="40dp">
 
     <ImageButton
         android:id="@+id/create_back_button"
@@ -12,9 +11,11 @@
         android:layout_height="40dp"
         android:layout_marginHorizontal="15dp"
         android:layout_marginTop="15dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/back" />
+        app:tint="?attr/colorOnBackground" />
 
     <Button
         android:id="@+id/create_save_button"
@@ -23,7 +24,7 @@
         android:layout_gravity="end"
         android:layout_marginHorizontal="15dp"
         android:layout_marginTop="15dp"
-        android:text="Save"
+        android:text="@string/save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,12 +40,14 @@
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/create_edit_text"
-        android:background="@null"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30sp"
-        android:layout_marginTop="70dp"
         android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="70dp"
+        android:backgroundTint="?attr/colorSurface"
+        android:textColorHint="?attr/colorOnSurfaceVariant"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="30sp"
         app:counterEnabled="true"
         app:counterMaxLength="1024"
         app:layout_constraintEnd_toEndOf="parent"
@@ -56,8 +59,8 @@
         android:id="@+id/create_event_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Event"
         android:layout_marginTop="10dp"
+        android:text="@string/event"
         app:layout_constraintEnd_toStartOf="@+id/create_task_button"
         app:layout_constraintTop_toBottomOf="@+id/create_edit_text" />
 
@@ -66,8 +69,8 @@
         android:id="@+id/create_task_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Task"
         android:layout_marginTop="10dp"
+        android:text="@string/task"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/create_edit_text" />
@@ -76,8 +79,8 @@
         android:id="@+id/create_birthday_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Birthday"
         android:layout_marginTop="10dp"
+        android:text="@string/birthday"
         app:layout_constraintStart_toEndOf="@+id/create_task_button"
         app:layout_constraintTop_toBottomOf="@+id/create_edit_text" />
 
