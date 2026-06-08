@@ -109,7 +109,7 @@ class BirthdayMapperTest {
     }
 
     /**
-     * Tests for [Birthday.toBirthdayEntity]
+     * Tests for [com.nikkap.calendar.domain.model.Birthday.toBirthdayEntity]
      */
 
     @Test
@@ -131,7 +131,7 @@ class BirthdayMapperTest {
     }
 
     /**
-     * Tests for [Birthday.toBirthdayDto]
+     * Tests for [com.nikkap.calendar.domain.model.Birthday.toBirthdayDto]
      */
 
     @Test

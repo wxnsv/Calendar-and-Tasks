@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 class StringUtilsTest {
 
     /**
-     * Tests for [trimBirthdaySuffix]
+     * Tests for [com.nikkap.calendar.core.trimBirthdaySuffix]
      */
 
     @Test

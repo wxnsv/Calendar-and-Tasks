@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nikkap.calendar"
+    namespace = "com.nikkap.calendar.app"
     compileSdk {
         version = release(36)
     }
@@ -58,9 +58,7 @@ android {
     }
     sourceSets {
         getByName("main") {
-            res.srcDirs(
-                "src/main/res-screens/create",
-                "src/main/res-screens/list",
+            res.directories.add(
                 "src/main/res"
             )
         }
@@ -71,27 +69,26 @@ android {
 }
 
 dependencies {
+// Project
+    implementation(project(":domain"))
+    implementation(project(":core"))
+    implementation(project(":data"))
 // Coil
     implementation(libs.coil)
 // Work
     implementation(libs.androidx.work.runtime.ktx)
-// Preferences
-    implementation(libs.androidx.datastore.preferences)
 // Nav
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 // XML
     implementation(libs.androidx.swiperefreshlayout)
+// Preferences
+    implementation(libs.androidx.datastore.preferences)
 // Material
     implementation(libs.material)
 // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.googleid)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
-    androidTestImplementation(libs.room.testing)
-// Kotlin.DateTime
-    implementation(libs.kotlinx.datetime)
 // SplashScreen
     implementation(libs.androidx.core.splashscreen)
 // Retrofit
@@ -115,7 +112,6 @@ dependencies {
     implementation(libs.google.api.services.calendar)
 // Google API Client
     implementation(libs.google.api.client.android)
-    implementation(libs.google.http.client.gson)
 // Koin
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.android)

@@ -1,0 +1,18 @@
+package com.nikkap.calendar.core.utils
+
+enum class CalendarColors(val id: Int, val hex: String) {
+    LAVENDER(1, "#A4BDFC"), SAGE(2, "#7ae7bf"),
+    GRAPE(3, "#dbadff"), FLAMINGO(4, "#ff887c"),
+    BANANA(5, "#fbd75b"), TANGERINE(6, "#ffb878"),
+    PEACOCK(7, "#039be5"), GRAPHITE(8, "#e1e1e1"),
+    BLUEBERRY(9, "#5484ed"), BASIL(10, "#51b749"),
+    TOMATO(11, "#dc2127");
+
+    companion object {
+        fun getEventColor(id: Int?) = entries.find { it.id == id } ?: PEACOCK
+
+        fun getTaskColor() = "#3F51B5"
+
+        fun getBirthdayColor(id: Int?) = entries.find { it.id == id } ?: SAGE
+    }
+}

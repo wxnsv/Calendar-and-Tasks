@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/createFragment"
-        android:name="com.nikkap.calendar.ui.screens.create.fragments.CreateFragment"
+        android:name="com.nikkap.calendar.app.ui.screens.create.fragments.CreateFragment"
         android:label="CreateFragment">
         <argument
             android:name="type"
@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/authFragment"
-        android:name="com.nikkap.calendar.ui.screens.auth.AuthFragment"
+        android:name="com.nikkap.calendar.app.ui.screens.auth.AuthFragment"
         android:label="AuthFragment">
         <action
             android:id="@+id/action_authFragment_to_mainPager"
@@ -30,7 +30,7 @@
 
     <fragment
         android:id="@+id/mainPagerFragment"
-        android:name="com.nikkap.calendar.ui.screens.mainpager.MainPagerFragment"
+        android:name="com.nikkap.calendar.app.ui.screens.mainpager.MainPagerFragment"
         android:label="Main Calendar">
 
         <action
@@ -43,12 +43,12 @@
 
     <fragment
         android:id="@+id/aboutFragment"
-        android:name="com.nikkap.calendar.ui.screens.about.AboutFragment"
+        android:name="com.nikkap.calendar.app.ui.screens.about.AboutFragment"
         android:label="AboutFragment" />
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.nikkap.calendar.ui.screens.settings.SettingsFragment"
+        android:name="com.nikkap.calendar.app.ui.screens.settings.SettingsFragment"
         android:label="SettingsFragment">
         <action
             android:id="@+id/action_settingsFragment_to_aboutFragment"

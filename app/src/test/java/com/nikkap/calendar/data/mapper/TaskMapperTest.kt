@@ -53,7 +53,7 @@ private fun testDto(
 class TaskMapperTest {
 
     /**
-     * Tests for [Task.toTaskDto]
+     * Tests for [com.nikkap.calendar.domain.model.Task.toTaskDto]
      */
 
     @Test
@@ -101,7 +101,7 @@ class TaskMapperTest {
     }
 
     /**
-     * Tests for [Task.toTaskEntity]
+     * Tests for [com.nikkap.calendar.domain.model.Task.toTaskEntity]
      */
 
     @Test
