@@ -7,7 +7,7 @@ import java.time.ZoneId
 
 class DateUtilsTest {
     /**
-     * Tests for [Long.toListUiDate]
+     * Tests for [com.nikkap.calendar.core.toListUiDate]
      */
 
     @Test
@@ -25,7 +25,7 @@ class DateUtilsTest {
     }
 
     /**
-     * Test for [Long.toTimeLong]
+     * Test for [com.nikkap.calendar.core.toTimeLong]
      */
 
     @Test
@@ -36,7 +36,7 @@ class DateUtilsTest {
     }
 
     /**
-     * Tests for [parseIsoDate]
+     * Tests for [com.nikkap.calendar.core.parseIsoDate]
      */
 
     @Test
@@ -72,7 +72,7 @@ class DateUtilsTest {
     }
 
     /**
-     * Tests for [Long.toIsoDateWithoutSeconds]
+     * Tests for [com.nikkap.calendar.core.toIsoDateWithoutSeconds]
      */
 
     @Test
@@ -83,7 +83,7 @@ class DateUtilsTest {
     }
 
     /**
-     * Tests for [Long.toIsoDate]
+     * Tests for [com.nikkap.calendar.core.toIsoDate]
      */
 
     @Test
@@ -100,7 +100,7 @@ class DateUtilsTest {
     }
 
     /**
-     * Test for [Long.toIsoDateAllDay]
+     * Test for [com.nikkap.calendar.core.toIsoDateAllDay]
      */
 
     @Test
@@ -111,7 +111,7 @@ class DateUtilsTest {
     }
 
     /**
-     * Tests for [Long.toUiDate]
+     * Tests for [com.nikkap.calendar.core.toUiDate]
      */
 
     @Test
@@ -136,7 +136,7 @@ class DateUtilsTest {
     }
 
     /**
-     * Tests for [eventDateFormatter]
+     * Tests for [com.nikkap.calendar.core.eventDateFormatter]
      */
 
     @Test
@@ -147,8 +147,8 @@ class DateUtilsTest {
             isAllDay = true
         )
 
-        val actualFirst = pair.first.dateTime
-        val actualSecond = pair.second.dateTime
+        val actualFirst = pair.first.first
+        val actualSecond = pair.second.second
 
         val expected = null
         assertEquals(expected, actualFirst)
@@ -163,8 +163,8 @@ class DateUtilsTest {
             isAllDay = false
         )
 
-        val actualFirst = pair.first.date
-        val actualSecond = pair.second.date
+        val actualFirst = pair.first.second
+        val actualSecond = pair.second.second
 
         val expected = null
         assertEquals(expected, actualFirst)
@@ -179,8 +179,8 @@ class DateUtilsTest {
             isAllDay = true
         )
 
-        val actualStart = pair.first.date
-        val actualEnd = pair.second.date
+        val actualStart = pair.first.second
+        val actualEnd = pair.second.second
 
         val expectedStart = "1970-01-01"
         val expectedEnd = "1970-01-02"
@@ -196,8 +196,8 @@ class DateUtilsTest {
             isAllDay = false
         )
 
-        val actualStart = pair.first.dateTime
-        val actualEnd = pair.second.dateTime
+        val actualStart = pair.first.first
+        val actualEnd = pair.second.first
 
         val expectedStart = "1970-01-01T00:00:00Z"
         val expectedEnd = "1970-01-01T00:01:00Z"
@@ -240,7 +240,7 @@ class DateUtilsTest {
     }
 
     /**
-     * Test for [Long.toCalendar]
+     * Test for [com.nikkap.calendar.core.toCalendar]
      */
 
     @Test

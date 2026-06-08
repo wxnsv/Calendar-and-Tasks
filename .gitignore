@@ -14,3 +14,4 @@
 local.properties
 /.kotlin/errors/
 credentials.json
+/cloc-2.00.exe

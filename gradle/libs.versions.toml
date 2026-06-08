@@ -1,4 +1,6 @@
 [versions]
+coil = "2.6.0"
+compose = "1.6.7"
 converterMoshi = "3.0.0"
 datastorePreferences = "1.2.1"
 junitJupiter = "6.0.3"
@@ -49,6 +51,7 @@ roomTesting = "2.8.4"
 swiperefreshlayout = "1.2.0"
 googleid = "1.2.0"
 workRuntimeKtx = "2.11.1"
+jetbrainsKotlinJvm = "2.3.10"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -104,9 +107,15 @@ androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview"
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 room-testing = { module = "androidx.room:room-testing", version.ref = "roomTesting" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "compose" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "compose" }
+androidx-compose-material = { group = "androidx.compose.material", name = "material", version.ref = "compose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 

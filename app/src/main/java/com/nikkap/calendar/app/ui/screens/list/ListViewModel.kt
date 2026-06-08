@@ -1,0 +1,109 @@
+package com.nikkap.calendar.app.ui.screens.list
+
+import android.content.Context
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import com.nikkap.calendar.data.worker.SyncWorker
+import com.nikkap.calendar.domain.repository.CalendarRepository
+import com.nikkap.calendar.domain.repository.TaskRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+class ListViewModel(
+    private val taskRepository: TaskRepository,
+    private val calendarRepository: CalendarRepository
+) : ViewModel() {
+    private val _tasksFlow = flow {
+        val tasks = taskRepository.getNonDeleteTasks()
+        emit(tasks)
+    }
+    private val _subtasksFlow = flow {
+        val subtasks = taskRepository.getNonDeleteSubtasks()
+        emit(subtasks)
+    }
+    private val _eventsFlow = flow {
+        val events = calendarRepository.getNonDeleteEvents()
+        emit(events)
+    }
+    private val _birthdaysFlow = flow {
+        val birthdays = calendarRepository.getNonDeleteBirthdays()
+        emit(birthdays)
+    }
+    private val _state = MutableStateFlow(ListState())
+    val state: StateFlow<ListState> = combine(
+        _state,
+        _tasksFlow,
+        _eventsFlow,
+        _birthdaysFlow,
+        _subtasksFlow
+    ) { state, tasks, events, birthdays, subtasks ->
+        val taskItems = tasks.filter { task -> !task.isCompleted }.map { ListItem.TaskItem(it) }
+        val subtaskItems =
+            subtasks.filter { subtask -> !subtask.isCompleted }.map { ListItem.SubtaskItem(it) }
+        val eventItems = events.map { ListItem.EventItem(it) }
+        val birthdayItems = birthdays.map { ListItem.BirthdayItem(it) }
+
+        /** Mixes tasks and calendarItems into a single list
+        to provide in Recycler View [ListAdapter] **/
+
+        val mixedList = (taskItems + eventItems + birthdayItems + subtaskItems).sortedBy { item ->
+            when (item) {
+                is ListItem.TaskItem -> item.task.title
+                is ListItem.EventItem -> item.event.summary
+                is ListItem.BirthdayItem -> item.birthday.name
+                is ListItem.SubtaskItem -> {
+                    val parentTitle = tasks.find { it.id == item.subtask.parentId }?.title ?: ""
+                    "$parentTitle / ${item.subtask.position}"
+                }
+            }
+        }
+
+        state.copy(
+            items = mixedList,
+            errorMessage = null,
+            isLoading = false
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = ListState()
+    )
+
+    fun refreshData(context: Context) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            withContext(Dispatchers.IO) { syncAll(context) } // TODO 4/5
+            _state.update { it.copy(isLoading = false) }
+        }
+    }
+
+    private suspend fun syncAll(context: Context) = coroutineScope {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "OneTimeSyncWorker",
+            ExistingWorkPolicy.KEEP,
+            syncRequest
+        )
+    }
+}

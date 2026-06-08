@@ -16,7 +16,8 @@ private fun testEntity(
     isCompleted: Boolean = false,
     taskListId: String = "taskListId",
     pendingAction: PendingActions = PendingActions.NONE,
-    lastModified: Long = 0L
+    lastModified: Long = 0L,
+    deadline: Long = 0L
 ): SubtaskEntity =
     SubtaskEntity(
         id = id,
@@ -26,7 +27,8 @@ private fun testEntity(
         parentId = parentId,
         position = position,
         isCompleted = isCompleted,
-        taskListId = taskListId
+        taskListId = taskListId,
+        deadline = deadline
     )
 
 private fun testDto(
