@@ -3,6 +3,7 @@ package com.nikkap.calendar.app.core.di
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.nikkap.calendar.app.core.auth.AuthentificationManager
 import com.nikkap.calendar.app.core.auth.AuthorizationManager
 import com.nikkap.calendar.app.ui.screens.about.AboutViewModel
@@ -105,6 +106,9 @@ val authModule = module {
     single { AuthentificationManager(androidContext()) }
 }
 val appModule = module {
+    single<WorkManager> {
+        WorkManager.getInstance(androidContext())
+    }
     worker { SyncWorker(get(), get(), get(), get()) }
     single<TaskRepository> { TaskRepositoryImpl(get(), get(), get()) }
     single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get()) }
@@ -113,7 +117,7 @@ val appModule = module {
     viewModel { ListViewModel(get(), get()) }
     viewModel { MainPagerViewModel(get()) }
     viewModelOf(::CreateViewModel)
-    viewModel { MainViewModel(get(), get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get()) }
     viewModel { SettingsViewModel(get()) }
     viewModel { AboutViewModel() }
 }

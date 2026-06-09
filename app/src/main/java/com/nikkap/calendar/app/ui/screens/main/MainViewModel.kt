@@ -19,7 +19,6 @@ import com.nikkap.calendar.data.repository.UserPreferencesRepository
 import com.nikkap.calendar.data.worker.SyncWorker
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +37,8 @@ import java.util.concurrent.TimeUnit
 class MainViewModel(
     private val tasksRepository: TaskRepository,
     private val calendarRepository: CalendarRepository,
-    private val userPrefRepository: UserPreferencesRepository
+    private val userPrefRepository: UserPreferencesRepository,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
     private val _navigationEvent = Channel<NavEvent>()
@@ -68,12 +68,12 @@ class MainViewModel(
         val isAuthReady = arrayOfFlows[5] as Boolean
 
 
-        if (prefs != null) {
+        if (prefs != null && state.isLoading) {
             val isReady =
                 isMainReady && isListReady && isSplitReady && !prefs.isFirstLaunch || isAuthReady
             if (prefs.isFirstLaunch) setAuthorizeScreensReady()
             setIsMainReadyTrue()
-            state.copy(userState = prefs, isScreensReady = isReady)
+            state.copy(userState = prefs, isScreensReady = isReady, isLoading = !isReady)
         } else state.copy(isScreensReady = false)
     }.stateIn(
         scope = viewModelScope,
@@ -145,11 +145,19 @@ class MainViewModel(
     private fun startActiveSync() {
         viewModelScope.launch {
             while (isActive) {
-                val tasksDeferred = async { tasksRepository.syncAllTasks() }
-                val calendarDeferred = async { calendarRepository.syncCalendar() }
+                val constraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
 
-                tasksDeferred.await()
-                calendarDeferred.await()
+                val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+                    .setConstraints(constraints)
+                    .build()
+
+                workManager.enqueueUniqueWork(
+                    "OneTimeSyncWorker",
+                    ExistingWorkPolicy.KEEP,
+                    syncRequest
+                )
                 delay(3 * 60 * 1000L)
             }
         }
@@ -188,7 +196,7 @@ class MainViewModel(
             val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(
                 30, TimeUnit.MINUTES,
                 5, TimeUnit.MINUTES
-            )
+            ) // TODO
                 .setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
@@ -197,7 +205,7 @@ class MainViewModel(
                 )
                 .build()
 
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            workManager.enqueueUniquePeriodicWork(
                 "AuthorizePeriodicSync",
                 ExistingPeriodicWorkPolicy.KEEP,
                 syncRequest
@@ -274,7 +282,7 @@ class MainViewModel(
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance(context).enqueueUniqueWork(
+        workManager.enqueueUniqueWork(
             "OneTimeSyncWorker",
             ExistingWorkPolicy.KEEP,
             syncRequest
