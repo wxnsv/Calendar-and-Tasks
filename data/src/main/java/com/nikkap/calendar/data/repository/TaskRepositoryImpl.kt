@@ -320,7 +320,7 @@ class TaskRepositoryImpl(
 
         if (userPrefRepository.defaultTasklistId.first() == null) {
             val result = api.getTasklist()
-            if (result.isSuccessful) userPrefRepository.setDefaultTasklistId(result.body()!!.id)
+            if (result.isSuccessful) userPrefRepository.setDefaultTasklistId(result.body()!!.id!!)
         }
 
         val tasksAndTaskListIdsResult =

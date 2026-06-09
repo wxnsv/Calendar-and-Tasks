@@ -258,7 +258,10 @@ class CalendarRepositoryImpl(
                         }
 
                         PendingActions.INSERT -> {
-                            val result = api.createEvent(entity.toEventDto())
+                            val dto = entity.toEventDto()
+                            val result = api.createEvent(
+                                dto
+                            )
                             if (result.isSuccessful) dao.updateEvent(
                                 entity.markAsSynchronized(parseIsoDate(result.body()?.updated))
                             )

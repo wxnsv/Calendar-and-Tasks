@@ -8,6 +8,7 @@ import com.nikkap.calendar.data.repository.UserPreferencesRepository
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.CalendarEntry
 import com.nikkap.calendar.domain.model.Event
+import com.nikkap.calendar.domain.model.EventStatus
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
@@ -69,7 +70,6 @@ class CreateViewModel(
             }
 
             is CreateIntent.UpdateItem -> {
-                _state.update { it.copy(isLoading = true) }
                 val intentEntry: CalendarEntry = when (intent.type) {
                     "TASK" -> Task()
                     "EVENT" -> Event()
@@ -187,7 +187,8 @@ class CreateViewModel(
                         id = event.id ?: UUID.randomUUID().toString().replace("-", ""),
                         summary = state.value.title,
                         startTimestamp = event.startTimestamp,
-                        endTimestamp = event.endTimestamp
+                        endTimestamp = event.endTimestamp,
+                        status = EventStatus.CONFIRMED
                     )
                     _state.update { it.copy(isLoading = true) }
                     if (state.value.isEditing) calendarRepository.updateEvent(eventToSave)
@@ -199,7 +200,6 @@ class CreateViewModel(
 
             is CreateEventIntent.UpdateColor ->
                 _state.update {
-                    if (state.value.isLoading) return
                     it.copy(
                         eventDraft = it.eventDraft.copy(
                             colorId = intent.color

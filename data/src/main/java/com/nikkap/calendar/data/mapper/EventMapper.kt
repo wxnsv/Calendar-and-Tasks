@@ -49,7 +49,7 @@ fun EventEntity.toEventDto(): EventDto {
         description = description,
         start = EventDateTime(start.first, start.second),
         end = EventDateTime(end.first, end.second),
-        updated = "",
+        updated = null,
         colorId = colorId.toString(),
         status = status
     )

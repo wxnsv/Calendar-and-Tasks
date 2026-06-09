@@ -9,8 +9,8 @@ import com.nikkap.calendar.domain.model.TaskList
 
 fun TaskListDto.toTaskListEntity(): TaskListEntity {
     return TaskListEntity(
-        id = id,
-        title = title,
+        id = id!!,
+        title = title!!,
         pendingAction = PendingActions.NONE,
         lastModified = parseIsoDate(updated)
     )
@@ -37,7 +37,7 @@ fun TaskListEntity.toTaskListDto(): TaskListDto {
     return TaskListDto(
         id = id,
         title = title,
-        updated = ""
+        updated = null
     )
 }
 
@@ -45,7 +45,7 @@ fun TaskListEntity.toTaskListUpdateDto(): TaskListUpdateDto {
     return TaskListUpdateDto(
         id = id,
         title = title,
-        updated = ""
+        updated = null
     )
 }
 
@@ -76,6 +76,6 @@ fun TaskList.toTaskListDto(): TaskListDto {
     return TaskListDto(
         id = id,
         title = title,
-        updated = "",
+        updated = null,
     )
 }
