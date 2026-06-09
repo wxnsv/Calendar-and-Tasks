@@ -6,7 +6,7 @@ data class EventDto(
     val description: String?,
     val start: EventDateTime,
     val end: EventDateTime,
-    val updated: String?,
+    val updated: String? = null,
     val deleted: Boolean = false,
     val colorId: String?,
     val status: String?,

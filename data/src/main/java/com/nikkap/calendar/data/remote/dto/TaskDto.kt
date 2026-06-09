@@ -8,6 +8,6 @@ data class TaskDto(
     val due: String?,
     val parent: String? = null,
     val position: String? = null,
-    val updated: String = "",
+    val updated: String? = null,
     val deleted: Boolean = false,
 )

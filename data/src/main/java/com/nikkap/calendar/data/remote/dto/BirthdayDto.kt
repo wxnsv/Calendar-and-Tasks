@@ -4,7 +4,7 @@ data class BirthdayDto(
     val id: String,
     val summary: String?,
     val start: BirthdayDateTime,
-    val updated: String = "",
+    val updated: String? = null,
     val deleted: Boolean = false,
     val colorId: String?,
 )
