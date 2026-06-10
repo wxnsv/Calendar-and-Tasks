@@ -5,7 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.nikkap.calendar.core.utils.toIsoDateWithoutSeconds
 import com.nikkap.calendar.data.local.prefs.UserPrefs
@@ -26,8 +25,6 @@ class UserPreferencesRepository(
         val USER_NAME = stringPreferencesKey("user_name")
         val USER_PHOTO_PATH = stringPreferencesKey("user_photo_path")
         val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
-        val CALENDAR_LAST_SYNC = longPreferencesKey("event_last_sync")
-        val TASK_LAST_SYNC = longPreferencesKey("task_last_sync")
         val DEFAULT_TASKLIST_ID = stringPreferencesKey("default_tasklist_id")
         val CALENDAR_TIME_MIN = stringPreferencesKey("calendar_time_min")
         val IS_LIST_SCREEN_LAST = booleanPreferencesKey("is_list_screen_last")
@@ -45,8 +42,6 @@ class UserPreferencesRepository(
         .map { prefs ->
             UserPrefs(
                 isAuthorized = prefs[Keys.IS_AUTHORIZED] ?: false,
-                eventLastSync = prefs[Keys.CALENDAR_LAST_SYNC],
-                taskLastSync = prefs[Keys.TASK_LAST_SYNC],
                 email = prefs[Keys.USER_EMAIL],
                 name = prefs[Keys.USER_NAME],
                 photoPath = prefs[Keys.USER_PHOTO_PATH],
@@ -59,20 +54,6 @@ class UserPreferencesRepository(
                 isMondayFirstDay = prefs[Keys.IS_MONDAY_FIRST_DAY] ?: true,
                 isSystemFirstDay = prefs[Keys.IS_SYSTEM_FIRST_DAY] ?: true,
             )
-        }
-
-    val taskSyncTime: Flow<Long?> = dataStore.data.catch { exception ->
-        if (exception is IOException) emit(emptyPreferences()) else throw exception
-    }
-        .map { prefs ->
-            prefs[Keys.TASK_LAST_SYNC]
-        }
-
-    val calendarSyncTime: Flow<Long?> = dataStore.data.catch { exception ->
-        if (exception is IOException) emit(emptyPreferences()) else throw exception
-    }
-        .map { prefs ->
-            prefs[Keys.CALENDAR_LAST_SYNC]
         }
 
     val calendarTimeMin = dataStore.data.catch { exception ->
@@ -95,30 +76,6 @@ class UserPreferencesRepository(
             prefs[Keys.IS_AUTHORIZED] = true
             prefs[Keys.IS_FIRST_LAUNCH] = false
             prefs[Keys.USER_NAME] = name
-        }
-    }
-
-    suspend fun updateTaskSyncTime() {
-        dataStore.edit { prefs ->
-            prefs[Keys.TASK_LAST_SYNC] = System.currentTimeMillis()
-        }
-    }
-
-    suspend fun updateEventSyncTime(syncTime: Long = System.currentTimeMillis()) {
-        dataStore.edit { prefs ->
-            prefs[Keys.CALENDAR_LAST_SYNC] = syncTime
-        }
-    }
-
-    suspend fun clearLastCalendarSyncTime() {
-        dataStore.edit { preferences ->
-            preferences.remove(Keys.CALENDAR_LAST_SYNC)
-        }
-    }
-
-    suspend fun clearLastTaskSyncTime() {
-        dataStore.edit { preferences ->
-            preferences.remove(Keys.TASK_LAST_SYNC)
         }
     }
 

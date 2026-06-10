@@ -1,7 +1,6 @@
 package com.nikkap.calendar.data.repository
 
 import com.nikkap.calendar.core.utils.parseIsoDate
-import com.nikkap.calendar.core.utils.toIsoDateWithoutSeconds
 import com.nikkap.calendar.data.local.dao.CalendarDao
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.mapper.changePendingAction
@@ -106,8 +105,6 @@ class CalendarRepositoryImpl(
     }
 
     override suspend fun syncCalendar(): Result<Unit> = try {
-        val calendarSyncTime =
-            userPrefRepository.calendarSyncTime.first()?.toIsoDateWithoutSeconds()
         val timeMin = userPrefRepository.calendarTimeMin.first()
 
         coroutineScope {
@@ -115,7 +112,6 @@ class CalendarRepositoryImpl(
 
                 val responseEvents = api.getEvents(
                     timeMin,
-                    updatedMin = calendarSyncTime,
                     singleEvents = true,
                 )
 
@@ -142,7 +138,6 @@ class CalendarRepositoryImpl(
 
                 val responseBirthdays = api.getBirthdays(
                     timeMin,
-                    updatedMin = calendarSyncTime,
                 )
 
                 if (!responseBirthdays.isSuccessful) {
@@ -166,7 +161,6 @@ class CalendarRepositoryImpl(
             }
 
             if (eventsResult.await().isSuccess && birthdayResult.await().isSuccess) {
-                userPrefRepository.updateEventSyncTime()
                 pendingSync()
                 Result.success(Unit)
             } else {
@@ -185,9 +179,10 @@ class CalendarRepositoryImpl(
 
     private suspend fun handleErrorCode(code: Int) {
         when (code) {
-            in 1..999 -> userPrefRepository.clearLastCalendarSyncTime()
-            // TODO
+            in 1..999 -> {
 
+            }
+            // TODO
         }
     }
 

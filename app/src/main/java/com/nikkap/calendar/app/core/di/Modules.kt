@@ -114,7 +114,7 @@ val appModule = module {
     single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get()) }
     viewModel { AuthViewModel(get(), get(), get()) }
     viewModel { SplitViewModel(get(), get()) }
-    viewModel { ListViewModel(get(), get()) }
+    viewModel { ListViewModel(get(), get(), get()) }
     viewModel { MainPagerViewModel(get()) }
     viewModelOf(::CreateViewModel)
     viewModel { MainViewModel(get(), get(), get(), get()) }

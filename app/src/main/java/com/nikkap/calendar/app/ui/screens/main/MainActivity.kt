@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         observeNavigation()
-        viewModel.checkAuthAndNavigate(this)
+        viewModel.checkAuthAndNavigate()
         observeState()
         installSplashScreen().setKeepOnScreenCondition {
             showSplash

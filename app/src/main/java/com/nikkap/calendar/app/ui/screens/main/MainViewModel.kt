@@ -111,7 +111,7 @@ class MainViewModel(
     }
 
 
-    fun checkAuthAndNavigate(context: Context) {
+    fun checkAuthAndNavigate() {
         viewModelScope.launch {
             _isMainReady.first { it }
             val prefs = state.value.userState
@@ -123,7 +123,7 @@ class MainViewModel(
                         NavigationTarget.Auth
                     )
                 )
-            } else if (isAuthorized) syncData(context)
+            } else if (isAuthorized) syncData()
             _navigationEvent.send(
                 NavEvent.SetRoot(
                     NavigationTarget.Pager
@@ -154,7 +154,7 @@ class MainViewModel(
                     .build()
 
                 workManager.enqueueUniqueWork(
-                    "OneTimeSyncWorker",
+                    "RegularSyncWorker",
                     ExistingWorkPolicy.KEEP,
                     syncRequest
                 )
@@ -273,7 +273,7 @@ class MainViewModel(
         }
     }
 
-    private fun syncData(context: Context) {
+    private fun syncData() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -283,7 +283,7 @@ class MainViewModel(
             .build()
 
         workManager.enqueueUniqueWork(
-            "OneTimeSyncWorker",
+            "OpenAppSync",
             ExistingWorkPolicy.KEEP,
             syncRequest
         )

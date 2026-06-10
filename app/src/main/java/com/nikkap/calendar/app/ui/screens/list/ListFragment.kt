@@ -56,7 +56,7 @@ class ListFragment : Fragment(R.layout.list_fragment) {
 
     private fun setupListeners() {
         binding.listSwipeRef.setOnRefreshListener {
-            viewModel.refreshData(requireContext())
+            viewModel.refreshData()
         }
     }
 
@@ -64,7 +64,7 @@ class ListFragment : Fragment(R.layout.list_fragment) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
-                    binding.listSwipeRef.isRefreshing = state.isLoading
+                    binding.listSwipeRef.isRefreshing = state.isRefreshing
                     if (state.items.isEmpty() && !state.isLoading) sharedViewModel.setListReady()
                     else binding.listRV.onFirstDraw {
                         sharedViewModel.setListReady()

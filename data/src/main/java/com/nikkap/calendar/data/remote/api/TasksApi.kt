@@ -19,7 +19,6 @@ interface TasksApi {
     @GET("tasks/v1/lists/{taskListId}/tasks")
     suspend fun getTasks(
         @Path("taskListId") taskListId: String,
-        @Query("updatedMin") updatedMin: String?,
         @Query("showCompleted") showCompleted: Boolean = true,
         @Query("showHidden") showHidden: Boolean = true,
         @Query("showDeleted") showDeleted: Boolean = true,
@@ -40,7 +39,6 @@ interface TasksApi {
 
     @GET("tasks/v1/users/@me/lists")
     suspend fun getTaskLists(
-        @Query("updatedMin") updatedMin: String?,
         @Query("showDeleted") showDeleted: Boolean = true,
         @Query("maxResults") maxResults: Int? = 100,
     ): Response<TaskListsResponse>

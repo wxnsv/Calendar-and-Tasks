@@ -1,7 +1,6 @@
 package com.nikkap.calendar.data.repository
 
 import com.nikkap.calendar.core.utils.parseIsoDate
-import com.nikkap.calendar.core.utils.toIsoDateWithoutSeconds
 import com.nikkap.calendar.data.local.dao.TaskDao
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.TaskListEntity
@@ -271,8 +270,8 @@ class TaskRepositoryImpl(
     }
 
 
-    private suspend fun getRemoteTaskLists(lastSyncTime: String?): Result<List<TaskListDto>?> {
-        val taskLists = api.getTaskLists(lastSyncTime)
+    private suspend fun getRemoteTaskLists(): Result<List<TaskListDto>?> {
+        val taskLists = api.getTaskLists()
         if (taskLists.isSuccessful) {
             val entities = taskLists.body()?.items
             return Result.success(entities)
@@ -283,9 +282,7 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun syncAllTasks(): Result<Unit> = try {
-        val tasksSyncTime = userPrefRepository.taskSyncTime.first()?.toIsoDateWithoutSeconds()
-
-        val remoteTaskLists = getRemoteTaskLists(lastSyncTime = tasksSyncTime)
+        val remoteTaskLists = getRemoteTaskLists()
 
         if (remoteTaskLists.isFailure) {
             return Result.failure(Exception("Failed to sync task lists"))
@@ -324,7 +321,7 @@ class TaskRepositoryImpl(
         }
 
         val tasksAndTaskListIdsResult =
-            getTasksWithTaskListIds(remoteTaskLists = taskLists, tasksSyncTime)
+            getTasksWithTaskListIds(remoteTaskLists = taskLists)
 
         if (tasksAndTaskListIdsResult.isFailure) {
             return Result.failure(tasksAndTaskListIdsResult.exceptionOrNull()!!)
@@ -374,7 +371,6 @@ class TaskRepositoryImpl(
             }
 
             if (tasksResult.await().isSuccess && subtasksResult.await().isSuccess) {
-                userPrefRepository.updateTaskSyncTime()
                 pendingSync()
                 Result.success(Unit)
             } else {
@@ -394,7 +390,9 @@ class TaskRepositoryImpl(
 
     private suspend fun handleErrorCode(code: Int) {
         when (code) {
-            in 1..999 -> userPrefRepository.clearLastTaskSyncTime()
+            in 1..999 -> {
+
+            }
 
             // TODO
 
@@ -604,7 +602,6 @@ class TaskRepositoryImpl(
 
     private suspend fun getTasksWithTaskListIds(
         remoteTaskLists: List<TaskListEntity>,
-        lastSyncTime: String?
     ): Result<List<Pair<String, List<TaskDto>>>> = try {
 
         coroutineScope {
@@ -614,7 +611,6 @@ class TaskRepositoryImpl(
                 async<Pair<String, List<TaskDto>>> {
                     val response = api.getTasks(
                         taskListId = taskList.id,
-                        updatedMin = lastSyncTime
                     )
 
                     if (response.isSuccessful) {
