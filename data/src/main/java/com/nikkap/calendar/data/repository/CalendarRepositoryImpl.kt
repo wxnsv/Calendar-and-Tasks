@@ -1,5 +1,6 @@
 package com.nikkap.calendar.data.repository
 
+import com.nikkap.calendar.core.exceptions.NetworkException
 import com.nikkap.calendar.core.utils.parseIsoDate
 import com.nikkap.calendar.data.local.dao.CalendarDao
 import com.nikkap.calendar.data.local.entity.PendingActions
@@ -8,12 +9,12 @@ import com.nikkap.calendar.data.mapper.markAsSynchronized
 import com.nikkap.calendar.data.mapper.toBirthday
 import com.nikkap.calendar.data.mapper.toBirthdayDto
 import com.nikkap.calendar.data.mapper.toBirthdayEntity
+import com.nikkap.calendar.data.mapper.toBirthdayUpdateDto
 import com.nikkap.calendar.data.mapper.toEvent
-import com.nikkap.calendar.data.mapper.toEventDto
 import com.nikkap.calendar.data.mapper.toEventEntity
 import com.nikkap.calendar.data.mapper.toEventUpdateDto
 import com.nikkap.calendar.data.remote.api.CalendarApi
-import com.nikkap.calendar.data.utils.syncEntities
+import com.nikkap.calendar.data.utils.localSyncEntities
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.repository.CalendarRepository
@@ -51,7 +52,7 @@ class CalendarRepositoryImpl(
     override suspend fun saveEvent(event: Event) {
         dao.insertEvent(event.toEventEntity().changePendingAction(PendingActions.INSERT))
         val result = api.createEvent(
-            event = event.toEventDto(),
+            event = event.toEventUpdateDto(),
         ).body()
         if (result != null) {
             dao.updateEvent(event.toEventEntity().markAsSynchronized(parseIsoDate(result.updated)))
@@ -98,7 +99,7 @@ class CalendarRepositoryImpl(
 
     override suspend fun saveBirthday(birthday: Birthday) {
         dao.insertBirthday(birthday.toBirthdayEntity().changePendingAction(PendingActions.INSERT))
-        val result = api.createBirthday(birthday.toBirthdayDto()).body()
+        val result = api.createBirthday(birthday.toBirthdayUpdateDto()).body()
         if (result != null) dao.updateBirthday(
             birthday.toBirthdayEntity().markAsSynchronized(parseIsoDate(result.updated))
         )
@@ -116,23 +117,25 @@ class CalendarRepositoryImpl(
                 )
 
                 val remoteEvents = responseEvents.body()?.items?.map {
-                    if (!it.deleted) it.toEventEntity() else it.toEventEntity()
+                    if (!it.deleted && it.status != "cancelled") it.toEventEntity() else it.toEventEntity()
                         .changePendingAction(PendingActions.DELETE)
                 } ?: emptyList()
 
-                if (responseEvents.code() != 200) {
-                    handleErrorCode(responseEvents.code())
-                    return@async Result.failure(Exception("Failed to sync events and birthdays"))
+                if (!responseEvents.isSuccessful) {
+                    throw NetworkException.ServerException(
+                        responseEvents.code(),
+                        "Error when syncing birthdays"
+                    )
                 }
 
                 if (remoteEvents.isNotEmpty()) {
-                    syncEntities(
+                    localSyncEntities(
                         remoteEntities = remoteEvents,
                         getLocalEntities = { dao.getNonDeleteEvents().first() },
                         deleteEntitiesByIds = { dao.deleteEventsByIds(it) },
                         insertEntities = { dao.insertEvents(it) }
                     )
-                } else Result.success(Unit)
+                }
             }
             val birthdayResult = async {
 
@@ -141,8 +144,10 @@ class CalendarRepositoryImpl(
                 )
 
                 if (!responseBirthdays.isSuccessful) {
-                    handleErrorCode(responseBirthdays.code())
-                    return@async Result.failure(Exception("Failed to sync events and birthdays"))
+                    throw NetworkException.ServerException(
+                        responseBirthdays.code(),
+                        "Error when syncing birthdays"
+                    )
                 }
 
                 val remoteBirthdays = responseBirthdays.body()?.items?.map {
@@ -151,7 +156,7 @@ class CalendarRepositoryImpl(
                 } ?: emptyList()
 
                 if (remoteBirthdays.isNotEmpty()) {
-                    syncEntities(
+                    localSyncEntities(
                         remoteEntities = remoteBirthdays,
                         getLocalEntities = { dao.getNonDeleteBirthdays().first() },
                         deleteEntitiesByIds = { dao.deleteBirthdaysByIds(it) },
@@ -159,33 +164,19 @@ class CalendarRepositoryImpl(
                     )
                 } else Result.success(Unit)
             }
-
-            if (eventsResult.await().isSuccess && birthdayResult.await().isSuccess) {
-                pendingSync()
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Failed to sync events and birthdays"))
-            }
-
+            eventsResult.await()
+            birthdayResult.await()
+            pendingSync()
+            Result.success(Unit)
         }
     } catch (e: Exception) {
-        Result.failure(Exception("Failed to sync events and birthdays with ${e.message} message"))
+        Result.failure(e)
     }
 
     private suspend fun pendingSync() {
         eventsPendingSync()
         birthdaysPendingSync()
     }
-
-    private suspend fun handleErrorCode(code: Int) {
-        when (code) {
-            in 1..999 -> {
-
-            }
-            // TODO
-        }
-    }
-
 
     private suspend fun birthdaysPendingSync() {
         val pendingEntities = dao.getPendingBirthdays().first()
@@ -215,7 +206,7 @@ class CalendarRepositoryImpl(
                         }
 
                         PendingActions.INSERT -> {
-                            val result = api.createBirthday(entity.toBirthdayDto())
+                            val result = api.createBirthday(entity.toBirthdayUpdateDto())
                             if (result.isSuccessful) {
                                 dao.insertBirthday(
                                     entity.markAsSynchronized(
@@ -253,7 +244,7 @@ class CalendarRepositoryImpl(
                         }
 
                         PendingActions.INSERT -> {
-                            val dto = entity.toEventDto()
+                            val dto = entity.toEventUpdateDto()
                             val result = api.createEvent(
                                 dto
                             )

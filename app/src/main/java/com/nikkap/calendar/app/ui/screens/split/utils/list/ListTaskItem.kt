@@ -259,7 +259,6 @@ private fun ListTaskItemWithSubtasks(
         modifier = Modifier
             .padding(5.dp)
             .fillMaxWidth()
-//            .wrapContentHeight()
     ) {
         Row {
             Text(

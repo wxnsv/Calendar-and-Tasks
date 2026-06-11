@@ -49,7 +49,7 @@ class AuthorizationManager(context: Context) {
             val result = authClient.authorize(getAuthorizationRequest()).await()
             result.accessToken
         } catch (_: Exception) {
-            null
+            null // todo auth exc
         }
     }
 }

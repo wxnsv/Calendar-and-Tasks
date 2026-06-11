@@ -18,6 +18,7 @@ import com.nikkap.calendar.data.local.AppDatabase
 import com.nikkap.calendar.data.remote.api.CalendarApi
 import com.nikkap.calendar.data.remote.api.TasksApi
 import com.nikkap.calendar.data.remote.interceptor.AuthInterceptor
+import com.nikkap.calendar.data.remote.interceptor.ErrorInterceptor
 import com.nikkap.calendar.data.repository.CalendarRepositoryImpl
 import com.nikkap.calendar.data.repository.TaskRepositoryImpl
 import com.nikkap.calendar.data.repository.UserPreferencesRepository
@@ -59,6 +60,7 @@ val networkModule = module {
             tokenProvider = { get<AuthorizationManager>().getAccessToken() }
         )
     }
+    single { ErrorInterceptor() }
 
     single {
         HttpLoggingInterceptor().apply {
@@ -74,6 +76,7 @@ val networkModule = module {
     single {
         OkHttpClient.Builder()
             .addInterceptor(get<AuthInterceptor>())
+            .addInterceptor(get<ErrorInterceptor>())
             .addInterceptor(get<HttpLoggingInterceptor>())
             .cache(get())
             .dispatcher(Dispatcher().apply {

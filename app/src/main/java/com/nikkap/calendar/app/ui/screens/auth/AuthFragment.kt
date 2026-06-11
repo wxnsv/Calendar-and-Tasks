@@ -71,7 +71,7 @@ class AuthFragment : Fragment() {
                         authorizationManager.getAuthIntent { intentSender ->
                             viewModel.onAuthIntentReady(intentSender, authLauncher)
                         }
-                        sharedViewModel.authorizeSuccess(requireContext())
+                        sharedViewModel.authorizeSuccess()
                         lifecycleScope.launch {
                             saveUserPhoto(requireContext(), viewModel.photoUri.value)
                         }

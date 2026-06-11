@@ -73,7 +73,6 @@ fun Day(
                         .fillMaxWidth()
                         .height(5.dp)
                         .background(color.copy(alpha = 0.5f))
-//                        .border(0.3F.dp, color = Color.Black),
                 )
             }
         }

@@ -1,8 +1,7 @@
 package com.nikkap.calendar.data.mapper
 
+import com.nikkap.calendar.core.utils.birthdayDateFormatter
 import com.nikkap.calendar.core.utils.parseIsoDate
-import com.nikkap.calendar.core.utils.toIsoDateAllDay
-import com.nikkap.calendar.core.utils.toIsoDateWithoutSeconds
 import com.nikkap.calendar.core.utils.trimBirthdaySuffix
 import com.nikkap.calendar.data.local.entity.BirthdayEntity
 import com.nikkap.calendar.data.local.entity.PendingActions
@@ -32,19 +31,34 @@ fun BirthdayEntity.toBirthday(): Birthday {
 }
 
 fun Birthday.toBirthdayUpdateDto(): BirthdayUpdateDto {
+    val (start, end) = birthdayDateFormatter(date!!)
     return BirthdayUpdateDto(
         id = id!!,
         summary = if (name.isNullOrBlank()) null else name,
-        start = if (date == 0L || date == null) null else BirthdayDateTime(date!!.toIsoDateAllDay()),
+        start = if (date == 0L) null else BirthdayDateTime(start),
+        end = if (date == 0L) null else BirthdayDateTime(end),
         colorId = colorId?.toString()
     )
 }
 
+fun BirthdayEntity.toBirthdayUpdateDto(): BirthdayUpdateDto {
+    val (start, end) = birthdayDateFormatter(date)
+    return BirthdayUpdateDto(
+        id = id,
+        summary = if (name.isNullOrBlank()) null else name,
+        start = BirthdayDateTime(date = start),
+        end = BirthdayDateTime(date = end),
+        colorId = colorId.toString()
+    )
+}
+
 fun BirthdayEntity.toBirthdayDto(): BirthdayDto {
+    val (start, end) = birthdayDateFormatter(date)
     return BirthdayDto(
         id = id,
         summary = name,
-        start = BirthdayDateTime(date.toIsoDateAllDay()),
+        start = BirthdayDateTime(date = start),
+        end = BirthdayDateTime(date = end),
         colorId = colorId.toString()
     )
 }
@@ -76,10 +90,12 @@ fun Birthday.toBirthdayEntity(currentTime: Long = System.currentTimeMillis()): B
 }
 
 fun Birthday.toBirthdayDto(): BirthdayDto {
+    val (start, end) = birthdayDateFormatter(date!!)
     return BirthdayDto(
         id = id!!,
         summary = name,
-        start = BirthdayDateTime(date = date!!.toIsoDateWithoutSeconds()),
+        start = BirthdayDateTime(date = start),
+        end = BirthdayDateTime(date = end),
         colorId = colorId.toString()
     )
 }

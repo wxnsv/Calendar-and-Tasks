@@ -42,7 +42,7 @@ class AuthentificationManager(private val context: Context) {
                 null
             }
         } catch (_: Exception) {
-            null
+            null // todo auth exc
         }
     }
 }

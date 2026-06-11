@@ -2,6 +2,7 @@ package com.nikkap.calendar.data.remote.api
 
 import com.nikkap.calendar.data.remote.dto.BirthdayDto
 import com.nikkap.calendar.data.remote.dto.EventDto
+import com.nikkap.calendar.data.remote.dto.update.BirthdayUpdateDto
 import com.nikkap.calendar.data.remote.dto.update.EventUpdateDto
 import retrofit2.Response
 import retrofit2.http.Body
@@ -38,7 +39,7 @@ interface CalendarApi {
 
     @POST("calendar/v3/calendars/primary/events")
     suspend fun createEvent(
-        @Body event: EventDto
+        @Body event: EventUpdateDto
     ): Response<EventDto>
 
     @PATCH("calendar/v3/calendars/{calendarId}/events/{eventId}")
@@ -57,8 +58,8 @@ interface CalendarApi {
 
     @POST("calendar/v3/calendars/primary/events")
     suspend fun createBirthday(
-        @Body birthday: BirthdayDto
-    ): Response<BirthdayDto>
+        @Body birthday: BirthdayUpdateDto
+    ): Response<BirthdayUpdateDto>
 }
 
 data class EventListResponse(

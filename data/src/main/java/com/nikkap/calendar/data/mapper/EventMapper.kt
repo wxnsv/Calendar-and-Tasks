@@ -88,7 +88,7 @@ fun Event.toEventDto(): EventDto {
 fun Event.toEventUpdateDto(): EventUpdateDto {
     val (start, end) = eventDateFormatter(startTimestamp, endTimestamp, isAllDay)
     return EventUpdateDto(
-        id = id!!,
+        id = id,
         summary = if (summary.isNullOrBlank()) null else summary,
         description = if (description.isNullOrBlank()) null else description,
         start = if (startTimestamp == 0L) null else EventDateTime(start.first, start.second),
@@ -106,8 +106,8 @@ fun EventEntity.toEventUpdateDto(): EventUpdateDto {
         description = if (description.isNullOrBlank()) null else description,
         start = if (startTimestamp == 0L) null else EventDateTime(start.first, start.second),
         end = if (endTimestamp == 0L) null else EventDateTime(end.first, end.second),
-        colorId = colorId.toString(),
-        status = status,
+        colorId = 3.toString(),
+        status = null,
     )
 }
 

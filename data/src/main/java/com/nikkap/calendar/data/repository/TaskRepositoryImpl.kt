@@ -1,5 +1,6 @@
 package com.nikkap.calendar.data.repository
 
+import com.nikkap.calendar.core.exceptions.NetworkException
 import com.nikkap.calendar.core.utils.parseIsoDate
 import com.nikkap.calendar.data.local.dao.TaskDao
 import com.nikkap.calendar.data.local.entity.PendingActions
@@ -20,11 +21,12 @@ import com.nikkap.calendar.data.remote.api.TasksApi
 import com.nikkap.calendar.data.remote.dto.TaskDto
 import com.nikkap.calendar.data.remote.dto.TaskListDto
 import com.nikkap.calendar.data.remote.dto.update.TaskUpdateDto
-import com.nikkap.calendar.data.utils.syncEntities
+import com.nikkap.calendar.data.utils.localSyncEntities
 import com.nikkap.calendar.domain.model.Subtask
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.model.TaskList
 import com.nikkap.calendar.domain.repository.TaskRepository
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -117,7 +119,7 @@ class TaskRepositoryImpl(
         if (result.isSuccessful) dao.updateTask(
             result.body()!!.toTaskEntity(task.taskListId)
                 .markAsSynchronized(parseIsoDate(result.body()!!.updated))
-        ) else handleErrorCode(result.code())
+        )
     }
 
     override suspend fun updateSubtask(subtask: Subtask) {
@@ -131,7 +133,7 @@ class TaskRepositoryImpl(
         if (result.isSuccessful) dao.updateSubtask(
             result.body()!!.toSubtaskEntity(entity.taskListId)
                 .markAsSynchronized(parseIsoDate(result.body()!!.updated))
-        ) else handleErrorCode(result.code())
+        )
     }
 
     override suspend fun updateTaskList(taskList: TaskList) {
@@ -142,7 +144,7 @@ class TaskRepositoryImpl(
         )
         if (result.isSuccessful) dao.updateTasklist(
             taskList.toTaskListEntity().markAsSynchronized(parseIsoDate(result.body()!!.updated))
-        ) else handleErrorCode(result.code())
+        )
     }
 
     override suspend fun deleteTask(id: String) {
@@ -157,8 +159,6 @@ class TaskRepositoryImpl(
         if (resultTask.isSuccessful && resultSubtasks.isSuccess) {
             dao.deleteTask(entity.id)
             dao.deleteSubtasksOfTask(entity.id)
-        } else {
-            handleErrorCode(resultTask.code())
         }
     }
 
@@ -176,7 +176,7 @@ class TaskRepositoryImpl(
                 subtaskIdsToDelete.forEach { subtaskId ->
                     launch {
                         val result = api.deleteSubtask(taskListId, subtaskId)
-                        if (result.isSuccessful) countOfSuccess++ else handleErrorCode(result.code())
+                        if (result.isSuccessful) countOfSuccess++
                     }
                 }
             }
@@ -211,7 +211,7 @@ class TaskRepositoryImpl(
                             subtaskId,
                             TaskUpdateDto(id = subtaskId, status = "completed")
                         )
-                        if (result.isSuccessful) countOfSuccess++ else handleErrorCode(result.code())
+                        if (result.isSuccessful) countOfSuccess++
                     }
                 }
             }
@@ -230,7 +230,7 @@ class TaskRepositoryImpl(
         val result = api.deleteSubtask(subtask.taskListId, subtaskId = id)
         if (result.isSuccessful) {
             dao.deleteSubtask(id)
-        } else handleErrorCode(result.code())
+        }
     }
 
     override suspend fun completeSubtask(id: String) {
@@ -246,7 +246,7 @@ class TaskRepositoryImpl(
             dao.updateSubtask(
                 subtask.markAsSynchronized(parseIsoDate(result.body()?.updated))
             )
-        } else handleErrorCode(result.code())
+        }
     }
 
     override suspend fun completeTask(id: String) {
@@ -266,7 +266,7 @@ class TaskRepositoryImpl(
             dao.updateTask(
                 task.markAsSynchronized(parseIsoDate(result.body()!!.updated))
             )
-        } else handleErrorCode(result.code())
+        }
     }
 
 
@@ -276,7 +276,6 @@ class TaskRepositoryImpl(
             val entities = taskLists.body()?.items
             return Result.success(entities)
         } else {
-            handleErrorCode(taskLists.code())
             return Result.failure(Exception("Failed to sync tasks with ${taskLists.code()} code"))
         }
     }
@@ -298,16 +297,13 @@ class TaskRepositoryImpl(
             return Result.success(Unit)
         }
 
-        val taskListsResult = syncEntities(
+        // tasklists
+        localSyncEntities(
             taskLists,
             getLocalEntities = { dao.getNonDeleteTaskLists().first() },
             deleteEntitiesByIds = { dao.deleteTaskListsByIds(it) },
             insertEntities = { dao.insertTaskLists(it) }
         )
-
-        if (taskListsResult.isFailure) {
-            return Result.failure(taskListsResult.exceptionOrNull()!!)
-        }
 
         val listsPendingResult = tasklistsPendingSync()
 
@@ -320,20 +316,14 @@ class TaskRepositoryImpl(
             if (result.isSuccessful) userPrefRepository.setDefaultTasklistId(result.body()!!.id!!)
         }
 
-        val tasksAndTaskListIdsResult =
+        val tasksAndTakListIds =
             getTasksWithTaskListIds(remoteTaskLists = taskLists)
 
-        if (tasksAndTaskListIdsResult.isFailure) {
-            return Result.failure(tasksAndTaskListIdsResult.exceptionOrNull()!!)
-        }
-
-        val tasksAndListIds = tasksAndTaskListIdsResult.getOrNull()!!
-
-        if (tasksAndListIds.isEmpty()) {
+        if (tasksAndTakListIds.isEmpty()) {
             return Result.success(Unit)
         }
 
-        val taskEntitiesToSync = tasksAndListIds.flatMap { (taskListId, tasks) ->
+        val taskEntitiesToSync = tasksAndTakListIds.flatMap { (taskListId, tasks) ->
             val (rootTasks, _) = tasks.partition { it.parent == null }
             rootTasks.map {
                 if (!it.deleted) it.toTaskEntity(taskListId) else it.toTaskEntity(
@@ -342,7 +332,7 @@ class TaskRepositoryImpl(
             }
         }
 
-        val subtaskEntitiesToSync = tasksAndListIds.flatMap { (taskListId, tasks) ->
+        val subtaskEntitiesToSync = tasksAndTakListIds.flatMap { (taskListId, tasks) ->
             val (_, subtasks) = tasks.partition { it.parent == null }
             subtasks.map {
                 if (!it.deleted) it.toSubtaskEntity(taskListId) else it.toSubtaskEntity(
@@ -352,8 +342,8 @@ class TaskRepositoryImpl(
         }
 
         coroutineScope {
-            val tasksResult = async {
-                syncEntities(
+            val tasksResultDeferred = async {
+                localSyncEntities(
                     taskEntitiesToSync,
                     { dao.getNonDeleteTasks().first() },
                     { dao.deleteTasksByIds(it) },
@@ -361,273 +351,222 @@ class TaskRepositoryImpl(
                 )
             }
 
-            val subtasksResult = async {
-                syncEntities(
+            val subtasksResultDeferred = async {
+                localSyncEntities(
                     subtaskEntitiesToSync,
                     { dao.getNonDeleteSubtasks().first() },
                     { dao.deleteSubtasksByIds(it) },
                     { dao.insertSubtasks(it) }
                 )
             }
+            tasksResultDeferred.await()
+            subtasksResultDeferred.await()
 
-            if (tasksResult.await().isSuccess && subtasksResult.await().isSuccess) {
-                pendingSync()
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Failed to sync tasks"))
-            }
+            tasksPendingSync()
+            subtasksPendingSync()
+            Result.success(Unit)
         }
-
-
     } catch (e: Exception) {
         Result.failure(e)
     }
 
-    private suspend fun pendingSync() {
-        tasksPendingSync()
-        subtasksPendingSync()
-    }
-
-    private suspend fun handleErrorCode(code: Int) {
-        when (code) {
-            in 1..999 -> {
-
-            }
-
-            // TODO
-
-        }
-    }
-
     private suspend fun tasksPendingSync(): Result<Unit> = coroutineScope {
         val pendingEntities = dao.getPendingTasks().first()
-        val results = pendingEntities.map { entity ->
+
+        val deferredResults: List<Deferred<Result<Unit>>> = pendingEntities.map { entity ->
             async {
-                try {
+                runCatching {
                     when (entity.pendingAction) {
                         PendingActions.DELETE -> {
-                            val resultTask =
-                                api.deleteTask(
-                                    taskId = entity.id,
-                                    taskListId = entity.taskListId
-                                )
-                            val resultSubtasks = deleteAllSubtasks(
-                                taskListId = entity.taskListId,
-                                entity.id
-                            ).isSuccess
-                            if (resultTask.isSuccessful && resultSubtasks) {
-                                dao.deleteTask(entity.id)
-                                dao.deleteSubtasksOfTask(entity.id)
-                                true
-                            } else {
-                                handleErrorCode(resultTask.code())
-                                false
-                            }
+                            val response = api.deleteTask(entity.taskListId, entity.id)
+                            if (!response.isSuccessful) throw NetworkException.ServerException(
+                                response.code(),
+                                "Delete failed"
+                            )
+                            dao.deleteTask(entity.id)
                         }
 
                         PendingActions.UPDATE -> {
-                            val result = api.updateTask(
-                                taskId = entity.id,
-                                taskListId = entity.taskListId,
+                            val response = api.updateTask(
+                                taskListId = entity.taskListId, entity.id,
                                 task = entity.toTaskUpdateDto()
                             )
-                            if (result.isSuccessful) {
-                                dao.updateTask(
-                                    entity.markAsSynchronized(
-                                        parseIsoDate(result.body()?.updated)
-                                    )
-                                )
-                                true
-                            } else {
-                                handleErrorCode(result.code())
-                                false
-                            }
+                            if (!response.isSuccessful) throw NetworkException.ServerException(
+                                response.code(),
+                                "Update failed"
+                            )
+
+                            dao.updateTask(
+                                entity.markAsSynchronized(parseIsoDate(response.body()?.updated))
+                            )
                         }
 
                         PendingActions.INSERT -> {
-                            val result = api.createTask(
-                                taskDto = entity.toTaskDto(),
-                                taskListId = entity.taskListId
-                            )
-                            if (result.isSuccessful
-                            ) {
-                                dao.insertTask(
-                                    entity.markAsSynchronized(
-                                        parseIsoDate(result.body()?.updated)
-                                    )
-                                )
-                                true
-                            } else {
-                                handleErrorCode(result.code())
-                                false
-                            }
-                        }
-
-                        PendingActions.NONE -> {
-                            true
-                        }
-                    }
-                } catch (_: Exception) {
-                    false
-                }
-            }
-        }.awaitAll()
-
-        if (results.all { it }) {
-            Result.success(Unit)
-        } else {
-            Result.failure(Exception("Some items failed to sync"))
-        }
-    }
-
-    private suspend fun subtasksPendingSync() {
-        val pendingEntities = dao.getPendingSubtasks().first()
-        coroutineScope {
-            pendingEntities.map { entity ->
-                async {
-                    when (entity.pendingAction) {
-                        PendingActions.DELETE -> {
-                            val result = api.deleteSubtask(
-                                subtaskId = entity.id,
-                                taskListId = entity.taskListId
-                            )
-                            if (result.isSuccessful) {
-                                dao.deleteSubtask(entity.id)
-                            } else handleErrorCode(result.code())
-                        }
-
-                        PendingActions.UPDATE -> {
-                            val result = api.updateSubtask(
-                                subtaskId = entity.id,
+                            val response = api.createTask(
                                 taskListId = entity.taskListId,
-                                subtask = entity.toTaskUpdateDto()
+                                taskDto = entity.toTaskDto()
                             )
-                            if (result.isSuccessful) {
-                                dao.updateSubtask(
-                                    entity.markAsSynchronized(
-                                        parseIsoDate(result.body()?.updated)
-                                    )
-                                )
-                            } else handleErrorCode(result.code())
-                        }
+                            if (!response.isSuccessful) throw NetworkException.ServerException(
+                                response.code(),
+                                "Insert failed"
+                            )
 
-                        PendingActions.INSERT -> {
-                            val result = api.createSubtask(
-                                taskListId = entity.taskListId,
-                                subtask = entity.toTaskUpdateDto()
+                            dao.insertTask(
+                                entity.markAsSynchronized(parseIsoDate(response.body()?.updated))
                             )
-                            if (result.isSuccessful) {
-                                dao.insertSubtask(
-                                    entity.markAsSynchronized(
-                                        parseIsoDate(result.body()?.updated)
-                                    )
-                                )
-                            } else handleErrorCode(result.code())
                         }
 
                         PendingActions.NONE -> {}
                     }
                 }
             }
-        }.awaitAll()
+        }
+        val results: List<Result<Unit>> = deferredResults.awaitAll()
+
+        if (results.all { it.isSuccess }) {
+            Result.success(Unit)
+        } else {
+            val firstException = results.firstNotNullOfOrNull { it.exceptionOrNull() }
+            Result.failure(firstException ?: Exception("Some tasks failed to sync with server"))
+        }
     }
 
-    private suspend fun tasklistsPendingSync(): Result<Unit> = coroutineScope {
-        val pendingEntities = dao.getPendingTaskLists().first()
-        val results = pendingEntities.map { entity ->
+    private suspend fun subtasksPendingSync(): Result<Unit> = coroutineScope {
+        val pendingEntities = dao.getPendingSubtasks().first()
+
+        val deferredResults: List<Deferred<Result<Unit>>> = pendingEntities.map { entity ->
             async {
-                try {
+                runCatching {
                     when (entity.pendingAction) {
                         PendingActions.DELETE -> {
-                            val result = api.deleteTaskList(entity.id)
-                            if (result.isSuccessful) {
-                                dao.deleteTasklist(entity)
-                                true
-                            } else {
-                                handleErrorCode(result.code())
-                                false
-                            }
+                            val response = api.deleteSubtask(entity.taskListId, entity.id)
+                            if (!response.isSuccessful) throw NetworkException.ServerException(
+                                response.code(),
+                                "Delete failed"
+                            )
+                            dao.deleteSubtask(entity.id)
                         }
 
                         PendingActions.UPDATE -> {
-                            val result = api.updateTaskList(
-                                taskListId = entity.id,
-                                taskList = entity.toTaskListUpdateDto()
+                            val response = api.updateSubtask(
+                                taskListId = entity.taskListId, entity.id,
+                                subtask = entity.toTaskUpdateDto()
                             )
-                            if (result.isSuccessful) {
-                                dao.updateTasklist(
-                                    entity.markAsSynchronized(
-                                        parseIsoDate(result.body()?.updated)
-                                    )
-                                )
-                                true
-                            } else {
-                                handleErrorCode(result.code())
-                                false
-                            }
+                            if (!response.isSuccessful) throw NetworkException.ServerException(
+                                response.code(),
+                                "Update failed"
+                            )
+
+                            dao.updateSubtask(
+                                entity.markAsSynchronized(parseIsoDate(response.body()?.updated))
+                            )
                         }
 
                         PendingActions.INSERT -> {
-                            val result =
-                                api.createTaskList(taskList = entity.toTaskListDto())
-                            if (result.isSuccessful) {
-                                dao.insertTaskList(
-                                    entity.markAsSynchronized(
-                                        parseIsoDate(result.body()?.updated)
-                                    )
-                                )
-                                true
-                            } else {
-                                handleErrorCode(result.code())
-                                false
-                            }
+                            val response = api.createSubtask(
+                                taskListId = entity.taskListId,
+                                subtask = entity.toTaskUpdateDto()
+                            )
+                            if (!response.isSuccessful) throw NetworkException.ServerException(
+                                response.code(),
+                                "Insert failed"
+                            )
+
+                            dao.insertSubtask(
+                                entity.markAsSynchronized(parseIsoDate(response.body()?.updated))
+                            )
                         }
 
-                        PendingActions.NONE -> {
-                            true
-                        }
+                        PendingActions.NONE -> {}
                     }
-                } catch (_: Exception) {
-                    false
                 }
             }
-        }.awaitAll()
+        }
+        val results: List<Result<Unit>> = deferredResults.awaitAll()
 
-        if (results.all { it }) {
+        if (results.all { it.isSuccess }) {
             Result.success(Unit)
         } else {
-            Result.failure(Exception("Some items failed to sync"))
+            val firstException = results.firstNotNullOfOrNull { it.exceptionOrNull() }
+            Result.failure(firstException ?: Exception("Some subtasks failed to sync with server"))
+        }
+    }
+    private suspend fun tasklistsPendingSync(): Result<Unit> = coroutineScope {
+        val pendingEntities = dao.getPendingTaskLists().first()
+
+        val deferredResults: List<Deferred<Result<Unit>>> = pendingEntities.map { entity ->
+            async {
+                runCatching {
+                    when (entity.pendingAction) {
+                        PendingActions.DELETE -> {
+                            val response = api.deleteTaskList(entity.id)
+                            if (!response.isSuccessful) throw NetworkException.ServerException(
+                                response.code(),
+                                "Delete failed"
+                            )
+                            dao.deleteTasklist(entity)
+                        }
+
+                        PendingActions.UPDATE -> {
+                            val response =
+                                api.updateTaskList(entity.id, entity.toTaskListUpdateDto())
+                            if (!response.isSuccessful) throw NetworkException.ServerException(
+                                response.code(),
+                                "Update failed"
+                            )
+
+                            dao.updateTasklist(
+                                entity.markAsSynchronized(parseIsoDate(response.body()?.updated))
+                            )
+                        }
+
+                        PendingActions.INSERT -> {
+                            val response = api.createTaskList(entity.toTaskListDto())
+                            if (!response.isSuccessful) throw NetworkException.ServerException(
+                                response.code(),
+                                "Insert failed"
+                            )
+
+                            dao.insertTaskList(
+                                entity.markAsSynchronized(parseIsoDate(response.body()?.updated))
+                            )
+                        }
+
+                        PendingActions.NONE -> {}
+                    }
+                }
+            }
+        }
+
+        val results: List<Result<Unit>> = deferredResults.awaitAll()
+
+        if (results.all { it.isSuccess }) {
+            Result.success(Unit)
+        } else {
+            val firstException = results.firstNotNullOfOrNull { it.exceptionOrNull() }
+            Result.failure(firstException ?: Exception("Some tasklists failed to sync with server"))
         }
     }
 
     private suspend fun getTasksWithTaskListIds(
         remoteTaskLists: List<TaskListEntity>,
-    ): Result<List<Pair<String, List<TaskDto>>>> = try {
+    ): List<Pair<String, List<TaskDto>>> = coroutineScope {
+        val taskLists = remoteTaskLists.map { it.toTaskList() }
 
-        coroutineScope {
-            val taskLists = remoteTaskLists.map { it.toTaskList() }
+        val deferredResults = taskLists.map { taskList ->
+            async<Pair<String, List<TaskDto>>> {
+                val response = api.getTasks(
+                    taskListId = taskList.id,
+                )
 
-            val deferredResults = taskLists.map { taskList ->
-                async<Pair<String, List<TaskDto>>> {
-                    val response = api.getTasks(
-                        taskListId = taskList.id,
-                    )
-
-                    if (response.isSuccessful) {
-                        taskList.id to (response.body()?.items ?: emptyList())
-                    } else {
-                        handleErrorCode(response.code())
-                        throw Exception("API Error ${response.code()}: Failed to fetch tasks for list ${taskList.id}")
-                    }
+                if (response.isSuccessful) {
+                    taskList.id to (response.body()?.items ?: emptyList())
+                } else {
+                    throw Exception("API Error ${response.code()}: Failed to fetch tasks for list ${taskList.id}")
                 }
             }
-            val results = deferredResults.awaitAll()
-
-            Result.success(results)
         }
-
-    } catch (e: Exception) {
-        Result.failure(e)
+        return@coroutineScope deferredResults.awaitAll()
     }
 
 }

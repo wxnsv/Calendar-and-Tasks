@@ -2,9 +2,7 @@ package com.nikkap.calendar.app.ui.screens.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -15,8 +13,6 @@ import com.nikkap.calendar.domain.model.Subtask
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,13 +22,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ListViewModel(
     private val taskRepository: TaskRepository,
     private val calendarRepository: CalendarRepository,
     private val workManager: WorkManager
 ) : ViewModel() {
+
     private val _tasksFlow = flow {
         val tasks = taskRepository.getNonDeleteTasks()
         emit(tasks)
@@ -49,13 +45,10 @@ class ListViewModel(
         val birthdays = calendarRepository.getNonDeleteBirthdays()
         emit(birthdays)
     }
-
-    private val _isRefreshingFlow = workManager
-        .getWorkInfosForUniqueWorkFlow("OneTimeSyncWorker")
+    private val _workInfoFlow = workManager
+        .getWorkInfosForUniqueWorkFlow("ManualSyncWorker")
         .map { workInfoList ->
-            val workInfo = workInfoList.firstOrNull()
-
-            workInfo?.state == WorkInfo.State.RUNNING || workInfo?.state == WorkInfo.State.ENQUEUED
+            workInfoList.firstOrNull()
         }
     private val _state = MutableStateFlow(ListState())
     val state: StateFlow<ListState> = combine(
@@ -64,7 +57,7 @@ class ListViewModel(
         _eventsFlow,
         _birthdaysFlow,
         _subtasksFlow,
-        _isRefreshingFlow
+        _workInfoFlow,
     ) { arrayOfFlows ->
 
         val state = arrayOfFlows[0] as ListState
@@ -72,7 +65,8 @@ class ListViewModel(
         val events = arrayOfFlows[2] as List<Event>
         val birthdays = arrayOfFlows[3] as List<Birthday>
         val subtasks = arrayOfFlows[4] as List<Subtask>
-        val isRefreshing = arrayOfFlows[5] as Boolean
+        val workInfo = arrayOfFlows[5] as WorkInfo?
+
 
         val taskItems = tasks.filter { task -> !task.isCompleted }.map { ListItem.TaskItem(it) }
         val subtaskItems =
@@ -106,10 +100,12 @@ class ListViewModel(
                 mixedList.addAll(associatedSubtasks)
             }
         }
+        val isRefreshing =
+            workInfo?.state == WorkInfo.State.RUNNING || workInfo?.state == WorkInfo.State.ENQUEUED
 
         state.copy(
             items = mixedList,
-            isRefreshing = isRefreshing
+            isRefreshing = isRefreshing,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -118,25 +114,25 @@ class ListViewModel(
     )
 
     fun refreshData() {
-        viewModelScope.launch {
             _state.update { it.copy(isRefreshing = true) }
-            withContext(Dispatchers.IO) { syncAll() } // TODO 4/5
-        }
+        syncAll() // TODO 4/5
     }
 
-    private suspend fun syncAll() = coroutineScope {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
+    private fun syncAll() {
         val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
-            .setConstraints(constraints)
             .build()
-
         workManager.enqueueUniqueWork(
-            "OneTimeSyncWorker",
+            "ManualSyncWorker",
             ExistingWorkPolicy.KEEP,
             syncRequest
         )
+        viewModelScope.launch {
+            workManager.getWorkInfoByIdFlow(syncRequest.id).collect { workInfo ->
+                if (workInfo != null && workInfo.state == WorkInfo.State.FAILED) {
+                    val errorKey = workInfo.outputData.getString("SYNC_ERROR_MESSAGE")
+                    _state.update { it.copy(errorMessage = errorKey) }
+                }
+            }
+        }
     }
 }

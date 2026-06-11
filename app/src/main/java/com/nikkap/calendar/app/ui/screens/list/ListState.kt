@@ -5,5 +5,5 @@ data class ListState(
     val errorMessage: String? = null,
     val isLoading: Boolean = true,
     val isMenuExpanded: Boolean = false,
-    val isRefreshing: Boolean = false
+    val isRefreshing: Boolean = false,
 )

@@ -71,7 +71,7 @@ class ListFragment : Fragment(R.layout.list_fragment) {
                     }
                     adapter.submitList(state.items)
                     state.errorMessage?.let { message ->
-                        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                     }
                 }
             }

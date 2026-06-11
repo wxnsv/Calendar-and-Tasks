@@ -107,7 +107,7 @@ fun Long?.toUiDate(): String {
         .format(formatter)
 }
 
-private fun eventDateFormatter(isAllDay: Boolean, timeStamp: Long): Pair<String?, String?> {
+private fun calendarDateFormatter(isAllDay: Boolean, timeStamp: Long): Pair<String?, String?> {
     return if (isAllDay) Pair(
         null,
         timeStamp.toIsoDateAllDay()
@@ -123,8 +123,8 @@ fun eventDateFormatter(
     isAllDay: Boolean
 ): Pair<Pair<String?, String?>, Pair<String?, String?>> {
     if (!isAllDay) return Pair(
-        eventDateFormatter(false, startTimestamp),
-        eventDateFormatter(false, endTimestamp)
+        calendarDateFormatter(false, startTimestamp),
+        calendarDateFormatter(false, endTimestamp)
     )
     val startDate =
         Instant.ofEpochMilli(startTimestamp).atZone(ZoneId.of("UTC")).toLocalDate()
@@ -137,14 +137,31 @@ fun eventDateFormatter(
     } else returnEndDate = endDate
 
     return Pair(
-        eventDateFormatter(
+        calendarDateFormatter(
             true,
             startDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
         ),
-        eventDateFormatter(
+        calendarDateFormatter(
             true,
             returnEndDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
         )
+    )
+}
+
+fun birthdayDateFormatter(
+    startTimestamp: Long,
+): Pair<String?, String?> {
+    val startDate =
+        Instant.ofEpochMilli(startTimestamp).atZone(ZoneId.of("UTC")).toLocalDate()
+
+    val returnEndDate: LocalDate = startDate.plusDays(1)
+
+    return Pair(
+        startDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
+            .toIsoDateAllDay(),
+        returnEndDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli()
+            .toIsoDateAllDay()
+
     )
 }
 

@@ -1,13 +1,10 @@
 package com.nikkap.calendar.app.ui.screens.main
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.BackoffPolicy
-import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -145,12 +142,8 @@ class MainViewModel(
     private fun startActiveSync() {
         viewModelScope.launch {
             while (isActive) {
-                val constraints = Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
-
+                delay(3 * 60 * 1000L)
                 val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
-                    .setConstraints(constraints)
                     .build()
 
                 workManager.enqueueUniqueWork(
@@ -158,7 +151,6 @@ class MainViewModel(
                     ExistingWorkPolicy.KEEP,
                     syncRequest
                 )
-                delay(3 * 60 * 1000L)
             }
         }
     }
@@ -179,7 +171,7 @@ class MainViewModel(
         }
     }
 
-    fun authorizeSuccess(context: Context) {
+    fun authorizeSuccess() {
         viewModelScope.launch {
             userPrefRepository.completeFirstLaunch()
 
@@ -189,15 +181,10 @@ class MainViewModel(
                 )
             )
 
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-
             val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(
-                30, TimeUnit.MINUTES,
+                1, TimeUnit.HOURS,
                 5, TimeUnit.MINUTES
             ) // TODO
-                .setConstraints(constraints)
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
                     WorkRequest.MIN_BACKOFF_MILLIS,
@@ -274,12 +261,7 @@ class MainViewModel(
     }
 
     private fun syncData() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
         val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
-            .setConstraints(constraints)
             .build()
 
         workManager.enqueueUniqueWork(

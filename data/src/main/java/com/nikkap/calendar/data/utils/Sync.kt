@@ -3,12 +3,12 @@ package com.nikkap.calendar.data.utils
 import com.nikkap.calendar.data.local.entity.PendingActions
 import com.nikkap.calendar.data.local.entity.SyncableEntity
 
-suspend fun <T : SyncableEntity> syncEntities(
+suspend fun <T : SyncableEntity> localSyncEntities(
     remoteEntities: List<T>,
     getLocalEntities: suspend () -> List<T>,
     deleteEntitiesByIds: suspend (List<String>) -> Unit,
     insertEntities: suspend (List<T>) -> Unit
-): Result<Unit> {
+) {
 
     val localEntities = getLocalEntities()
     val localMap = localEntities.associateBy { it.id }
@@ -29,6 +29,4 @@ suspend fun <T : SyncableEntity> syncEntities(
     if (insertItems.isNotEmpty()) {
         insertEntities(insertItems)
     }
-
-    return Result.success(Unit)
 }
