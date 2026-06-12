@@ -22,6 +22,7 @@ import com.nikkap.calendar.data.remote.interceptor.ErrorInterceptor
 import com.nikkap.calendar.data.repository.CalendarRepositoryImpl
 import com.nikkap.calendar.data.repository.TaskRepositoryImpl
 import com.nikkap.calendar.data.repository.UserPreferencesRepository
+import com.nikkap.calendar.data.worker.SavePhotoWorker
 import com.nikkap.calendar.data.worker.SyncWorker
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
@@ -113,10 +114,11 @@ val appModule = module {
         WorkManager.getInstance(androidContext())
     }
     worker { SyncWorker(get(), get(), get(), get()) }
+    worker { SavePhotoWorker(get(), get(), get()) }
     single<TaskRepository> { TaskRepositoryImpl(get(), get(), get()) }
     single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get()) }
     viewModel { AuthViewModel(get(), get(), get()) }
-    viewModel { SplitViewModel(get(), get()) }
+    viewModel { SplitViewModel(get(), get(), get()) }
     viewModel { ListViewModel(get(), get(), get()) }
     viewModel { MainPagerViewModel(get()) }
     viewModelOf(::CreateViewModel)

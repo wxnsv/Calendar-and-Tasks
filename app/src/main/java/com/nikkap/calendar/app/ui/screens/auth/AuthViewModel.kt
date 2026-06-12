@@ -37,12 +37,6 @@ class AuthViewModel(
         }
     }
 
-    fun saveUserPhotoPath(path: String) {
-        viewModelScope.launch {
-            userPrefRepository.saveUserPhoto(path)
-        }
-    }
-
     fun onAuthIntentReady(
         intentSender: IntentSender,
         launcher: ActivityResultLauncher<IntentSenderRequest>

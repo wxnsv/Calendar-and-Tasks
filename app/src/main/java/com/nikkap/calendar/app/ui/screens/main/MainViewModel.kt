@@ -9,10 +9,12 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import androidx.work.workDataOf
 import com.nikkap.calendar.app.ui.navigation.NavEvent
 import com.nikkap.calendar.app.ui.navigation.NavigationTarget
 import com.nikkap.calendar.data.local.prefs.UserPrefs
 import com.nikkap.calendar.data.repository.UserPreferencesRepository
+import com.nikkap.calendar.data.worker.SavePhotoWorker
 import com.nikkap.calendar.data.worker.SyncWorker
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
@@ -171,7 +173,7 @@ class MainViewModel(
         }
     }
 
-    fun authorizeSuccess() {
+    fun authorizeSuccess(url: String) {
         viewModelScope.launch {
             userPrefRepository.completeFirstLaunch()
 
@@ -181,10 +183,10 @@ class MainViewModel(
                 )
             )
 
-            val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(
+            val periodicSyncRequest = PeriodicWorkRequestBuilder<SyncWorker>(
                 1, TimeUnit.HOURS,
                 5, TimeUnit.MINUTES
-            ) // TODO
+            )
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
                     WorkRequest.MIN_BACKOFF_MILLIS,
@@ -192,11 +194,17 @@ class MainViewModel(
                 )
                 .build()
 
+            val savePhotoRequest = OneTimeWorkRequestBuilder<SavePhotoWorker>()
+                .setInputData(workDataOf("PHOTO_URL" to url))
+                .build()
+            workManager.enqueue(savePhotoRequest)
             workManager.enqueueUniquePeriodicWork(
                 "AuthorizePeriodicSync",
                 ExistingPeriodicWorkPolicy.KEEP,
-                syncRequest
+                periodicSyncRequest
             )
+
+
         }
     }
 
