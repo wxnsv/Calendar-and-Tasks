@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -16,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kizitonwose.calendar.compose.CalendarState
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.OutDateStyle
@@ -74,18 +77,27 @@ fun Calendar(
     state: SplitState,
     onSelectedDateChanged: (LocalDate?) -> Unit
 ) {
+    lateinit var calendarState: CalendarState
     if (listOfItems.isEmpty()) return
-    val daysOfWeek = daysOfWeek(firstDayOfWeek = DayOfWeek.MONDAY)
+
     val currentMonth = remember { YearMonth.now() }
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     val coroutineScope = rememberCoroutineScope()
-    val calendarState = rememberCalendarState(
-        startMonth = currentMonth.minusMonths(36),
-        endMonth = currentMonth.plusMonths(24),
-        firstVisibleMonth = currentMonth,
-        firstDayOfWeek = DayOfWeek.MONDAY,
-        outDateStyle = OutDateStyle.EndOfGrid
-    )
+    val firstDay = if (state.isMondayFirst) DayOfWeek.MONDAY else DayOfWeek.SUNDAY
+
+    key(state.isMondayFirst) {
+        calendarState = rememberCalendarState(
+            startMonth = currentMonth.minusMonths(36),
+            endMonth = currentMonth.plusMonths(24),
+            firstVisibleMonth = currentMonth,
+            firstDayOfWeek = firstDay,
+            outDateStyle = OutDateStyle.EndOfGrid
+        )
+    }
+
+    val daysOfWeek = remember(firstDay) {
+        daysOfWeek(firstDayOfWeek = firstDay)
+    }
     val nearest = listOfItems.minByOrNull { item ->
         System.currentTimeMillis() - item.date
     }
@@ -141,7 +153,7 @@ fun Calendar(
     HorizontalCalendar(
         modifier = Modifier
             .wrapContentWidth()
-            .background(androidx.compose.material3.MaterialTheme.colorScheme.outline),
+            .background(MaterialTheme.colorScheme.outline),
         state = calendarState,
         monthHeader = {
             WeekDaysTitle(daysOfWeek = daysOfWeek)
@@ -162,7 +174,8 @@ fun Calendar(
                 colorsList = colorsByDayMap[day.date] ?: emptyList()
             )
         },
-        userScrollEnabled = false
+        userScrollEnabled = false,
+
 
     )
 

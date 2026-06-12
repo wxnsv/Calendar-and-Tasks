@@ -3,6 +3,12 @@ package com.nikkap.calendar.app.ui.screens.split
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nikkap.calendar.app.ui.screens.split.utils.SplitEntity
+import com.nikkap.calendar.data.local.prefs.UserPrefs
+import com.nikkap.calendar.data.repository.UserPreferencesRepository
+import com.nikkap.calendar.domain.model.Birthday
+import com.nikkap.calendar.domain.model.Event
+import com.nikkap.calendar.domain.model.Subtask
+import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +22,7 @@ import kotlinx.coroutines.flow.update
 class SplitViewModel(
     private val tasksRepository: TaskRepository,
     private val calendarRepository: CalendarRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(SplitState())
     private val _tasksFlow = flow {
@@ -34,17 +41,23 @@ class SplitViewModel(
         val birthdays = calendarRepository.getNonDeleteBirthdays()
         emit(birthdays)
     }
+    private val _userPrefsFlow = userPreferencesRepository.userStateFlow
     val state: StateFlow<SplitState> = combine(
         _state,
         _tasksFlow,
         _eventsFlow,
         _birthdaysFlow,
-        _subtasksFlow
-    ) { state,
-        tasks,
-        events,
-        birthdays,
-        subtasks ->
+        _subtasksFlow,
+        _userPrefsFlow
+    ) { arrayOfFlows ->
+
+        val state = arrayOfFlows[0] as SplitState
+        val tasks = arrayOfFlows[1] as List<Task>
+        val events = arrayOfFlows[2] as List<Event>
+        val birthdays = arrayOfFlows[3] as List<Birthday>
+        val subtasks = arrayOfFlows[4] as List<Subtask>
+        val userPrefs = arrayOfFlows[5] as UserPrefs
+
         val taskItems =
             tasks.filter { task -> !task.isCompleted && task.deadline != null && task.deadline != 0L }
                 .map { SplitEntity.TaskItem(it) }
@@ -74,7 +87,8 @@ class SplitViewModel(
         }
 
         state.copy(
-            items = mixedList
+            items = mixedList,
+            isMondayFirst = userPrefs.isMondayFirstDay
         )
     }.stateIn(
         scope = viewModelScope,

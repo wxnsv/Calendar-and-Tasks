@@ -6,5 +6,6 @@ import java.time.LocalDate
 data class SplitState(
     val items: List<SplitEntity> = emptyList(),
     val selectedDate: LocalDate? = null,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isMondayFirst: Boolean = true
 )
