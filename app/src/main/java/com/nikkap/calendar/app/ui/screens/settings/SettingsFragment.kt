@@ -151,7 +151,7 @@ class SettingsFragment : Fragment(R.layout.settings_fragment) {
         if (binding.settingsFirstWeekDayTV.text != firstDayOfWeek) {
             binding.settingsFirstWeekDayTV.text = firstDayOfWeek
         }
-        if (!state.userImagePath.isNullOrBlank() && state.isBlankPhoto) setupPhoto(state)
+        if (!state.userImagePath.isNullOrBlank()) setupPhoto(state)
     }
 
     private fun setupPhoto(state: SettingsState) {
@@ -160,6 +160,7 @@ class SettingsFragment : Fragment(R.layout.settings_fragment) {
             binding.settingsUserImage.load(photo) {
                 crossfade(true)
                 placeholder(R.drawable.avatar_placeholder)
+                error(R.drawable.avatar_placeholder)
                 listener(
                     onSuccess = { _, _ ->
                         startPostponedEnterTransition()
@@ -169,7 +170,6 @@ class SettingsFragment : Fragment(R.layout.settings_fragment) {
                     })
             }
         }
-        viewModel.onIntent(SettingsIntent.UpdateIsBlankPhoto(false))
     }
 
     private fun showSelectionDialog(

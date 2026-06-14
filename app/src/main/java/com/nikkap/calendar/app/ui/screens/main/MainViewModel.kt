@@ -66,13 +66,17 @@ class MainViewModel(
         val isMainReady = arrayOfFlows[4] as Boolean
         val isAuthReady = arrayOfFlows[5] as Boolean
 
-
         if (prefs != null && state.isLoading) {
             val isReady =
                 isMainReady && isListReady && isSplitReady && !prefs.isFirstLaunch || isAuthReady
             if (prefs.isFirstLaunch) setAuthorizeScreensReady()
-            setIsMainReadyTrue()
-            state.copy(userState = prefs, isScreensReady = isReady, isLoading = !isReady)
+            setIsMainReady()
+            state.copy(
+                userState = prefs,
+                isScreensReady = isReady,
+                isLoading = !isReady,
+                isPrefsLoaded = true
+            )
         } else state.copy(isScreensReady = false)
     }.stateIn(
         scope = viewModelScope,
@@ -96,11 +100,11 @@ class MainViewModel(
         _isSplitReady.value = true
     }
 
-    fun setIsMainReadyTrue() {
+    fun setIsMainReady() {
         _isMainReady.value = true
     }
 
-    fun setIsAuthReadyTrue() {
+    fun setIsAuthReady() {
         _isAuthReady.value = true
     }
 

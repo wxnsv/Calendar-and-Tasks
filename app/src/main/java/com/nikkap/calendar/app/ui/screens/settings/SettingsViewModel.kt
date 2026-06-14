@@ -76,10 +76,6 @@ class SettingsViewModel(
                     )
                 }
             }
-
-            is SettingsIntent.UpdateIsBlankPhoto -> _state.update {
-                it.copy(isBlankPhoto = intent.isBlank)
-            }
         }
     }
 }

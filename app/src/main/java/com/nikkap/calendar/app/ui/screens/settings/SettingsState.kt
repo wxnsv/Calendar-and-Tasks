@@ -6,6 +6,5 @@ data class SettingsState(
     val userEmail: String = "",
     val isMondayFirstDayOfWeek: Boolean? = null,
     val isLightTheme: Boolean? = null,
-    val isListStartScreen: Boolean? = null,
-    val isBlankPhoto: Boolean = true
+    val isListStartScreen: Boolean? = null
 )

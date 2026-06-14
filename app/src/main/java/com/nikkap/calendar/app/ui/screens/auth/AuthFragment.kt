@@ -64,7 +64,7 @@ class AuthFragment : Fragment() {
                     }
                 }
             )
-            sharedViewModel.setIsAuthReadyTrue()
+            sharedViewModel.setIsAuthReady()
         }
     }
 

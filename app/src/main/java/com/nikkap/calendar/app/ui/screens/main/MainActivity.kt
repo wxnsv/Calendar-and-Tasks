@@ -2,6 +2,7 @@ package com.nikkap.calendar.app.ui.screens.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -12,21 +13,34 @@ import androidx.navigation.navOptions
 import com.nikkap.calendar.app.R
 import com.nikkap.calendar.app.ui.navigation.NavEvent
 import com.nikkap.calendar.app.ui.navigation.NavigationTarget
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModel()
     private lateinit var navController: NavController
-    private var showSplash = true
     override fun onCreate(savedInstanceState: Bundle?) {
+        lifecycleScope.launch {
+            viewModel.state.first { it.isPrefsLoaded }
+            val userState = viewModel.state.value.userState
+            val currentTheme = if (userState.isSystemTheme) null else userState.isLightTheme
+            val targetMode = when (currentTheme) {
+                true -> AppCompatDelegate.MODE_NIGHT_NO
+                false -> AppCompatDelegate.MODE_NIGHT_YES
+                else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
+            if (AppCompatDelegate.getDefaultNightMode() != targetMode) {
+                AppCompatDelegate.setDefaultNightMode(targetMode)
+            }
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         observeNavigation()
         viewModel.checkAuthAndNavigate()
         observeState()
         installSplashScreen().setKeepOnScreenCondition {
-            showSplash
+            !viewModel.state.value.isScreensReady
         }
     }
 
@@ -36,7 +50,6 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.fragment_container) as NavHostFragment
         navController = navHostFragment.navController
         val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.navigationEvent.collect { event ->
@@ -106,9 +119,24 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect {
-                    if (it.isScreensReady) showSplash = false
+                    val userState = viewModel.state.value.userState
+                    updateTheme(
+                        if (userState.isSystemTheme) null
+                        else userState.isLightTheme
+                    )
                 }
             }
+        }
+    }
+
+    private fun updateTheme(isLight: Boolean?) {
+        val targetMode = when (isLight) {
+            true -> AppCompatDelegate.MODE_NIGHT_NO
+            false -> AppCompatDelegate.MODE_NIGHT_YES
+            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
+        if (AppCompatDelegate.getDefaultNightMode() != targetMode) {
+            AppCompatDelegate.setDefaultNightMode(targetMode)
         }
     }
 }
