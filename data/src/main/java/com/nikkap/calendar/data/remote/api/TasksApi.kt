@@ -39,11 +39,10 @@ interface TasksApi {
 
     @GET("tasks/v1/users/@me/lists")
     suspend fun getTaskLists(
-        @Query("showDeleted") showDeleted: Boolean = true,
         @Query("maxResults") maxResults: Int? = 100,
     ): Response<TaskListsResponse>
 
-    @GET("tasks/v1/users/@me/lists/{tasklistId}")
+    @GET("tasks/v1/lists/{tasklistId}")
     suspend fun getTasklist(
         @Path("tasklistId") tasklistId: String = "@default"
     ): Response<TaskListDto>
@@ -70,9 +69,10 @@ interface TasksApi {
         @Path("tasklist") taskListId: String
     ): Response<Unit>
 
-    @POST("lists/{tasklist}/tasks")
+    @POST("tasks/v1/lists/{tasklist}/tasks")
     suspend fun createSubtask(
         @Path("tasklist") taskListId: String,
+        @Query("parent") parentTaskId: String,
         @Body subtask: TaskUpdateDto
     ): Response<TaskUpdateDto>
 
@@ -83,10 +83,11 @@ interface TasksApi {
         @Body subtask: TaskUpdateDto
     ): Response<TaskUpdateDto>
 
-    @DELETE("lists/{tasklist}/tasks/{task}")
+    @DELETE("tasks/v1/lists/{tasklist}/tasks/{subtask}")
     suspend fun deleteSubtask(
         @Path("tasklist") taskListId: String,
-        @Path("task") subtaskId: String
+        @Query("parent") parentTaskId: String,
+        @Path("subtask") subtaskId: String
     ): Response<Unit>
 
 }

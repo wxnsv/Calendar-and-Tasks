@@ -45,7 +45,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeNavigation() {
-
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.fragment_container) as NavHostFragment
         navController = navHostFragment.navController

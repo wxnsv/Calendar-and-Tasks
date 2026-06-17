@@ -51,68 +51,34 @@ class CalendarRepositoryImpl(
 
     override suspend fun saveEvent(event: Event) {
         dao.insertEvent(event.toEventEntity().changePendingAction(PendingActions.INSERT))
-        val result = api.createEvent(
-            event = event.toEventUpdateDto(),
-        ).body()
-        if (result != null) {
-            dao.updateEvent(event.toEventEntity().markAsSynchronized(parseIsoDate(result.updated)))
-        }
     }
 
     override suspend fun updateBirthday(birthday: Birthday) {
         dao.updateBirthday(birthday.toBirthdayEntity().changePendingAction(PendingActions.UPDATE))
-        val result = api.updateBirthday(
-            birthday = birthday.toBirthdayDto(),
-            birthdayId = birthday.id!!
-        ).body()
-        if (result != null) dao.updateBirthday(
-            birthday.toBirthdayEntity().markAsSynchronized(parseIsoDate(result.updated))
-        )
     }
 
     override suspend fun updateEvent(event: Event) {
         dao.updateEvent(event.toEventEntity().changePendingAction(PendingActions.UPDATE))
-        val result = api.updateEvent(
-            event = event.toEventUpdateDto(),
-            eventId = event.id!!
-        ).body()
-        if (result != null) dao.updateEvent(
-            event.toEventEntity().markAsSynchronized(parseIsoDate(result.updated))
-        )
     }
 
     override suspend fun deleteEvent(id: String) {
         dao.markAsDeleteEvent(id, System.currentTimeMillis())
-        val result = api.deleteItem(
-            eventId = id
-        )
-        if (result.isSuccessful) dao.deleteEvent(id)
     }
 
     override suspend fun deleteBirthday(id: String) {
         dao.markAsDeleteBirthday(id, System.currentTimeMillis())
-        val result = api.deleteItem(
-            eventId = id
-        )
-        if (result.isSuccessful) dao.deleteBirthday(id)
     }
 
     override suspend fun saveBirthday(birthday: Birthday) {
         dao.insertBirthday(birthday.toBirthdayEntity().changePendingAction(PendingActions.INSERT))
-        val result = api.createBirthday(birthday.toBirthdayUpdateDto()).body()
-        if (result != null) dao.updateBirthday(
-            birthday.toBirthdayEntity().markAsSynchronized(parseIsoDate(result.updated))
-        )
     }
 
     override suspend fun syncCalendar(): Result<Unit> = try {
-        val timeMin = userPrefRepository.calendarTimeMin.first()
 
         coroutineScope {
             val eventsResult = async {
 
                 val responseEvents = api.getEvents(
-                    timeMin,
                     singleEvents = true,
                 )
 
@@ -139,9 +105,7 @@ class CalendarRepositoryImpl(
             }
             val birthdayResult = async {
 
-                val responseBirthdays = api.getBirthdays(
-                    timeMin,
-                )
+                val responseBirthdays = api.getBirthdays()
 
                 if (!responseBirthdays.isSuccessful) {
                     throw NetworkException.ServerException(

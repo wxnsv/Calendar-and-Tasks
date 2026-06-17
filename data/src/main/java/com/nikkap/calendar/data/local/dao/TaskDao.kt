@@ -42,6 +42,9 @@ interface TaskDao {
     @Query("DELETE FROM tasks WHERE id IN (:ids)")
     suspend fun deleteTasksByIds(ids: List<String>)
 
+    @Query("DELETE FROM tasks WHERE taskListId = :id")
+    suspend fun deleteTasksByTasklistId(id: String)
+
     @Query("SELECT * FROM tasks WHERE pendingAction != 'DELETE'")
     fun getNonDeleteTasks(): Flow<List<TaskEntity>>
 
@@ -53,6 +56,9 @@ interface TaskDao {
 
     @Query("UPDATE tasks SET pendingAction = 'DELETE', lastModified = :lastModified WHERE id = :id")
     suspend fun markAsDeleteTask(id: String, lastModified: Long)
+
+    @Query("UPDATE tasks SET taskListId = :newId WHERE taskListId = :oldId")
+    suspend fun updateTasksTasklistId(oldId: String, newId: String)
 
     /**
      * SUBTASKS
@@ -67,19 +73,25 @@ interface TaskDao {
     @Query("SELECT * from subtasks WHERE id = :id")
     suspend fun getSubtask(id: String): SubtaskEntity
 
-    @Query("SELECT * from subtasks")
+    @Query("SELECT * from subtasks ORDER BY position ASC")
     suspend fun getAllSubtasks(): List<SubtaskEntity>
 
     @Query("DELETE FROM subtasks WHERE id IN (:ids)")
     suspend fun deleteSubtasksByIds(ids: List<String>)
 
+    @Query("DELETE FROM subtasks WHERE taskListId = :id")
+    suspend fun deleteSubtasksByTasklistId(id: String)
+
     @Query("DELETE FROM subtasks WHERE parentId = :parentId")
     suspend fun deleteSubtasksOfTask(parentId: String)
 
-    @Query("SELECT * FROM subtasks WHERE pendingAction != 'DELETE'")
+    @Query("SELECT * FROM subtasks WHERE parentId = :parentId ORDER BY position ASC")
+    suspend fun getSubtasksByParentId(parentId: String): List<SubtaskEntity>
+
+    @Query("SELECT * FROM subtasks WHERE pendingAction != 'DELETE' ORDER BY position ASC")
     fun getNonDeleteSubtasks(): Flow<List<SubtaskEntity>>
 
-    @Query("SELECT * FROM subtasks WHERE pendingAction != 'NONE'")
+    @Query("SELECT * FROM subtasks WHERE pendingAction != 'NONE' ORDER BY position ASC ")
     fun getPendingSubtasks(): Flow<List<SubtaskEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -94,6 +106,9 @@ interface TaskDao {
     @Query("UPDATE subtasks SET isCompleted = 1, pendingAction = 'UPDATE', lastModified = :lastModified WHERE id = :subtaskId")
     suspend fun completeSubtask(subtaskId: String, lastModified: Long)
 
+    @Query("SELECT EXISTS(SELECT 1 FROM subtasks WHERE id = :id LIMIT 1)")
+    suspend fun isSubtaskExists(id: String): Boolean
+
     @Query("UPDATE subtasks SET pendingAction = 'DELETE', lastModified = :lastModified WHERE id = :id")
     suspend fun markAsDeleteSubtask(id: String, lastModified: Long)
 
@@ -102,6 +117,9 @@ interface TaskDao {
 
     @Query("UPDATE subtasks SET isCompleted = 1, lastModified = :lastModified WHERE parentId = :parentId")
     suspend fun markAsCompleteSubtasksOfTask(parentId: String, lastModified: Long)
+
+    @Query("UPDATE subtasks SET taskListId = :newId WHERE taskListId = :oldId")
+    suspend fun updateSubtasksTasklistId(oldId: String, newId: String)
 
     /**
      * TASKLISTS
@@ -120,6 +138,9 @@ interface TaskDao {
 
     @Delete
     suspend fun deleteTasklist(taskList: TaskListEntity)
+
+    @Query("DELETE from tasklist WHERE id = :id")
+    suspend fun deleteTasklistById(id: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTaskList(taskList: TaskListEntity)

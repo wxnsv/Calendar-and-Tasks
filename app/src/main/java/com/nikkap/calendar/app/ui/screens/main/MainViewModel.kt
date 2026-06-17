@@ -3,8 +3,10 @@ package com.nikkap.calendar.app.ui.screens.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.BackoffPolicy
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -186,7 +188,8 @@ class MainViewModel(
                     NavigationTarget.Pager
                 )
             )
-
+            val constraint =
+                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val periodicSyncRequest = PeriodicWorkRequestBuilder<SyncWorker>(
                 1, TimeUnit.HOURS,
                 5, TimeUnit.MINUTES
@@ -196,6 +199,7 @@ class MainViewModel(
                     WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
+                .setConstraints(constraint)
                 .build()
 
             val savePhotoRequest = OneTimeWorkRequestBuilder<SavePhotoWorker>()

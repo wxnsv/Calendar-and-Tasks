@@ -15,7 +15,7 @@ fun TaskDto.toSubtaskEntity(taskListId: String): SubtaskEntity {
         parentId = parent!!,
         position = position!!,
         isCompleted = isCompleted,
-        pendingAction = PendingActions.NONE,
+        pendingAction = if (deleted) PendingActions.DELETE else PendingActions.NONE,
         lastModified = parseIsoDate(updated, true),
         taskListId = taskListId,
         deadline = parseIsoDate(due)
@@ -68,7 +68,6 @@ fun SubtaskEntity.toTaskDto(): TaskDto {
         title = title,
         status = isCompletedString,
         parent = parentId,
-        position = position,
         due = null,
     )
 }
@@ -89,25 +88,11 @@ fun SubtaskEntity.changePendingAction(pendingAction: PendingActions): SubtaskEnt
     )
 }
 
-fun Subtask.toTaskUpdateDto(): TaskUpdateDto {
-    return TaskUpdateDto(
-        id = id,
-        title = if (title.isNullOrBlank()) null else title,
-        status = if (isCompleted) "completed" else "needsAction",
-        due = if (deadline != null && deadline != 0L) deadline.toIsoDate() else null,
-        parent = parentId,
-        position = position.ifBlank { null },
-    )
-}
-
 fun SubtaskEntity.toTaskUpdateDto(): TaskUpdateDto {
     return TaskUpdateDto(
-        id = id,
         title = if (title.isNullOrBlank()) null else title,
         status = if (isCompleted) "completed" else "needsAction",
         due = if (deadline != null && deadline != 0L) deadline.toIsoDate() else null,
-        parent = parentId,
-        position = position.ifBlank { null },
     )
 }
 
