@@ -15,33 +15,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
 class SplitViewModel(
-    private val tasksRepository: TaskRepository,
-    private val calendarRepository: CalendarRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    tasksRepository: TaskRepository,
+    calendarRepository: CalendarRepository,
+    userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
+
     private val _state = MutableStateFlow(SplitState())
-    private val _tasksFlow = flow {
-        val tasks = tasksRepository.getNonDeleteTasks()
-        emit(tasks)
-    }
-    private val _subtasksFlow = flow {
-        val subtasks = tasksRepository.getNonDeleteSubtasks()
-        emit(subtasks)
-    }
-    private val _eventsFlow = flow {
-        val events = calendarRepository.getNonDeleteEvents()
-        emit(events)
-    }
-    private val _birthdaysFlow = flow {
-        val birthdays = calendarRepository.getNonDeleteBirthdays()
-        emit(birthdays)
-    }
+    private val _tasksFlow = tasksRepository.getNonDeleteTasks()
+    private val _subtasksFlow = tasksRepository.getNonDeleteSubtasks()
+    private val _eventsFlow = calendarRepository.getNonDeleteEvents()
+    private val _birthdaysFlow = calendarRepository.getNonDeleteBirthdays()
     private val _userPrefsFlow = userPreferencesRepository.userStateFlow
+
     val state: StateFlow<SplitState> = combine(
         _state,
         _tasksFlow,

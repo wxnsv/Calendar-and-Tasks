@@ -21,7 +21,9 @@ import com.nikkap.calendar.domain.repository.CalendarRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class CalendarRepositoryImpl(
     private val api: CalendarApi,
@@ -29,15 +31,15 @@ class CalendarRepositoryImpl(
     private val userPrefRepository: UserPreferencesRepository
 ) : CalendarRepository {
 
-    override suspend fun getNonDeleteEvents(): List<Event> {
-        return dao.getNonDeleteEvents().first().map {
-            it.toEvent()
+    override fun getNonDeleteEvents(): Flow<List<Event>> {
+        return dao.getNonDeleteEvents().map {
+            it.map { it.toEvent() }
         }
     }
 
-    override suspend fun getNonDeleteBirthdays(): List<Birthday> {
-        return dao.getNonDeleteBirthdays().first().map {
-            it.toBirthday()
+    override fun getNonDeleteBirthdays(): Flow<List<Birthday>> {
+        return dao.getNonDeleteBirthdays().map {
+            it.map { it.toBirthday() }
         }
     }
 

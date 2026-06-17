@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -29,22 +28,10 @@ class ListViewModel(
     private val workManager: WorkManager
 ) : ViewModel() {
 
-    private val _tasksFlow = flow {
-        val tasks = taskRepository.getNonDeleteTasks()
-        emit(tasks)
-    }
-    private val _subtasksFlow = flow {
-        val subtasks = taskRepository.getNonDeleteSubtasks()
-        emit(subtasks)
-    }
-    private val _eventsFlow = flow {
-        val events = calendarRepository.getNonDeleteEvents()
-        emit(events)
-    }
-    private val _birthdaysFlow = flow {
-        val birthdays = calendarRepository.getNonDeleteBirthdays()
-        emit(birthdays)
-    }
+    private val _tasksFlow = taskRepository.getNonDeleteTasks()
+    private val _subtasksFlow = taskRepository.getNonDeleteSubtasks()
+    private val _eventsFlow = calendarRepository.getNonDeleteEvents()
+    private val _birthdaysFlow = calendarRepository.getNonDeleteBirthdays()
     private val _workInfoFlow = workManager
         .getWorkInfosForUniqueWorkFlow("ManualSyncWorker")
         .map { workInfoList ->

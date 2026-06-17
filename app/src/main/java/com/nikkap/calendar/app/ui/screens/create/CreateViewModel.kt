@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -32,10 +31,7 @@ class CreateViewModel(
     private val calendarRepository: CalendarRepository,
     private val userPrefRepository: UserPreferencesRepository
 ) : ViewModel() {
-    private val _taskListsFlow = flow {
-        val lists = taskRepository.getNonDeleteTaskLists()
-        emit(lists)
-    }
+    private val _taskListsFlow = taskRepository.getNonDeleteTaskLists()
     private val _state = MutableStateFlow(CreateState.initial())
     val state: StateFlow<CreateState> = combine(
         _state,

@@ -30,7 +30,9 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Collections.emptyList
 
@@ -50,21 +52,21 @@ class TaskRepositoryImpl(
         }
     }
 
-    override suspend fun getNonDeleteTasks(): List<Task> {
-        return dao.getNonDeleteTasks().first().map {
-            it.toTask()
+    override fun getNonDeleteTasks(): Flow<List<Task>> {
+        return dao.getNonDeleteTasks().map {
+            it.map { it.toTask() }
         }
     }
 
-    override suspend fun getNonDeleteTaskLists(): List<TaskList> {
-        return dao.getNonDeleteTaskLists().first().map {
-            it.toTaskList()
+    override fun getNonDeleteTaskLists(): Flow<List<TaskList>> {
+        return dao.getNonDeleteTaskLists().map {
+            it.map { it.toTaskList() }
         }
     }
 
-    override suspend fun getNonDeleteSubtasks(): List<Subtask> {
-        return dao.getNonDeleteSubtasks().first().map {
-            it.toSubtask()
+    override fun getNonDeleteSubtasks(): Flow<List<Subtask>> {
+        return dao.getNonDeleteSubtasks().map {
+            it.map { it.toSubtask() }
         }
     }
 
