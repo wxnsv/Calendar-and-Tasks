@@ -9,6 +9,7 @@ import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.CalendarEntry
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.EventStatus
+import com.nikkap.calendar.domain.model.Subtask
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.math.BigInteger
 import java.util.UUID
 
 class CreateViewModel(
@@ -40,7 +42,7 @@ class CreateViewModel(
         _taskListsFlow
     ) { state, taskLists ->
 
-    state.copy(
+        state.copy(
             taskLists = taskLists,
             selectedTaskList = state.selectedTaskList
                 ?: taskLists.find { it.id == state.taskDraft.taskListId }
@@ -80,11 +82,13 @@ class CreateViewModel(
                 when (intentEntry) {
                     is Task -> viewModelScope.launch {
                         val task = taskRepository.getTask(intent.id)
+                        val subtasks = taskRepository.getSubtasksByParentId(parentId = intent.id)
                         _state.update {
                             it.copy(
                                 taskDraft = task,
                                 title = task.title,
-                                isLoading = false
+                                isLoading = false,
+                                subtasks = subtasks
                             )
                         }
                     }
@@ -147,6 +151,12 @@ class CreateViewModel(
                         title = state.title,
                         taskListId = state.selectedTaskList!!.id
                     )
+                    val subtasksToSave = state.subtasks.map {
+                        it.copy(
+                            parentId = taskToSave.id!!,
+                            taskListId = taskToSave.taskListId
+                        )
+                    }
 
                     _state.update { it.copy(isLoading = true) }
                     if (!state.taskLists.contains(state.selectedTaskList))
@@ -155,8 +165,15 @@ class CreateViewModel(
                                 state.selectedTaskList
                             )
                         }
-                    if (state.isEditing) taskRepository.updateTask(taskToSave)
-                    else taskRepository.saveTask(taskToSave)
+                    if (state.isEditing) {
+                        taskRepository.updateTask(taskToSave)
+                        if (subtasksToSave.isNotEmpty()) taskRepository.updateSubtasks(
+                            subtasksToSave
+                        )
+                    } else {
+                        taskRepository.saveTask(taskToSave)
+                        if (subtasksToSave.isNotEmpty()) taskRepository.saveSubtasks(subtasksToSave)
+                    }
                     _state.update { it.copy(isLoading = false) }
                 }
             }
@@ -173,6 +190,66 @@ class CreateViewModel(
                         )
                     )
                 }
+            }
+
+            is CreateTaskIntent.AddSubtask -> {
+                _state.update {
+                    val maxSubtasksPosition = state.value.subtasks.maxOfOrNull { it.position }
+                    val newSubtaskPosition = if (!maxSubtasksPosition.isNullOrBlank()) {
+                        try {
+                            val bigNum = BigInteger(maxSubtasksPosition.trim())
+
+                            val nextNum = bigNum.add(BigInteger.ONE)
+
+                            nextNum.toString().padStart(maxSubtasksPosition.length, '0')
+                        } catch (e: Exception) {
+                            "00000000000000000000"
+                        }
+                    } else {
+                        "00000000000000000000"
+                    }
+                    val subtask = Subtask(
+                        id = UUID.randomUUID().toString().replace("-", ""),
+                        title = intent.title,
+                        position = newSubtaskPosition
+                    )
+                    it.copy(
+                        subtasks = it.subtasks + subtask
+                    )
+                }
+            }
+
+            is CreateTaskIntent.DeleteSubtask -> {
+                _state.update {
+                    val deleteSubtask = it.subtasks.first {
+                        it.id == intent.id
+                    }
+                    it.copy(
+                        subtasks = it.subtasks - deleteSubtask
+                    )
+                }
+            }
+
+            is CreateTaskIntent.UpdateCompleteSubtask -> _state.update {
+                val updatedList = it.subtasks.map { subtask ->
+                    if (subtask.id == intent.id) subtask.copy(isCompleted = intent.isCompleted) else subtask
+                }
+                it.copy(
+                    subtasks = updatedList
+                )
+            }
+
+            is CreateTaskIntent.UpdateTitleSubtask -> _state.update {
+                val subtasks = it.subtasks.toMutableList()
+                val oldSubtask = subtasks.filter {
+                    it.id == intent.id
+                }.first()
+                val updatedSubtask = oldSubtask.copy(title = intent.title)
+                val index = subtasks.indexOfFirst { it.id == intent.id }
+                subtasks[index] = updatedSubtask
+                it.copy(
+                    subtasks = subtasks
+                )
             }
         }
     }
@@ -290,7 +367,22 @@ class CreateViewModel(
         }
     }
 
-    fun saveItemResult(): Result<Unit> {
+    fun checkSubtaskBeforeSave(text: String): Result<Unit> {
+        if (text == "") {
+            viewModelScope.launch {
+                _errorEvents.send("Subtask title cannot be empty")
+            }
+            return Result.failure(Exception("Subtask title cannot be empty"))
+        }
+        if (text.length > 1024) {
+            viewModelScope.launch {
+                _errorEvents.send("Subtask title is too long")
+            }
+            return Result.failure(Exception("Subtask title is too long"))
+        } else return Result.success(Unit)
+    }
+
+    fun checkItemAndSave(): Result<Unit> {
         val state = state.value
         when (state.activeType) {
             "TASK" -> {

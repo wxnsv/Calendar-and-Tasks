@@ -5,6 +5,7 @@ import com.nikkap.calendar.core.utils.toOnlyDateLong
 import com.nikkap.calendar.core.utils.toTimeLong
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.Event
+import com.nikkap.calendar.domain.model.Subtask
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.model.TaskList
 
@@ -15,6 +16,8 @@ data class CreateState(
     val taskDraft: Task = Task(),
     val eventDraft: Event = Event(),
     val birthdayDraft: Birthday = Birthday(),
+
+    val subtasks: List<Subtask> = emptyList(),
 
     val isLoading: Boolean = false,
     val isEditing: Boolean = false,

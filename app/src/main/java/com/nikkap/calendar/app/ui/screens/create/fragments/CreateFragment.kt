@@ -113,7 +113,7 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
             sharedViewModel.popBackStack()
         }
         binding.createSaveButton.setOnClickListener {
-            val result = viewModel.saveItemResult()
+            val result = viewModel.checkItemAndSave()
 
             if (result.isSuccess) sharedViewModel.popBackStack()
         }

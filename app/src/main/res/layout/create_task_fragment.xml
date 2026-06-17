@@ -39,10 +39,10 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/create_task_set_list_button"
         style="@style/Button"
-        android:textColor="?attr/colorOnSurfaceVariant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/my_tasks"
+        android:textColor="?attr/colorOnSurfaceVariant"
         app:layout_constraintTop_toBottomOf="@+id/create_task_description_edit_text" />
 
     <View
@@ -50,5 +50,59 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/create_task_set_list_button" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/create_task_subtasks_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/inter_regular"
+        android:text="@string/subtasks"
+        android:textColor="?attr/colorOnSurface"
+        app:layout_constraintTop_toBottomOf="@+id/create_task_set_list_button" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/create_task_subtasks_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/create_task_subtasks_tv" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@+id/create_task_subtasks_rv">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/create_task_add_subtask_et"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:hint="Write a new subtask"
+            android:layout_weight="1"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:imeOptions="actionSend"
+            app:layout_constraintEnd_toStartOf="@+id/create_task_add_subtask_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/create_task_subtasks_rv" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/create_task_add_subtask_btn"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            style="@style/Widget.Material3.Button.IconButton"
+            app:icon="@drawable/send"
+            app:iconSize="30dp"
+            android:padding="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/create_task_subtasks_rv" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

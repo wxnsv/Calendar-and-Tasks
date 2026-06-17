@@ -73,7 +73,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
         val itemType: TextView = view.findViewById(R.id.list_item_type_tv)
         val itemIcon: ImageView = view.findViewById(R.id.list_item_type_icon)
         val itemTime: TextView = view.findViewById(R.id.item_timestamp)
-        val itemCheckBox: CheckBox = view.findViewById(R.id.checkBox)
+        val itemCheckBox: CheckBox = view.findViewById(R.id.list_item_checkbox)
 
 
         fun bind(task: Task, onClick: () -> Unit) {

@@ -19,7 +19,7 @@
         android:paddingHorizontal="10dp">
 
         <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/checkBox"
+            android:id="@+id/list_item_checkbox"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -39,7 +39,7 @@
             android:text="@string/item_text_sample"
             android:textColor="?attr/colorOnSurface"
             android:textSize="15sp"
-            app:layout_constraintStart_toEndOf="@+id/checkBox"
+            app:layout_constraintStart_toEndOf="@+id/list_item_checkbox"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -51,7 +51,7 @@
             android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/checkBox"
+            app:layout_constraintStart_toEndOf="@+id/list_item_checkbox"
             app:layout_constraintTop_toBottomOf="@+id/itemText" />
 
         <TextView

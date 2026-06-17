@@ -1,9 +1,11 @@
 package com.nikkap.calendar.app.ui.screens.create.fragments
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ListPopupWindow
@@ -14,12 +16,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.nikkap.calendar.app.R
 import com.nikkap.calendar.app.databinding.CreateTaskFragmentBinding
 import com.nikkap.calendar.app.ui.screens.create.CreateState
 import com.nikkap.calendar.app.ui.screens.create.CreateTaskIntent
 import com.nikkap.calendar.app.ui.screens.create.CreateViewModel
+import com.nikkap.calendar.app.ui.screens.create.subtask.SubtaskAdapter
+import com.nikkap.calendar.app.ui.screens.create.subtask.SubtasksAnimator
 import com.nikkap.calendar.app.ui.utils.showDatePicker
 import com.nikkap.calendar.core.utils.toShortUiDate
 import com.nikkap.calendar.domain.model.TaskList
@@ -44,8 +49,34 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeState()
+        val adapter = SubtaskAdapter(
+            onDeleteClick = { subtask ->
+                viewModel.onTaskIntent(
+                    CreateTaskIntent.DeleteSubtask(
+                        subtask.id
+                    )
+                )
+            },
+            onCheckedChange = { subtask, isChecked ->
+                viewModel.onTaskIntent(
+                    CreateTaskIntent.UpdateCompleteSubtask(
+                        subtask.id,
+                        isChecked
+                    )
+                )
+            },
+            onChangeTitle = { subtask ->
+                viewModel.onTaskIntent(
+                    CreateTaskIntent.UpdateTitleSubtask(
+                        subtask.id,
+                        subtask.title!!
+                    )
+                )
+            }
+        )
+        observeState(adapter)
         setupListeners()
+        binding.createTaskSubtasksRv.adapter = adapter
     }
 
     private fun setupListeners() {
@@ -68,14 +99,49 @@ class CreateTaskFragment : Fragment(R.layout.create_task_fragment) {
                 showTaskListMenu(view, state.taskLists)
             }
         }
+        binding.createTaskAddSubtaskBtn.setOnClickListener {
+            val text = binding.createTaskAddSubtaskEt.text.toString().trim()
+            if (viewModel.checkSubtaskBeforeSave(text).isSuccess) {
+                viewModel.onTaskIntent(CreateTaskIntent.AddSubtask(text))
+                binding.createTaskAddSubtaskEt.text?.clear()
+            }
+        }
+        binding.createTaskSubtasksRv.layoutManager = LinearLayoutManager(requireContext())
+        binding.createTaskSubtasksRv.itemAnimator = SubtasksAnimator()
+        binding.createTaskAddSubtaskEt.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                val text = binding.createTaskAddSubtaskEt.text.toString().trim()
+
+                if (viewModel.checkSubtaskBeforeSave(text).isSuccess) {
+                    viewModel.onTaskIntent(CreateTaskIntent.AddSubtask(text))
+                    binding.createTaskAddSubtaskEt.text?.clear()
+                }
+
+                true
+            } else {
+                false
+            }
+        }
+        binding.createTaskAddSubtaskEt.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                val text = binding.createTaskAddSubtaskEt.text.toString().trim()
+
+                if (viewModel.checkSubtaskBeforeSave(text).isSuccess) {
+                    viewModel.onTaskIntent(CreateTaskIntent.AddSubtask(text))
+                    binding.createTaskAddSubtaskEt.text?.clear()
+                }
+                true
+            } else false
+        }
     }
 
 
-    private fun observeState() {
+    private fun observeState(adapter: SubtaskAdapter) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect { state ->
                     updateUi(state)
+                    adapter.submitList(state.subtasks)
                 }
             }
         }

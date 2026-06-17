@@ -16,6 +16,10 @@ sealed interface CreateTaskIntent {
     data class UpdateRepeat(val repeat: String) : CreateTaskIntent
     data class UpdateDeadline(val deadline: Long) : CreateTaskIntent
     object SaveTask : CreateTaskIntent
+    data class DeleteSubtask(val id: String) : CreateTaskIntent
+    data class UpdateCompleteSubtask(val id: String, val isCompleted: Boolean) : CreateTaskIntent
+    data class UpdateTitleSubtask(val id: String, val title: String) : CreateTaskIntent
+    data class AddSubtask(val title: String) : CreateTaskIntent
 }
 
 sealed interface CreateEventIntent {

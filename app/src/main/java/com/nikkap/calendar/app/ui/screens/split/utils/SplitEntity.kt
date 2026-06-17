@@ -28,7 +28,7 @@ sealed class SplitEntity {
 
     data class SubtaskItem(val subtask: Subtask, val deadline: Long? = null) : SplitEntity() {
         override val id: String = subtask.id
-        override val date: Long = deadline ?: subtask.deadline!!
+        override val date: Long = deadline ?: subtask.deadline ?: 0L
         override val title: String = subtask.title ?: "(No title)"
         override val colorHex: String = ""
     }
