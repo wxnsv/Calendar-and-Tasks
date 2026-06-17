@@ -45,8 +45,8 @@
         android:layout_marginHorizontal="40dp"
         android:layout_marginTop="70dp"
         android:backgroundTint="?attr/colorSurface"
-        android:textColorHint="?attr/colorOnSurfaceVariant"
         android:textColor="?attr/colorOnSurface"
+        android:textColorHint="?attr/colorOnSurfaceVariant"
         android:textSize="30sp"
         app:counterEnabled="true"
         app:counterMaxLength="1024"
@@ -54,42 +54,80 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <Button
-        android:id="@+id/create_event_button"
-        android:layout_width="wrap_content"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/create_card_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/event"
-        app:layout_constraintEnd_toStartOf="@+id/create_task_button"
-        app:layout_constraintTop_toBottomOf="@+id/create_edit_text" />
-
-
-    <Button
-        android:id="@+id/create_task_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/task"
+        android:layout_marginHorizontal="30dp"
+        app:strokeColor="?attr/colorOutline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_edit_text" />
+        app:cardCornerRadius="35dp"
+        app:layout_constraintTop_toBottomOf="@+id/create_edit_text">
 
-    <Button
-        android:id="@+id/create_birthday_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="@string/birthday"
-        app:layout_constraintStart_toEndOf="@+id/create_task_button"
-        app:layout_constraintTop_toBottomOf="@+id/create_edit_text" />
+        <LinearLayout
+            android:background="?attr/colorSurfaceContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/create_event_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                app:iconPadding="0dp"
+                app:iconSize="28dp"
+                android:textColor="?attr/colorPrimary"
+                app:iconGravity="top"
+                app:icon="@drawable/event"
+                app:iconTint="?attr/colorPrimary"
+
+                android:text="@string/event" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/create_task_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                app:iconPadding="0dp"
+                app:iconSize="28dp"
+                android:textColor="?attr/colorPrimary"
+                app:iconGravity="top"
+                app:icon="@drawable/task"
+                app:iconTint="?attr/colorPrimary"
+
+                android:text="@string/task"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/create_birthday_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                app:iconPadding="0dp"
+                app:iconSize="28dp"
+                android:textColor="?attr/colorPrimary"
+                app:iconGravity="top"
+                app:icon="@drawable/event"
+                app:iconTint="?attr/colorPrimary"
+
+                android:text="@string/birthday" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
 
     <View
         android:id="@+id/view"
         style="@style/Divider"
+        android:layout_marginTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/create_task_button" />
+        app:layout_constraintTop_toBottomOf="@id/create_card_view" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/create_fcv"

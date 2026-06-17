@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -15,6 +14,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.button.MaterialButton
 import com.nikkap.calendar.app.R
 import com.nikkap.calendar.app.databinding.CreateFragmentBinding
 import com.nikkap.calendar.app.ui.screens.create.CreateIntent
@@ -67,6 +67,7 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
     }
 
     private fun updateNestedFragment(item: CalendarEntry) {
+        val activeType = viewModel.state.value.activeType
         val fragment = when (item) {
             is Task -> {
                 binding.createEditText.hint = "Add title"
@@ -98,12 +99,15 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
 
     private fun setupListeners() {
         binding.createTaskButton.setOnClickListener {
+            if (viewModel.state.value.activeType != "TASK")
             updateNestedFragment(viewModel.state.value.taskDraft)
         }
         binding.createEventButton.setOnClickListener {
+            if (viewModel.state.value.activeType != "EVENT")
             updateNestedFragment(viewModel.state.value.eventDraft)
         }
         binding.createBirthdayButton.setOnClickListener {
+            if (viewModel.state.value.activeType != "BIRTHDAY")
             updateNestedFragment(viewModel.state.value.birthdayDraft)
         }
         binding.createEditText.doAfterTextChanged {
@@ -129,20 +133,63 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
         }
     }
 
-    private fun doInactive(button: Button) {
+    private fun doButtonInactive(button: MaterialButton) {
         button.isEnabled = false
-        button.backgroundTintList =
+        button.setTextColor(
             ColorStateList.valueOf(
                 requireContext().getColorFromAttr(
-                    com.google.android.material.R.attr.colorSurfaceVariant
+                    com.google.android.material.R.attr.colorOutlineVariant
                 )
             )
-        button.foregroundTintList = ColorStateList.valueOf(
+        )
+        button.iconTint = ColorStateList.valueOf(
             requireContext().getColorFromAttr(
-                com.google.android.material.R.attr.colorOnSurfaceVariant
+                com.google.android.material.R.attr.colorOutlineVariant
+            )
+        )
+        button.backgroundTintList = ColorStateList.valueOf(
+            requireContext().getColor(R.color.trans)
+        )
+    }
+
+    private fun doButtonFocused(button: MaterialButton) {
+        button.setTextColor(
+            ColorStateList.valueOf(
+                requireContext().getColorFromAttr(
+                    com.google.android.material.R.attr.colorOnPrimary
+                )
+            )
+        )
+        button.iconTint = ColorStateList.valueOf(
+            requireContext().getColorFromAttr(
+                com.google.android.material.R.attr.colorOnPrimary
+            )
+        )
+        button.backgroundTintList = ColorStateList.valueOf(
+            requireContext().getColorFromAttr(
+                androidx.appcompat.R.attr.colorPrimary
             )
         )
     }
+
+    private fun doButtonUnFocused(button: MaterialButton) {
+        button.setTextColor(
+            ColorStateList.valueOf(
+                requireContext().getColorFromAttr(
+                    com.google.android.material.R.attr.colorOnSecondaryContainer
+                )
+            )
+        )
+        button.iconTint = ColorStateList.valueOf(
+            requireContext().getColorFromAttr(
+                com.google.android.material.R.attr.colorOnSecondaryContainer
+            )
+        )
+        button.backgroundTintList = ColorStateList.valueOf(
+            requireContext().getColor(R.color.trans)
+        )
+    }
+
 
     private fun initial() {
         viewModel.onIntent(CreateIntent.UpdateShowFragment(args.type))
@@ -155,14 +202,29 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
             "EVENT" -> updateNestedFragment(viewModel.state.value.eventDraft)
             "BIRTHDAY" -> updateNestedFragment(viewModel.state.value.birthdayDraft)
         }
-        if (itemId.isNotEmpty() && createType != "TASK") doInactive(binding.createTaskButton)
-        if (itemId.isNotEmpty() && createType != "EVENT") doInactive(binding.createEventButton)
-        if (itemId.isNotEmpty() && createType != "BIRTHDAY") doInactive(binding.createBirthdayButton)
+        if (itemId.isNotEmpty() && createType != "TASK") doButtonInactive(binding.createTaskButton)
+        if (itemId.isNotEmpty() && createType != "EVENT") doButtonInactive(binding.createEventButton)
+        if (itemId.isNotEmpty() && createType != "BIRTHDAY") doButtonInactive(binding.createBirthdayButton)
     }
 
     private fun updateUi(state: CreateState) {
         if (binding.createEditText.text.toString() != state.title) {
             binding.createEditText.setText(state.title)
         }
+        if (state.activeType != "TASK" && !state.isEditing) {
+            doButtonUnFocused(binding.createTaskButton)
+        } else if (!state.isEditing || state.activeType == "TASK") {
+            doButtonFocused(binding.createTaskButton)
+        } else doButtonInactive(binding.createTaskButton)
+        if (state.activeType != "EVENT" && !state.isEditing) {
+            doButtonUnFocused(binding.createEventButton)
+        } else if (!state.isEditing || state.activeType == "EVENT") {
+            doButtonFocused(binding.createEventButton)
+        } else doButtonInactive(binding.createEventButton)
+        if (state.activeType != "BIRTHDAY" && !state.isEditing) {
+            doButtonUnFocused(binding.createBirthdayButton)
+        } else if (!state.isEditing || state.activeType == "BIRTHDAY") {
+            doButtonFocused(binding.createBirthdayButton)
+        } else doButtonInactive(binding.createBirthdayButton)
     }
 }
