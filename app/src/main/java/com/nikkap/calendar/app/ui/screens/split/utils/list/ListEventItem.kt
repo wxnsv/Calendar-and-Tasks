@@ -63,7 +63,7 @@ fun ListEventItem(
             if (item.event.description?.isBlank() == false) {
                 Text(
                     item.event.description!!,
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     modifier = Modifier
                         .weight(7f)
                         .fillMaxWidth()

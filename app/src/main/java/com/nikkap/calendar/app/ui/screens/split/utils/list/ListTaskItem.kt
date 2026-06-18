@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -72,8 +71,10 @@ fun ListTaskItem(
             Text(
                 item.title,
                 fontSize = 16.sp,
-                modifier = Modifier.weight(1f),
-                maxLines = 3,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 5.dp),
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Normal
@@ -96,7 +97,6 @@ fun ListTaskItem(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    autoSize = TextAutoSize.StepBased(minFontSize = 15.sp, maxFontSize = 20.sp),
                     fontWeight = FontWeight.Normal
                 )
             }

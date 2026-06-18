@@ -26,6 +26,7 @@ import com.nikkap.calendar.app.R
 
 @Composable
 fun DropDownMenu(
+    isSubtask: Boolean = false,
     completable: Boolean = false,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -46,19 +47,21 @@ fun DropDownMenu(
             onDismissRequest = { expanded = false },
             modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
-            DropdownMenuItem(
-                text = {
-                    Text(
-                        "Edit",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Normal
-                    )
-                },
-                onClick = {
-                    expanded = false
-                    onEditClick()
-                },
-            )
+            if (!isSubtask) {
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            "Edit",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Normal
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        onEditClick()
+                    },
+                )
+            }
             DropdownMenuItem(
                 text = {
                     Text(

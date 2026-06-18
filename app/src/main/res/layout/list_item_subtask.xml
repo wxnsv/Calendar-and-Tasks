@@ -10,8 +10,8 @@
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/list_subtask_checkbox"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="50dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:button="@drawable/checkbox_round_selector"

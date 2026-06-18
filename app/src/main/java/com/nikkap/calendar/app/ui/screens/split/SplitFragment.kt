@@ -56,6 +56,7 @@ class SplitFragment : Fragment() {
                 HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                 List(
                     state.items,
+                    itemsWithoutDateList = state.itemsWithoutDate,
                     onEditClick = { id, type ->
                         sharedViewModel.onEditListItemClicked(id, type)
                     },

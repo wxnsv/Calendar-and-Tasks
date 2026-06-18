@@ -33,7 +33,9 @@ fun ListSubtaskItem(
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        Row {
+        Row(
+            Modifier.padding(start = 40.dp)
+        ) {
             Text(
                 subtask.title ?: "No title",
                 fontSize = 16.sp,
@@ -45,6 +47,7 @@ fun ListSubtaskItem(
                 fontWeight = FontWeight.Normal
             )
             DropDownMenu(
+                true,
                 completable = true,
                 onEditClick = onEditClick,
                 onDeleteClick = onDeleteClick,

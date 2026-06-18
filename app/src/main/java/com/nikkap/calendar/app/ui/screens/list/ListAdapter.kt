@@ -20,7 +20,10 @@ import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.Subtask
 import com.nikkap.calendar.domain.model.Task
 
-class ListAdapter(private val onItemClick: (String, String) -> Unit) :
+class ListAdapter(
+    private val onItemClick: (String, String) -> Unit,
+    private val onTaskComplete: (String, String) -> Unit
+) :
     ListAdapter<ListItem, RecyclerView.ViewHolder>(ListDiffCallback()) {
 
     companion object {
@@ -76,7 +79,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
         val itemCheckBox: CheckBox = view.findViewById(R.id.list_item_checkbox)
 
 
-        fun bind(task: Task, onClick: () -> Unit) {
+        fun bind(task: Task, onClick: () -> Unit, onTaskComplete: () -> Unit) {
             itemTime.text = task.deadline?.toListUiDate() ?: ""
             title.text = task.title
             itemType.text = "Task"
@@ -88,6 +91,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
             itemView.setOnClickListener {
                 onClick()
             }
+            itemCheckBox.setOnClickListener { onTaskComplete() }
         }
     }
 
@@ -97,6 +101,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
         val eventTime: TextView = view.findViewById(R.id.item_timestamp)
         val itemType: TextView = view.findViewById(R.id.list_item_type_tv)
         val itemIcon: ImageView = view.findViewById(R.id.list_item_type_icon)
+        val itemCheckBox: CheckBox = view.findViewById(R.id.list_item_checkbox)
 
         fun bind(event: Event, onClick: () -> Unit) {
             val color = CalendarColors.getBirthdayColor(event.colorId).hex.toColorInt()
@@ -108,6 +113,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
                 onClick()
             }
             itemIcon.imageTintList = ColorStateList.valueOf(color)
+            itemCheckBox.visibility = View.GONE
         }
     }
 
@@ -116,6 +122,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
         val birthdayDate: TextView = view.findViewById(R.id.item_timestamp)
         val itemType: TextView = view.findViewById(R.id.list_item_type_tv)
         val itemIcon: ImageView = view.findViewById(R.id.list_item_type_icon)
+        val itemCheckBox: CheckBox = view.findViewById(R.id.list_item_checkbox)
 
         fun bind(birthday: Birthday, onClick: () -> Unit) {
             val color = CalendarColors.getBirthdayColor(birthday.colorId).hex.toColorInt()
@@ -127,15 +134,17 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
                 onClick()
             }
             itemIcon.imageTintList = ColorStateList.valueOf(color)
+            itemCheckBox.visibility = View.GONE
         }
     }
 
     class SubtaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val subtaskTitle: TextView = view.findViewById(R.id.list_subtask_title)
-        fun bind(subtask: Subtask, onClick: () -> Unit) {
+        val itemCheckBox: CheckBox = view.findViewById(R.id.list_subtask_checkbox)
+        fun bind(subtask: Subtask, onSubtaskComplete: () -> Unit) {
             subtaskTitle.text = subtask.title
-            itemView.setOnClickListener {
-                onClick()
+            itemCheckBox.setOnClickListener {
+                onSubtaskComplete()
             }
         }
     }
@@ -145,7 +154,7 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
             is ListItem.TaskItem -> {
                 (holder as TaskViewHolder).bind(item.task, onClick = {
                     onItemClick(item.task.id!!, "TASK")
-                })
+                }, { onTaskComplete(item.task.id!!, "TASK") })
             }
 
             is ListItem.EventItem -> {
@@ -161,9 +170,9 @@ class ListAdapter(private val onItemClick: (String, String) -> Unit) :
             }
 
             is ListItem.SubtaskItem -> {
-                (holder as SubtaskViewHolder).bind(item.subtask, onClick = {
-                    onItemClick(item.subtask.id, "BIRTHDAY")
-                })
+                (holder as SubtaskViewHolder).bind(
+                    item.subtask,
+                    { onTaskComplete(item.subtask.id, "SUBTASK") })
             }
         }
     }

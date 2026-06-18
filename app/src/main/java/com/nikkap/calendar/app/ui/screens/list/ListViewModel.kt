@@ -122,4 +122,15 @@ class ListViewModel(
             }
         }
     }
+
+    fun completeTask(id: String, type: String) {
+        viewModelScope.launch {
+            when (type) {
+                "TASK" -> taskRepository.completeTask(id)
+                "SUBTASK" -> taskRepository.completeSubtask(id)
+                else -> {}
+            }
+
+        }
+    }
 }

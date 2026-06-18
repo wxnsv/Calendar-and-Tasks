@@ -40,7 +40,9 @@ class ListFragment : Fragment(R.layout.list_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = ListAdapter { id, type -> sharedViewModel.onEditListItemClicked(id, type) }
+        val adapter = ListAdapter(
+            { id, type -> sharedViewModel.onEditListItemClicked(id, type) },
+            { id, type -> viewModel.completeTask(id, type) })
         setupRecyclerView(adapter)
         setupListeners()
         observeState(adapter)

@@ -1,12 +1,16 @@
 package com.nikkap.calendar.app.ui.screens.split.utils.list
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +26,7 @@ import com.nikkap.calendar.core.utils.toLocalDate
 @Composable
 fun List(
     itemsList: List<SplitEntity>,
+    itemsWithoutDateList: List<SplitEntity>,
     onEditClick: (String, String) -> Unit,
     onDeleteClick: (String, String) -> Unit,
     listState: LazyListState,
@@ -47,6 +52,44 @@ fun List(
                 )
             }
         }
+        if (itemsWithoutDateList.isNotEmpty()) {
+            stickyHeader {
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                            .height(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Tasks without date",
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                }
+            }
+            items(itemsWithoutDateList) { task ->
+                if (task is SplitEntity.TaskItem) {
+                    val subtasks = itemsWithoutDateList.mapNotNull {
+                        if (it is SplitEntity.SubtaskItem) {
+                            if (it.subtask.parentId == task.id) it.subtask else null
+                        } else null
+                    }
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                    ListTaskItem(
+                        item = task,
+                        onEditClick = onEditClick,
+                        onDeleteClick = onDeleteClick,
+                        onCompleteClick = onCompleteClick,
+                        subtasks = subtasks
+                    )
+                }
+            }
+        }
         item {
             Box(
                 modifier = Modifier
@@ -58,8 +101,10 @@ fun List(
                     text = "That end of list",
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 40.dp),
-                    fontWeight = FontWeight.Normal
+                    modifier = Modifier
+                        .background(color = MaterialTheme.colorScheme.background)
+                        .padding(top = 40.dp),
+                    fontWeight = FontWeight.Medium
                 )
             }
         }

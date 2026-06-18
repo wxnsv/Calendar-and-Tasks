@@ -52,10 +52,10 @@ class SplitViewModel(
                 .map { SplitEntity.TaskItem(it) }
         val subtaskItems =
             subtasks.map { subtask ->
-                val tasks1 = tasks.filter { it.deadline != null && it.deadline != 0L }
+                val tasks = tasks.filter { it.deadline != null && it.deadline != 0L }
                 SplitEntity.SubtaskItem(
                     subtask,
-                    deadline = tasks1.find { it.id == subtask.parentId }?.deadline
+                    deadline = tasks.find { it.id == subtask.parentId }?.deadline
                 )
             }.filter { subtask -> !subtask.subtask.isCompleted && subtask.deadline != null }
         val eventItems = events.map { SplitEntity.EventItem(it) }
@@ -63,7 +63,8 @@ class SplitViewModel(
 
         /** Mixes taskItems and calendarItems into a single list **/
 
-        val mixedList = (taskItems + eventItems + birthdayItems + subtaskItems).sortedBy { item ->
+        val mixedListWithDate =
+            (taskItems + eventItems + birthdayItems + subtaskItems).sortedBy { item ->
             when (item) {
                 is SplitEntity.TaskItem -> item.task.title
                 is SplitEntity.EventItem -> item.event.summary
@@ -75,8 +76,38 @@ class SplitViewModel(
             }
         }
 
+        val taskItemsWithoutDate =
+            tasks.filter { task -> !task.isCompleted && task.deadline == null || !task.isCompleted && task.deadline == 0L }
+                .map { task ->
+                    val taskWithDate = task.copy(deadline = 0L)
+                    SplitEntity.TaskItem(taskWithDate)
+                }
+        val subtaskItemsWithoutDate =
+            subtasks.map { subtask ->
+                SplitEntity.SubtaskItem(
+                    subtask,
+                    deadline = 0L
+                )
+            }.filter { subtask -> !subtask.subtask.isCompleted }
+
+        val mixedListWithoutDate =
+            (taskItemsWithoutDate + subtaskItemsWithoutDate).sortedBy { item ->
+                when (item) {
+                    is SplitEntity.TaskItem -> item.task.title
+                    is SplitEntity.EventItem -> item.event.summary
+                    is SplitEntity.BirthdayItem -> item.birthday.name
+                    is SplitEntity.SubtaskItem -> {
+                        val parentTitle = tasks.find { it.id == item.subtask.parentId }?.title ?: ""
+                        "$parentTitle / ${item.subtask.position}"
+                    }
+                }
+            }
+
+
+
         state.copy(
-            items = mixedList,
+            items = mixedListWithDate,
+            itemsWithoutDate = mixedListWithoutDate,
             isMondayFirst = userPrefs.isMondayFirstDay
         )
     }.stateIn(
