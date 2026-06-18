@@ -56,4 +56,6 @@
     <string name="jan_27">Jan 27</string>
     <string name="all_day">All-day</string>
     <string name="subtasks">Subtasks</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
 </resources>

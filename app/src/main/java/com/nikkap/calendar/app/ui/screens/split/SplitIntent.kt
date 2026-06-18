@@ -4,4 +4,6 @@ import java.time.LocalDate
 
 sealed interface SplitIntent {
     data class UpdateSelectedDate(val date: LocalDate?) : SplitIntent
+    data class PendingDeleteItem(val id: String, val type: String) : SplitIntent
+    data class UndoPendingDelete(val id: String) : SplitIntent
 }

@@ -22,9 +22,9 @@ import com.nikkap.calendar.domain.model.Task
 
 class ListAdapter(
     private val onItemClick: (String, String) -> Unit,
-    private val onTaskComplete: (String, String) -> Unit
-) :
-    ListAdapter<ListItem, RecyclerView.ViewHolder>(ListDiffCallback()) {
+    private val onTaskComplete: (String, String) -> Unit,
+    private val onDeleteClick: (ListItem) -> Unit
+) : ListAdapter<ListItem, RecyclerView.ViewHolder>(ListDiffCallback()) {
 
     companion object {
         private const val TYPE_TASK = 0
@@ -63,15 +63,14 @@ class ListAdapter(
             }
 
             else -> {
-                val view =
-                    LayoutInflater.from(parent.context)
-                        .inflate(R.layout.list_item_subtask, parent, false)
+                val view = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.list_item_subtask, parent, false)
                 SubtaskViewHolder(view)
             }
         }
     }
 
-    class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class TaskViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         val title: TextView = view.findViewById(R.id.itemText)
         val itemType: TextView = view.findViewById(R.id.list_item_type_tv)
         val itemIcon: ImageView = view.findViewById(R.id.list_item_type_icon)
@@ -79,7 +78,9 @@ class ListAdapter(
         val itemCheckBox: CheckBox = view.findViewById(R.id.list_item_checkbox)
 
 
-        fun bind(task: Task, onClick: () -> Unit, onTaskComplete: () -> Unit) {
+        fun bind(
+            task: Task, onClick: () -> Unit, onTaskComplete: () -> Unit, onDelete: () -> Unit
+        ) {
             itemTime.text = task.deadline?.toListUiDate() ?: ""
             title.text = task.title
             itemType.text = "Task"
@@ -92,18 +93,43 @@ class ListAdapter(
                 onClick()
             }
             itemCheckBox.setOnClickListener { onTaskComplete() }
+
+            view.setOnLongClickListener { view ->
+                val popup = androidx.appcompat.widget.PopupMenu(view.context, view)
+
+                popup.menuInflater.inflate(R.menu.list_item_menu, popup.menu)
+
+                popup.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.action_edit -> {
+                            onClick()
+                            true
+                        }
+
+                        R.id.action_delete -> {
+                            onDelete()
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
+                popup.show()
+
+                true
+            }
         }
     }
 
     // EVENT
-    class EventViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class EventViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         val eventTitle: TextView = view.findViewById(R.id.itemText)
         val eventTime: TextView = view.findViewById(R.id.item_timestamp)
         val itemType: TextView = view.findViewById(R.id.list_item_type_tv)
         val itemIcon: ImageView = view.findViewById(R.id.list_item_type_icon)
         val itemCheckBox: CheckBox = view.findViewById(R.id.list_item_checkbox)
 
-        fun bind(event: Event, onClick: () -> Unit) {
+        fun bind(event: Event, onClick: () -> Unit, onDelete: () -> Unit) {
             val color = CalendarColors.getBirthdayColor(event.colorId).hex.toColorInt()
             eventTitle.text = event.summary
             eventTime.text = event.startTimestamp.toListUiDate(event.isAllDay)
@@ -114,17 +140,42 @@ class ListAdapter(
             }
             itemIcon.imageTintList = ColorStateList.valueOf(color)
             itemCheckBox.visibility = View.GONE
+
+            view.setOnLongClickListener { view ->
+                val popup = androidx.appcompat.widget.PopupMenu(view.context, view)
+
+                popup.menuInflater.inflate(R.menu.list_item_menu, popup.menu)
+
+                popup.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.action_edit -> {
+                            onClick()
+                            true
+                        }
+
+                        R.id.action_delete -> {
+                            onDelete()
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
+                popup.show()
+
+                true
+            }
         }
     }
 
-    class BirthdayViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class BirthdayViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         val birthdayName: TextView = view.findViewById(R.id.itemText)
         val birthdayDate: TextView = view.findViewById(R.id.item_timestamp)
         val itemType: TextView = view.findViewById(R.id.list_item_type_tv)
         val itemIcon: ImageView = view.findViewById(R.id.list_item_type_icon)
         val itemCheckBox: CheckBox = view.findViewById(R.id.list_item_checkbox)
 
-        fun bind(birthday: Birthday, onClick: () -> Unit) {
+        fun bind(birthday: Birthday, onClick: () -> Unit, onDelete: () -> Unit) {
             val color = CalendarColors.getBirthdayColor(birthday.colorId).hex.toColorInt()
             birthdayName.text = birthday.name
             birthdayDate.text = birthday.date.toUiDate()
@@ -135,16 +186,62 @@ class ListAdapter(
             }
             itemIcon.imageTintList = ColorStateList.valueOf(color)
             itemCheckBox.visibility = View.GONE
+
+            view.setOnLongClickListener { view ->
+                val popup = androidx.appcompat.widget.PopupMenu(view.context, view)
+
+                popup.menuInflater.inflate(R.menu.list_item_menu, popup.menu)
+
+                popup.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.action_edit -> {
+                            onClick()
+                            true
+                        }
+
+                        R.id.action_delete -> {
+                            onDelete()
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
+                popup.show()
+
+                true
+            }
         }
     }
 
-    class SubtaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class SubtaskViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         val subtaskTitle: TextView = view.findViewById(R.id.list_subtask_title)
         val itemCheckBox: CheckBox = view.findViewById(R.id.list_subtask_checkbox)
-        fun bind(subtask: Subtask, onSubtaskComplete: () -> Unit) {
+        fun bind(subtask: Subtask, onSubtaskComplete: () -> Unit, onDelete: () -> Unit) {
             subtaskTitle.text = subtask.title
             itemCheckBox.setOnClickListener {
                 onSubtaskComplete()
+            }
+
+            view.setOnLongClickListener { view ->
+                val popup = androidx.appcompat.widget.PopupMenu(view.context, view)
+
+                popup.menuInflater.inflate(R.menu.list_subtask_menu, popup.menu)
+
+                popup.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+
+                        R.id.action_subtask_delete -> {
+                            onDelete()
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
+                popup.show()
+
+                true
             }
         }
     }
@@ -152,27 +249,32 @@ class ListAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is ListItem.TaskItem -> {
-                (holder as TaskViewHolder).bind(item.task, onClick = {
-                    onItemClick(item.task.id!!, "TASK")
-                }, { onTaskComplete(item.task.id!!, "TASK") })
+                (holder as TaskViewHolder).bind(
+                    item.task,
+                    { onItemClick(item.task.id!!, "TASK") },
+                    { onTaskComplete(item.task.id!!, "TASK") },
+                    { onDeleteClick(item) })
             }
 
             is ListItem.EventItem -> {
-                (holder as EventViewHolder).bind(item.event, onClick = {
-                    onItemClick(item.event.id!!, "EVENT")
-                })
+                (holder as EventViewHolder).bind(
+                    item.event,
+                    { onItemClick(item.event.id!!, "EVENT") },
+                    { onDeleteClick(item) })
             }
 
             is ListItem.BirthdayItem -> {
-                (holder as BirthdayViewHolder).bind(item.birthday, onClick = {
-                    onItemClick(item.birthday.id!!, "BIRTHDAY")
-                })
+                (holder as BirthdayViewHolder).bind(
+                    item.birthday,
+                    { onItemClick(item.birthday.id!!, "BIRTHDAY") },
+                    { onDeleteClick(item) })
             }
 
             is ListItem.SubtaskItem -> {
                 (holder as SubtaskViewHolder).bind(
                     item.subtask,
-                    { onTaskComplete(item.subtask.id, "SUBTASK") })
+                    { onTaskComplete(item.subtask.id, "SUBTASK") },
+                    { onDeleteClick(item) })
             }
         }
     }

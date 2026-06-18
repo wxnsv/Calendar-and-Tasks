@@ -13,6 +13,8 @@ import com.nikkap.calendar.domain.model.Subtask
 import com.nikkap.calendar.domain.model.Task
 import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -27,6 +29,9 @@ class ListViewModel(
     private val calendarRepository: CalendarRepository,
     private val workManager: WorkManager
 ) : ViewModel() {
+
+    private val _pendingDeletedIds = MutableStateFlow<Set<String>>(emptySet())
+    private val deletionJobs = mutableMapOf<String, Job>()
 
     private val _tasksFlow = taskRepository.getNonDeleteTasks()
     private val _subtasksFlow = taskRepository.getNonDeleteSubtasks()
@@ -45,6 +50,7 @@ class ListViewModel(
         _birthdaysFlow,
         _subtasksFlow,
         _workInfoFlow,
+        _pendingDeletedIds
     ) { arrayOfFlows ->
 
         val state = arrayOfFlows[0] as ListState
@@ -53,11 +59,14 @@ class ListViewModel(
         val birthdays = arrayOfFlows[3] as List<Birthday>
         val subtasks = arrayOfFlows[4] as List<Subtask>
         val workInfo = arrayOfFlows[5] as WorkInfo?
+        val pendingDeletedIds = arrayOfFlows[6] as Set<String>
 
 
-        val taskItems = tasks.filter { task -> !task.isCompleted }.map { ListItem.TaskItem(it) }
+        val taskItems = tasks.filter { task -> !task.isCompleted }
+            .map { ListItem.TaskItem(it) }
         val subtaskItems =
-            subtasks.filter { subtask -> !subtask.isCompleted }.map { ListItem.SubtaskItem(it) }
+            subtasks.filter { subtask -> !subtask.isCompleted }
+                .map { ListItem.SubtaskItem(it) }
         val eventItems = events.map { ListItem.EventItem(it) }
         val birthdayItems = birthdays.map { ListItem.BirthdayItem(it) }
 
@@ -90,8 +99,13 @@ class ListViewModel(
         val isRefreshing =
             workInfo?.state == WorkInfo.State.RUNNING || workInfo?.state == WorkInfo.State.ENQUEUED
 
+        val filteredList = mixedList.filter { listItem ->
+            listItem.id !in pendingDeletedIds
+        }
+
+
         state.copy(
-            items = mixedList,
+            items = filteredList,
             isRefreshing = isRefreshing,
         )
     }.stateIn(
@@ -101,7 +115,7 @@ class ListViewModel(
     )
 
     fun refreshData() {
-            _state.update { it.copy(isRefreshing = true) }
+        _state.update { it.copy(isRefreshing = true) }
         syncAll() // TODO 4/5
     }
 
@@ -132,5 +146,45 @@ class ListViewModel(
             }
 
         }
+    }
+
+    fun pendingDeleteItem(item: ListItem) {
+        _pendingDeletedIds.update {
+            it + item.id
+        }
+
+        val job = viewModelScope.launch {
+            delay(4000)
+
+            when (item) {
+                is ListItem.TaskItem -> {
+                    taskRepository.deleteTask(item.id)
+                }
+
+                is ListItem.EventItem -> {
+                    calendarRepository.deleteEvent(item.id)
+                }
+
+                is ListItem.BirthdayItem -> {
+                    calendarRepository.deleteBirthday(item.id)
+                }
+
+                is ListItem.SubtaskItem -> {
+                    taskRepository.deleteSubtask(item.id)
+                }
+            }
+
+            _pendingDeletedIds.value -= item.id
+            deletionJobs.remove(item.id)
+        }
+
+        deletionJobs[item.id] = job
+    }
+
+    fun undoDeletion(itemId: String) {
+        deletionJobs[itemId]?.cancel()
+        deletionJobs.remove(itemId)
+
+        _pendingDeletedIds.value -= itemId
     }
 }

@@ -85,7 +85,6 @@ fun List(
                         onEditClick = onEditClick,
                         onDeleteClick = onDeleteClick,
                         onCompleteClick = onCompleteClick,
-                        subtasks = subtasks
                     )
                 }
             }

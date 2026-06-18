@@ -22,7 +22,9 @@ import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -44,6 +46,9 @@ class MainViewModel(
 
     private val _navigationEvent = Channel<NavEvent>()
     val navigationEvent = _navigationEvent.receiveAsFlow()
+
+    private val _snackbarEvent = MutableSharedFlow<SnackbarMessage>()
+    val snackbarEvent: SharedFlow<SnackbarMessage> = _snackbarEvent
 
 
     private val _prefsFlow = userPrefRepository.userStateFlow.map<UserPrefs, UserPrefs?> { it }
@@ -91,6 +96,12 @@ class MainViewModel(
             state.first { !it.isLoading }
             val prefs = state.value.userState
             if (prefs.isAuthorized) startActiveSync()
+        }
+    }
+
+    fun showSnackbar(message: String, actionText: String, onUndo: () -> Unit) {
+        viewModelScope.launch {
+            _snackbarEvent.emit(SnackbarMessage(message, actionText, onUndo))
         }
     }
 
@@ -221,17 +232,6 @@ class MainViewModel(
             "BIRTHDAY" -> toCreateBirthday(id)
             "EVENT" -> toCreateEvent(id)
             "TASK" -> toCreateTask(id)
-        }
-    }
-
-    fun onDeleteListItemClicked(id: String, type: String) {
-        viewModelScope.launch {
-            when (type) {
-                "BIRTHDAY" -> calendarRepository.deleteBirthday(id)
-                "EVENT" -> calendarRepository.deleteEvent(id)
-                "TASK" -> tasksRepository.deleteTask(id)
-                "SUBTASK" -> tasksRepository.deleteSubtask(id)
-            }
         }
     }
 

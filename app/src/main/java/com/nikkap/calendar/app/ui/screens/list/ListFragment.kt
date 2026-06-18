@@ -42,7 +42,14 @@ class ListFragment : Fragment(R.layout.list_fragment) {
         super.onViewCreated(view, savedInstanceState)
         val adapter = ListAdapter(
             { id, type -> sharedViewModel.onEditListItemClicked(id, type) },
-            { id, type -> viewModel.completeTask(id, type) })
+            { id, type -> viewModel.completeTask(id, type) },
+            { item ->
+                viewModel.pendingDeleteItem(item)
+                sharedViewModel.showSnackbar("Item deleted", "Undo") {
+                    viewModel.undoDeletion(item.id)
+                }
+            }
+        )
         setupRecyclerView(adapter)
         setupListeners()
         observeState(adapter)

@@ -36,20 +36,20 @@ fun GroupOfListItem(
                         onEditClick = { id, type -> onEditClick(id, type) },
                         onCompleteClick = { id, type -> onCompleteClick(id, type) },
                         subtasks = listOfSubtasks,
-                        onDeleteClick = { id, type -> onDeleteClick(id, type) }
+                        onDeleteClick = { id, type -> onDeleteClick(id, type) },
                     )
                 }
 
                 is SplitEntity.EventItem -> ListEventItem(
                     item = entity,
                     onEditClick = { onEditClick(entity.id, "EVENT") },
-                    onDeleteClick = { onDeleteClick(entity.id, "EVENT") }
+                    onDeleteClick = { onDeleteClick(entity.id, "EVENT") },
                 )
 
                 is SplitEntity.BirthdayItem -> ListBirthdayItem(
                     entity,
                     onEditClick = { onEditClick(entity.id, "BIRTHDAY") },
-                    onDeleteClick = { onDeleteClick(entity.id, "BIRTHDAY") }
+                    onDeleteClick = { onDeleteClick(entity.id, "BIRTHDAY") },
                 )
 
                 else -> {}

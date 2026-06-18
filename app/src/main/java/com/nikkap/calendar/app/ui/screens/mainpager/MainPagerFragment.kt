@@ -16,6 +16,7 @@ import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.snackbar.Snackbar
 import com.nikkap.calendar.app.R
 import com.nikkap.calendar.app.databinding.MainPagerFragmentBinding
 import com.nikkap.calendar.app.ui.screens.main.MainViewModel
@@ -63,6 +64,7 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
 
         setupListeners()
         observeMainState()
+        observeMainSnackbar()
     }
 
     override fun onResume() {
@@ -94,6 +96,29 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
                         setupTransition()
                     }
                 }
+            }
+        }
+    }
+
+    private fun observeMainSnackbar() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            sharedViewModel.snackbarEvent.collect { event ->
+                val snackbar = Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG)
+                    .setAction(event.actionText) {
+                        event.onUndo()
+                    }
+                val context = binding.root.context
+                val backgroundColor =
+                    context.getColorFromAttr(com.google.android.material.R.attr.colorSurface)
+                val textColor =
+                    context.getColorFromAttr(com.google.android.material.R.attr.colorOnSurface)
+                val actionColor = context.getColorFromAttr(androidx.appcompat.R.attr.colorPrimary)
+
+                snackbar.setBackgroundTint(backgroundColor)
+                snackbar.setTextColor(textColor)
+                snackbar.setActionTextColor(actionColor)
+
+                snackbar.show()
             }
         }
     }
