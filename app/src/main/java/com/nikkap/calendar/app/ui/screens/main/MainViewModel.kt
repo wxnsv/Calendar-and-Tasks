@@ -160,6 +160,27 @@ class MainViewModel(
 
     private fun startActiveSync() {
         viewModelScope.launch {
+            val constraint =
+                Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+
+            val periodicSyncRequest = PeriodicWorkRequestBuilder<SyncWorker>(
+                1, TimeUnit.HOURS,
+                5, TimeUnit.MINUTES
+            )
+                .setBackoffCriteria(
+                    BackoffPolicy.LINEAR,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                )
+                .setConstraints(constraint)
+                .build()
+
+            workManager.enqueueUniquePeriodicWork(
+                "AuthorizePeriodicSync",
+                ExistingPeriodicWorkPolicy.KEEP,
+                periodicSyncRequest
+            )
+
             while (isActive) {
                 delay(3 * 60 * 1000L)
                 val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
@@ -194,11 +215,6 @@ class MainViewModel(
         viewModelScope.launch {
             userPrefRepository.completeFirstLaunch()
 
-            _navigationEvent.send(
-                NavEvent.NavigateTo(
-                    NavigationTarget.Pager
-                )
-            )
             val constraint =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
             val periodicSyncRequest = PeriodicWorkRequestBuilder<SyncWorker>(
@@ -223,7 +239,11 @@ class MainViewModel(
                 periodicSyncRequest
             )
 
-
+            _navigationEvent.send(
+                NavEvent.NavigateTo(
+                    NavigationTarget.Pager
+                )
+            )
         }
     }
 

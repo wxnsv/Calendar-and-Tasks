@@ -42,7 +42,7 @@ interface TasksApi {
         @Query("maxResults") maxResults: Int? = 100,
     ): Response<TaskListsResponse>
 
-    @GET("tasks/v1/lists/{tasklistId}")
+    @GET("tasks/v1/users/@me/lists/{tasklistId}")
     suspend fun getTasklist(
         @Path("tasklistId") tasklistId: String = "@default"
     ): Response<TaskListDto>

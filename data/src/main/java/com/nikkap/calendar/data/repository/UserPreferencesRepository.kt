@@ -56,13 +56,6 @@ class UserPreferencesRepository(
             )
         }
 
-    val calendarTimeMin = dataStore.data.catch { exception ->
-        if (exception is IOException) emit(emptyPreferences()) else throw exception
-    }
-        .map { prefs ->
-            prefs[Keys.CALENDAR_TIME_MIN]
-        }
-
     val defaultTasklistId = dataStore.data.catch { exception ->
         if (exception is IOException) emit(emptyPreferences()) else throw exception
     }

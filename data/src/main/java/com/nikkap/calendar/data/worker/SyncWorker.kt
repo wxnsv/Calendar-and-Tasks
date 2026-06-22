@@ -11,7 +11,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 
 class SyncWorker(
-    appContext: Context, params: WorkerParameters,
+    appContext: Context,
+    params: WorkerParameters,
     private val calendarRepository: CalendarRepository,
     private val taskRepository: TaskRepository
 ) : CoroutineWorker(appContext, params) {

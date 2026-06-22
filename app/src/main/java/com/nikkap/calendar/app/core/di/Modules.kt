@@ -33,7 +33,7 @@ import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.workmanager.dsl.worker
+import org.koin.androidx.workmanager.dsl.workerOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -42,6 +42,18 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
 val networkModule = module {
+    single<WorkManager> {
+        WorkManager.getInstance(androidContext())
+    }
+
+    workerOf(::SyncWorker)
+
+    workerOf(::SavePhotoWorker)
+
+    single<TaskRepository> { TaskRepositoryImpl(get(), get(), get()) }
+
+    single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get()) }
+
     val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
     single {
@@ -95,8 +107,11 @@ val localModule = module {
             "app_database"
         ).build()
     }
+
     single { get<AppDatabase>().taskDao() }
+
     single { get<AppDatabase>().calendarDao() }
+
     single {
         PreferenceDataStoreFactory.create(
             produceFile = { androidContext().preferencesDataStoreFile("user_prefs") }
@@ -107,22 +122,23 @@ val localModule = module {
 }
 val authModule = module {
     single { AuthorizationManager(androidContext()) }
+
     single { AuthentificationManager(androidContext()) }
 }
 val appModule = module {
-    single<WorkManager> {
-        WorkManager.getInstance(androidContext())
-    }
-    worker { SyncWorker(get(), get(), get(), get()) }
-    worker { SavePhotoWorker(get(), get(), get()) }
-    single<TaskRepository> { TaskRepositoryImpl(get(), get(), get()) }
-    single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get()) }
     viewModel { AuthViewModel(get(), get(), get()) }
+
     viewModel { SplitViewModel(get(), get(), get()) }
+
     viewModel { ListViewModel(get(), get(), get()) }
+
     viewModel { MainPagerViewModel(get()) }
+
     viewModelOf(::CreateViewModel)
+
     viewModel { MainViewModel(get(), get(), get(), get()) }
+
     viewModel { SettingsViewModel(get()) }
+
     viewModel { AboutViewModel() }
 }
