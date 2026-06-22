@@ -4,15 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
@@ -50,9 +52,9 @@ class SplitFragment : Fragment() {
         val state = viewModel.state.collectAsState().value
         val listState = rememberLazyListState()
         CalendarTheme {
-            Scaffold(
-                backgroundColor = MaterialTheme.colorScheme.background
-            ) { _ ->
+            Column(
+                Modifier.background(MaterialTheme.colorScheme.background)
+            ) {
                 Calendar(
                     state.items,
                     listState,

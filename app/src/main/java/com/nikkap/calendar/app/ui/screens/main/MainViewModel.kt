@@ -182,7 +182,6 @@ class MainViewModel(
             )
 
             while (isActive) {
-                delay(3 * 60 * 1000L)
                 val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
                     .build()
 
@@ -191,6 +190,7 @@ class MainViewModel(
                     ExistingWorkPolicy.KEEP,
                     syncRequest
                 )
+                delay(3 * 60 * 1000L)
             }
         }
     }
@@ -238,6 +238,7 @@ class MainViewModel(
                 ExistingPeriodicWorkPolicy.KEEP,
                 periodicSyncRequest
             )
+            startActiveSync()
 
             _navigationEvent.send(
                 NavEvent.NavigateTo(
