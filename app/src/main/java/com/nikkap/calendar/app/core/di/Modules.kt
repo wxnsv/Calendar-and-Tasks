@@ -28,7 +28,9 @@ import com.nikkap.calendar.domain.repository.CalendarRepository
 import com.nikkap.calendar.domain.repository.TaskRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import okhttp3.Cache
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -36,6 +38,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.workmanager.dsl.workerOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -49,10 +52,6 @@ val networkModule = module {
     workerOf(::SyncWorker)
 
     workerOf(::SavePhotoWorker)
-
-    single<TaskRepository> { TaskRepositoryImpl(get(), get(), get()) }
-
-    single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get()) }
 
     val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
@@ -82,16 +81,10 @@ val networkModule = module {
     }
 
     single {
-        val cacheSize = 10 * 1024 * 1024L
-        Cache(androidContext().cacheDir, cacheSize)
-    }
-
-    single {
         OkHttpClient.Builder()
             .addInterceptor(get<AuthInterceptor>())
             .addInterceptor(get<ErrorInterceptor>())
             .addInterceptor(get<HttpLoggingInterceptor>())
-            .cache(get())
             .dispatcher(Dispatcher().apply {
                 maxRequestsPerHost = 15
             })
@@ -100,6 +93,13 @@ val networkModule = module {
     }
 }
 val localModule = module {
+    single<TaskRepository> { TaskRepositoryImpl(get(), get(), get(), get(named("AppScope"))) }
+    single<CalendarRepository> { CalendarRepositoryImpl(get(), get(), get(named("AppScope"))) }
+
+    single(named("AppScope")) {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    }
+
     single {
         Room.databaseBuilder(
             get(),

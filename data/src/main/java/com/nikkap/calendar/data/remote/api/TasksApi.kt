@@ -22,11 +22,13 @@ interface TasksApi {
         @Query("showCompleted") showCompleted: Boolean = true,
         @Query("showHidden") showHidden: Boolean = true,
         @Query("showDeleted") showDeleted: Boolean = true,
+        @Query("maxResults") maxResults: Int = 100
     ): Response<TasksListResponse>
 
     @POST("tasks/v1/lists/{tasklist}/tasks")
     suspend fun createTask(
         @Path("tasklist") taskListId: String,
+        @Query("maxResults") maxResults: Int = 100,
         @Body taskDto: TaskDto
     ): Response<TaskDto>
 
@@ -34,6 +36,7 @@ interface TasksApi {
     suspend fun updateTask(
         @Path("tasklistId") taskListId: String,
         @Path("taskId") taskId: String,
+        @Query("maxResults") maxResults: Int = 100,
         @Body task: TaskUpdateDto
     ): Response<TaskDto>
 
@@ -73,6 +76,7 @@ interface TasksApi {
     suspend fun createSubtask(
         @Path("tasklist") taskListId: String,
         @Query("parent") parentTaskId: String,
+        @Query("previous") previousSubtaskId: String? = null,
         @Body subtask: TaskUpdateDto
     ): Response<TaskUpdateDto>
 
@@ -86,8 +90,8 @@ interface TasksApi {
     @DELETE("tasks/v1/lists/{tasklist}/tasks/{subtask}")
     suspend fun deleteSubtask(
         @Path("tasklist") taskListId: String,
-        @Query("parent") parentTaskId: String,
-        @Path("subtask") subtaskId: String
+        @Path("subtask") subtaskId: String,
+        @Query("parent") parentTaskId: String
     ): Response<Unit>
 
 }

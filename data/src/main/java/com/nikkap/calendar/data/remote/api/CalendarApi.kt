@@ -20,6 +20,7 @@ interface CalendarApi {
         @Query("singleEvents") singleEvents: Boolean,
         @Query("showHidden") showHidden: Boolean = true,
         @Query("showDeleted") showDeleted: Boolean = true,
+        @Query("maxResults") maxResults: Int = 100,
     ): Response<EventListResponse>
 
     @DELETE("calendar/v3/calendars/{calendarId}/events/{eventId}")
@@ -33,6 +34,7 @@ interface CalendarApi {
         @Query("eventTypes") type: String = "birthday",
         @Query("showHidden") showHidden: Boolean = true,
         @Query("showDeleted") showDeleted: Boolean = true,
+        @Query("maxResults") maxResults: Int = 100,
     ): Response<BirthdayListResponse>
 
     @POST("calendar/v3/calendars/primary/events")
