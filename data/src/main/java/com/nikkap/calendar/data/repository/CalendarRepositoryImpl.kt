@@ -18,17 +18,19 @@ import com.nikkap.calendar.data.utils.localSyncEntities
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.repository.CalendarRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class CalendarRepositoryImpl(
     private val api: CalendarApi,
     private val dao: CalendarDao,
-    private val userPrefRepository: UserPreferencesRepository
+    private val appScope: CoroutineScope
 ) : CalendarRepository {
 
     override fun getNonDeleteEvents(): Flow<List<Event>> {
@@ -52,27 +54,43 @@ class CalendarRepositoryImpl(
     }
 
     override suspend fun saveEvent(event: Event) {
-        dao.insertEvent(event.toEventEntity().changePendingAction(PendingActions.INSERT))
+        appScope.launch {
+            dao.insertEvent(event.toEventEntity().changePendingAction(PendingActions.INSERT))
+        }
     }
 
     override suspend fun updateBirthday(birthday: Birthday) {
-        dao.updateBirthday(birthday.toBirthdayEntity().changePendingAction(PendingActions.UPDATE))
+        appScope.launch {
+            dao.updateBirthday(
+                birthday.toBirthdayEntity().changePendingAction(PendingActions.UPDATE)
+            )
+        }
     }
 
     override suspend fun updateEvent(event: Event) {
-        dao.updateEvent(event.toEventEntity().changePendingAction(PendingActions.UPDATE))
+        appScope.launch {
+            dao.updateEvent(event.toEventEntity().changePendingAction(PendingActions.UPDATE))
+        }
     }
 
     override suspend fun deleteEvent(id: String) {
-        dao.markAsDeleteEvent(id, System.currentTimeMillis())
+        appScope.launch {
+            dao.markAsDeleteEvent(id, System.currentTimeMillis())
+        }
     }
 
     override suspend fun deleteBirthday(id: String) {
-        dao.markAsDeleteBirthday(id, System.currentTimeMillis())
+        appScope.launch {
+            dao.markAsDeleteBirthday(id, System.currentTimeMillis())
+        }
     }
 
     override suspend fun saveBirthday(birthday: Birthday) {
-        dao.insertBirthday(birthday.toBirthdayEntity().changePendingAction(PendingActions.INSERT))
+        appScope.launch {
+            dao.insertBirthday(
+                birthday.toBirthdayEntity().changePendingAction(PendingActions.INSERT)
+            )
+        }
     }
 
     override suspend fun syncCalendar(): Result<Unit> = try {

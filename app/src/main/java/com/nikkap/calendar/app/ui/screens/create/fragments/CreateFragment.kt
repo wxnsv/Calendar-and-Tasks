@@ -67,7 +67,6 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
     }
 
     private fun updateNestedFragment(item: CalendarEntry) {
-        val activeType = viewModel.state.value.activeType
         val fragment = when (item) {
             is Task -> {
                 binding.createEditText.hint = "Add title"

@@ -22,10 +22,7 @@ interface TaskDao {
     suspend fun insertTasks(tasks: List<TaskEntity>)
 
     @Query("SELECT * from tasks WHERE id = :id")
-    suspend fun getTask(
-        id: String
-    )
-            : TaskEntity
+    suspend fun getTask(id: String): TaskEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(taskEntity: TaskEntity)
@@ -63,6 +60,11 @@ interface TaskDao {
     /**
      * SUBTASKS
      */
+    @Query("SELECT id FROM subtasks WHERE parentId = :parentId AND position = :position")
+    suspend fun getSubtaskIdByPosition(parentId: String, position: String): String?
+
+    @Query("SELECT * FROM subtasks WHERE parentId = :parentId ORDER BY position DESC LIMIT 1")
+    suspend fun getLastPositionSubtask(parentId: String): SubtaskEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSubtasks(tasks: List<SubtaskEntity>)
@@ -85,7 +87,7 @@ interface TaskDao {
     @Query("DELETE FROM subtasks WHERE parentId = :parentId")
     suspend fun deleteSubtasksOfTask(parentId: String)
 
-    @Query("SELECT * FROM subtasks WHERE parentId = :parentId ORDER BY position ASC")
+    @Query("SELECT * FROM subtasks WHERE parentId = :parentId AND pendingAction != 'DELETE' ORDER BY position ASC")
     suspend fun getSubtasksByParentId(parentId: String): List<SubtaskEntity>
 
     @Query("SELECT * FROM subtasks WHERE pendingAction != 'DELETE' ORDER BY position ASC")

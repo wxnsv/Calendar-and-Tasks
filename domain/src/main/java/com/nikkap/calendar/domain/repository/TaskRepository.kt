@@ -14,7 +14,7 @@ interface TaskRepository {
     fun getNonDeleteSubtasks(): Flow<List<Subtask>>
     suspend fun saveTask(task: Task)
     suspend fun saveSubtask(subtask: Subtask)
-    suspend fun saveSubtasks(list: List<Subtask>)
+    fun saveSubtasks(list: List<Subtask>)
     suspend fun saveTasklist(taskList: TaskList)
     suspend fun updateTask(task: Task)
     suspend fun updateSubtask(subtask: Subtask)

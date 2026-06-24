@@ -155,17 +155,39 @@ class CreateViewModel(
                     }
 
                     _state.update { it.copy(isLoading = true) }
+
                     if (!state.taskLists.contains(state.selectedTaskList))
                         launch {
                             taskRepository.saveTasklist(
                                 state.selectedTaskList
                             )
                         }
+
                     if (state.isEditing) {
-                        taskRepository.updateTask(taskToSave)
-                        if (subtasksToSave.isNotEmpty()) taskRepository.updateSubtasks(
-                            subtasksToSave
+                        val subtasksBeforeSave =
+                            taskRepository.getSubtasksByParentId(taskToSave.id!!)
+
+                        val subtasksToSaveIdMap = subtasksToSave.associateBy { it.id }
+                        val subtasksBeforeSaveIdMap = subtasksBeforeSave.associateBy { it.id }
+
+                        val (insertSubtasks, updateSubtasks) = subtasksToSave.partition { subtaskToSave ->
+                            val subtaskBeforeSave = subtasksBeforeSaveIdMap[subtaskToSave.id]
+                            subtaskBeforeSave == null
+                        }
+
+                        val deleteSubtasks = subtasksBeforeSave.filter { subtaskBeforeSave ->
+                            val subtaskToSave = subtasksToSaveIdMap[subtaskBeforeSave.id]
+                            subtaskToSave == null
+                        }
+
+                        if (insertSubtasks.isNotEmpty()) taskRepository.saveSubtasks(insertSubtasks)
+                        if (updateSubtasks.isNotEmpty()) taskRepository.updateSubtasks(
+                            updateSubtasks
                         )
+                        if (deleteSubtasks.isNotEmpty()) deleteSubtasks.forEach { deleteSubtask ->
+                            taskRepository.deleteSubtask(deleteSubtask.id)
+                        }
+
                     } else {
                         taskRepository.saveTask(taskToSave)
                         if (subtasksToSave.isNotEmpty()) taskRepository.saveSubtasks(subtasksToSave)
