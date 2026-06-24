@@ -136,7 +136,7 @@ val appModule = module {
 
     viewModelOf(::CreateViewModel)
 
-    viewModel { MainViewModel(get(), get(), get(), get()) }
+    viewModel { MainViewModel(get(), get(), get(), get(), get()) }
 
     viewModel { SettingsViewModel(get()) }
 

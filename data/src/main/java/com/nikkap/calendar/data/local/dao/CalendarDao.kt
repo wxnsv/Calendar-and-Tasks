@@ -17,6 +17,9 @@ interface CalendarDao {
      * EVENTS
      */
 
+    @Query("DELETE FROM event")
+    suspend fun clearEvents()
+
     @Query("SELECT * FROM event WHERE pendingAction != 'DELETE'")
     fun getNonDeleteEvents(): Flow<List<EventEntity>>
 

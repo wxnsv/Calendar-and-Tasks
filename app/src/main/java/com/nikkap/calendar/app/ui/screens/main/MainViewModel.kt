@@ -12,6 +12,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
+import com.nikkap.calendar.app.core.auth.AuthentificationManager
 import com.nikkap.calendar.app.ui.navigation.NavEvent
 import com.nikkap.calendar.app.ui.navigation.NavigationTarget
 import com.nikkap.calendar.data.local.prefs.UserPrefs
@@ -35,13 +36,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import okhttp3.internal.platform.PlatformRegistry.applicationContext
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 class MainViewModel(
     private val tasksRepository: TaskRepository,
     private val calendarRepository: CalendarRepository,
     private val userPrefRepository: UserPreferencesRepository,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val authentificationManager: AuthentificationManager,
 ) : ViewModel() {
 
     private val _navigationEvent = Channel<NavEvent>()
@@ -297,6 +301,28 @@ class MainViewModel(
         }
     }
 
+    fun logout() {
+        viewModelScope.launch {
+            authentificationManager.signOutUser()
+            userPrefRepository.clearSession()
+            tasksRepository.clearAll()
+            calendarRepository.clearAll()
+
+            val fileName = "user_avatar.jpg"
+            val file = File(applicationContext!!.filesDir, fileName)
+
+            if (file.exists()) {
+                file.delete()
+            }
+
+            _navigationEvent.send(
+                NavEvent.NavigateTo(
+                    NavigationTarget.Auth
+                )
+            )
+        }
+    }
+
     private fun syncData() {
         val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
             .build()
@@ -306,6 +332,5 @@ class MainViewModel(
             ExistingWorkPolicy.KEEP,
             syncRequest
         )
-        // TODO (exceptions)
     }
 }

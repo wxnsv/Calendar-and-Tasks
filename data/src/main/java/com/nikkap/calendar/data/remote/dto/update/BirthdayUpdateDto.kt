@@ -9,5 +9,8 @@ data class BirthdayUpdateDto(
     val end: BirthdayDateTime? = null,
     val colorId: String? = null,
     val transparency: String = "transparent",
-    val updated: String? = null
+    val updated: String? = null,
+    val eventType: String = "birthday",
+    val recurrence: List<String> = listOf("RRULE:FREQ=YEARLY"),
+    val visibility: String = "private"
 )

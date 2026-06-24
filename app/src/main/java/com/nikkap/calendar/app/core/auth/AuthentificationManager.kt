@@ -1,10 +1,11 @@
 package com.nikkap.calendar.app.core.auth
 
 import android.content.Context
+import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.nikkap.calendar.app.core.Secrets
 
@@ -12,10 +13,7 @@ class AuthentificationManager(private val context: Context) {
     private val credentialManager: CredentialManager = CredentialManager.create(context)
 
     private fun getCredentialRequest(): GetCredentialRequest {
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId(Secrets.GOOGLE_CLIENT_ID)
-            .setFilterByAuthorizedAccounts(false)
-            .setAutoSelectEnabled(false)
+        val googleIdOption = GetSignInWithGoogleOption.Builder(Secrets.GOOGLE_CLIENT_ID)
             .build()
 
         return GetCredentialRequest.Builder()
@@ -23,11 +21,10 @@ class AuthentificationManager(private val context: Context) {
             .build()
     }
 
-    suspend fun authenticate(): UserInfo? {
+    suspend fun authenticate(context: Context): UserInfo? {
         return try {
             val result = credentialManager.getCredential(context, getCredentialRequest())
             val credential = result.credential
-
             if (credential is CustomCredential &&
                 credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
             ) {
@@ -42,7 +39,21 @@ class AuthentificationManager(private val context: Context) {
                 null
             }
         } catch (_: Exception) {
-            null // todo auth exc
+            null // TODO auth exc
         }
     }
+
+    suspend fun signOutUser() {
+        runCatching {
+            val credentialManager = CredentialManager.create(context)
+            val request = ClearCredentialStateRequest()
+
+            credentialManager.clearCredentialState(request)
+        }.onSuccess {
+            // TODO()
+        }.onFailure { error ->
+            // TODO()
+        }
+    }
+
 }

@@ -39,6 +39,9 @@
         <action
             android:id="@+id/action_mainPager_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_mainPager_to_authFragment"
+            app:destination="@id/authFragment" />
     </fragment>
 
     <fragment

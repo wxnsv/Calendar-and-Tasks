@@ -108,6 +108,9 @@ class SettingsFragment : Fragment(R.layout.settings_fragment) {
                 isFirst = viewModel.state.value.isMondayFirstDayOfWeek
             )
         }
+        binding.settingsLogoutButton.setOnClickListener {
+            sharedViewModel.logout()
+        }
     }
 
     private fun observeState() {

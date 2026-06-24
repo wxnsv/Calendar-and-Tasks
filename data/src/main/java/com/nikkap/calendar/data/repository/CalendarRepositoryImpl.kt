@@ -85,6 +85,13 @@ class CalendarRepositoryImpl(
         }
     }
 
+    override fun clearAll() {
+        appScope.launch {
+            dao.clearBirthdays()
+            dao.clearEvents()
+        }
+    }
+
     override suspend fun saveBirthday(birthday: Birthday) {
         appScope.launch {
             dao.insertBirthday(

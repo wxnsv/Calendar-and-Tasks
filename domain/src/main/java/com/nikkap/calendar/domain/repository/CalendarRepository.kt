@@ -16,4 +16,5 @@ interface CalendarRepository {
     suspend fun updateEvent(event: Event)
     suspend fun deleteEvent(id: String)
     suspend fun deleteBirthday(id: String)
+    fun clearAll()
 }

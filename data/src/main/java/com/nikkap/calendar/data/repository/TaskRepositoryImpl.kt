@@ -200,6 +200,14 @@ class TaskRepositoryImpl(
         }
     }
 
+    override fun clearAll() {
+        appScope.launch {
+            dao.clearSubtasks()
+            dao.clearTasks()
+            dao.clearTaskLists()
+        }
+    }
+
 
     private suspend fun getRemoteTaskLists(): Result<List<TaskListDto>?> {
         val taskLists = api.getTaskLists()

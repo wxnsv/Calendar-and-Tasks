@@ -8,6 +8,7 @@ data class BirthdayDto(
     val updated: String? = null,
     val deleted: Boolean = false,
     val colorId: String?,
+    val eventType: String = "birthday"
 )
 
 data class BirthdayDateTime(

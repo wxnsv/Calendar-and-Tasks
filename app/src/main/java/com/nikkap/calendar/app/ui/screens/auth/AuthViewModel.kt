@@ -1,5 +1,6 @@
 package com.nikkap.calendar.app.ui.screens.auth
 
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import androidx.activity.result.ActivityResultLauncher
@@ -23,9 +24,9 @@ class AuthViewModel(
     val state = _state.asStateFlow()
     private val _photoUri = MutableStateFlow("")
     val photoUri = _photoUri.asStateFlow()
-    fun startAuth(authIntent: () -> Unit) {
+    fun startAuth(context: Context, authIntent: () -> Unit) {
         viewModelScope.launch {
-            val userInfo = authentificationManager.authenticate()
+            val userInfo = authentificationManager.authenticate(context)
             if (userInfo != null) {
                 userPrefRepository.authorizeSession(
                     userInfo.email,

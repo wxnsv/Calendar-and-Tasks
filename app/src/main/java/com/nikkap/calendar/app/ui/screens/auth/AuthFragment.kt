@@ -55,7 +55,9 @@ class AuthFragment : Fragment() {
         CalendarTheme {
             LoginScreen(
                 onLoginClick = {
-                    viewModel.startAuth {
+                    viewModel.startAuth(
+                        requireActivity()
+                    ) {
                         authorizationManager.getAuthIntent { intentSender ->
                             viewModel.onAuthIntentReady(intentSender, authLauncher)
                         }

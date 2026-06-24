@@ -18,6 +18,9 @@ interface TaskDao {
      * TASKS
      */
 
+    @Query("DELETE FROM tasks")
+    suspend fun clearTasks()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTasks(tasks: List<TaskEntity>)
 
@@ -126,6 +129,10 @@ interface TaskDao {
     /**
      * TASKLISTS
      */
+
+    @Query("DELETE FROM tasklist")
+    suspend fun clearTaskLists()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTaskLists(taskLists: List<TaskListEntity>)
 
