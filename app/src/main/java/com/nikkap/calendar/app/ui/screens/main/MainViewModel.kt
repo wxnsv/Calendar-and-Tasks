@@ -303,7 +303,7 @@ class MainViewModel(
 
     fun logout() {
         viewModelScope.launch {
-            authentificationManager.signOutUser()
+            authentificationManager.revokeCredentials()
             userPrefRepository.clearSession()
             tasksRepository.clearAll()
             calendarRepository.clearAll()

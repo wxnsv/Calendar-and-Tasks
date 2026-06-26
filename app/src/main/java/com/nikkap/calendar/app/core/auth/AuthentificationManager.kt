@@ -8,6 +8,10 @@ import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.nikkap.calendar.app.BuildConfig.GOOGLE_CLIENT_ID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.HttpURLConnection
+import java.net.URL
 
 class AuthentificationManager(private val context: Context) {
     private val credentialManager: CredentialManager = CredentialManager.create(context)
@@ -43,16 +47,31 @@ class AuthentificationManager(private val context: Context) {
         }
     }
 
-    suspend fun signOutUser() {
-        runCatching {
-            val credentialManager = CredentialManager.create(context)
-            val request = ClearCredentialStateRequest()
+    suspend fun revokeCredentials() {
+        try {
+            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
-            credentialManager.clearCredentialState(request)
-        }.onSuccess {
-            // TODO()
-        }.onFailure { error ->
-            // TODO()
+    suspend fun hardResetLogout(): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val auth = AuthorizationManager(context)
+            val accessToken = auth.getAccessToken()
+
+            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+
+            val url = URL("https://oauth2.googleapis.com/revoke?token=$accessToken")
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "POST"
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+
+            val responseCode = connection.responseCode
+            responseCode == HttpURLConnection.HTTP_OK
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 

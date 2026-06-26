@@ -33,6 +33,9 @@ class UserPreferencesRepository(
         val IS_LIGHT_THEME = booleanPreferencesKey("is_light_theme")
         val IS_MONDAY_FIRST_DAY = booleanPreferencesKey("is_monday_first_day")
         val IS_SYSTEM_FIRST_DAY = booleanPreferencesKey("is_system_first_day")
+        val IS_CALENDAR_GRANTED = booleanPreferencesKey("is_calendar_granted")
+        val IS_TASKS_GRANTED = booleanPreferencesKey("is_tasks_granted")
+        val IS_PROFILE_GRANTED = booleanPreferencesKey("is_profile_granted")
     }
 
     val userStateFlow: Flow<UserPrefs> = dataStore.data
@@ -53,6 +56,9 @@ class UserPreferencesRepository(
                 isLightTheme = prefs[Keys.IS_LIGHT_THEME] ?: true,
                 isMondayFirstDay = prefs[Keys.IS_MONDAY_FIRST_DAY] ?: true,
                 isSystemFirstDay = prefs[Keys.IS_SYSTEM_FIRST_DAY] ?: true,
+                isProfileGranted = prefs[Keys.IS_PROFILE_GRANTED] ?: false,
+                isCalendarGranted = prefs[Keys.IS_CALENDAR_GRANTED] ?: false,
+                isTasksGranted = prefs[Keys.IS_TASKS_GRANTED] ?: false,
             )
         }
 
@@ -138,5 +144,24 @@ class UserPreferencesRepository(
             prefs[Keys.IS_LIST_SCREEN_LAST] = boolean
         }
     }
+
+    suspend fun tasksGranted() {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_TASKS_GRANTED] = true
+        }
+    }
+
+    suspend fun calendarGranted() {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_CALENDAR_GRANTED] = true
+        }
+    }
+
+    suspend fun profileGranted() {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_PROFILE_GRANTED] = true
+        }
+    }
+
 
 }

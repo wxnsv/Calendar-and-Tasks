@@ -9,10 +9,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nikkap.calendar.app.core.auth.AuthentificationManager
 import com.nikkap.calendar.app.core.auth.AuthorizationManager
+import com.nikkap.calendar.data.local.prefs.UserPrefs
 import com.nikkap.calendar.data.repository.UserPreferencesRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 class AuthViewModel(
     private val authorizationManager: AuthorizationManager,
@@ -20,10 +31,46 @@ class AuthViewModel(
     private val authentificationManager: AuthentificationManager
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<AuthState>(AuthState.Loading)
-    val state = _state.asStateFlow()
-    private val _photoUri = MutableStateFlow("")
-    val photoUri = _photoUri.asStateFlow()
+    private val _state = MutableStateFlow(AuthState())
+
+    private val _prefsFlow = userPrefRepository.userStateFlow.map<UserPrefs, UserPrefs?> { it }
+        .onStart { emit(null) }
+
+    val state = combine(
+        _state,
+        _prefsFlow
+    ) { state, userPrefs ->
+
+        if (userPrefs != null) {
+
+            val requiredScopes: MutableList<String> = mutableListOf()
+            if (!userPrefs.isTasksGranted) requiredScopes.add("https://www.googleapis.com/auth/tasks")
+            else requiredScopes.remove("https://www.googleapis.com/auth/tasks")
+            if (!userPrefs.isProfileGranted) requiredScopes.add("profile")
+            else requiredScopes.remove("profile")
+            if (!userPrefs.isCalendarGranted) requiredScopes.add("https://www.googleapis.com/auth/calendar")
+            else requiredScopes.remove("https://www.googleapis.com/auth/calendar")
+
+            val isAllGranted =
+                userPrefs.isCalendarGranted && userPrefs.isTasksGranted && userPrefs.isProfileGranted
+
+            state.copy(
+                isCalendarGranted = userPrefs.isCalendarGranted,
+                isTasksGranted = userPrefs.isTasksGranted,
+                isProfileGranted = userPrefs.isProfileGranted,
+                isAllGranted = isAllGranted,
+                requiredScopes = requiredScopes,
+                isLoading = false,
+                email = userPrefs.email
+            )
+        } else state.copy(isLoading = true)
+
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = AuthState()
+    )
+
     fun startAuth(context: Context, authIntent: () -> Unit) {
         viewModelScope.launch {
             val userInfo = authentificationManager.authenticate(context)
@@ -32,7 +79,12 @@ class AuthViewModel(
                     userInfo.email,
                     userInfo.displayName ?: "",
                 )
-                _photoUri.value = userInfo.photoUri ?: ""
+                _state.update {
+                    it.copy(
+                        email = userInfo.email,
+                        photoUri = userInfo.photoUri ?: ""
+                    )
+                }
                 authIntent()
             }
         }
@@ -46,15 +98,68 @@ class AuthViewModel(
         launcher.launch(request)
     }
 
-    fun handleAuthResult(intent: Intent?) {
+    fun handleLauncherResult(intent: Intent?) {
         viewModelScope.launch {
-            authorizationManager.handleActivityResult(intent) { token ->
-                if (token != null) {
-                    _state.value = AuthState.Authenticated
-                } else {
-                    _state.value = AuthState.Unauthenticated
+            authorizationManager.handleActivityResult(intent) { result ->
+                viewModelScope.launch {
+                    _state.update { it.copy(isFirstLaunch = false) }
+                    val resultEmail = fetchEmailFromToken(result?.accessToken)
+                    if (resultEmail != state.value.email && resultEmail != null) {
+                        _state.update {
+                            it.copy(
+                                errorMessage = "Please select your primary account (${state.value.email}) to grant permissions."
+                            )
+                        }
+                        return@launch
+                    }
+                    val scopes = result?.grantedScopes
+                    if (scopes != null) {
+                        if (scopes.contains("https://www.googleapis.com/auth/calendar")) {
+                            userPrefRepository.calendarGranted()
+                            _state.update { it.copy(isCalendarGranted = true) }
+                        }
+                        if (scopes.contains("https://www.googleapis.com/auth/tasks")) {
+                            userPrefRepository.tasksGranted()
+                            _state.update { it.copy(isTasksGranted = true) }
+                        }
+                        if (scopes.contains("https://www.googleapis.com/auth/userinfo.profile")) {
+                            userPrefRepository.profileGranted()
+                            _state.update { it.copy(isProfileGranted = true) }
+                        }
+                    }
+                    _state.update { it.copy(isFirstLaunch = false) }
                 }
             }
+        }
+    }
+
+    private suspend fun fetchEmailFromToken(accessToken: String?): String? =
+        withContext(Dispatchers.IO) {
+            if (accessToken == null) return@withContext null
+            try {
+                val url = URL("https://www.googleapis.com/oauth2/v3/userinfo")
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+
+                connection.setRequestProperty("Authorization", "Bearer $accessToken")
+
+                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                    val response = connection.inputStream.bufferedReader().use { it.readText() }
+
+                    val jsonObject = JSONObject(response)
+                    return@withContext jsonObject.optString("email")
+                }
+                null
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+
+    fun invalidateCache() {
+        viewModelScope.launch {
+            authorizationManager.revokeToken()
+            authentificationManager.revokeCredentials()
         }
     }
 }

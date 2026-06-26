@@ -154,7 +154,7 @@ class SettingsFragment : Fragment(R.layout.settings_fragment) {
         if (binding.settingsFirstWeekDayTV.text != firstDayOfWeek) {
             binding.settingsFirstWeekDayTV.text = firstDayOfWeek
         }
-        if (!state.userImagePath.isNullOrBlank()) setupPhoto(state)
+        if (!state.userImagePath.isNullOrBlank()) setupPhoto(state) else startPostponedEnterTransition()
     }
 
     private fun setupPhoto(state: SettingsState) {
