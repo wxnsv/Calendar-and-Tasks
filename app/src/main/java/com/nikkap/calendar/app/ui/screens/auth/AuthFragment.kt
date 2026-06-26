@@ -74,7 +74,7 @@ class AuthFragment : Fragment() {
                             requireActivity()
                         ) {
                             authorizationManager.getAuthResult(
-                                viewModel.state.value.requiredScopes
+                                viewModel.state.value.requiredScopes.map { it.scopeUri }
                             ) { managerResult ->
                                 when (managerResult) {
                                     is AuthorizationManagerResult.InvalidCache -> {
@@ -91,6 +91,8 @@ class AuthFragment : Fragment() {
                                     is AuthorizationManagerResult.Success -> sharedViewModel.authorizeSuccess(
                                         viewModel.state.value.photoUri
                                     )
+
+                                    AuthorizationManagerResult.MissingScopes -> viewModel.resetScopes()
                                 }
                             }
                         }

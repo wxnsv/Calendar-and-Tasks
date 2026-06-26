@@ -51,10 +51,17 @@ class AuthorizationManager(context: Context) {
                     onResult(AuthorizationManagerResult.NeedResolution(result.pendingIntent!!.intentSender))
                 } else {
                     val token = result.accessToken
-                    if (token != null) {
+
+                    val grantedScopeStrings = result.grantedScopes.toList()
+
+                    val allScopesGranted = requestedScopes.all { reqScope ->
+                        grantedScopeStrings.contains(reqScope)
+                    }
+
+                    if (token != null && allScopesGranted) {
                         onResult(AuthorizationManagerResult.Success(result))
                     } else {
-                        onResult(AuthorizationManagerResult.InvalidCache)
+                        onResult(AuthorizationManagerResult.MissingScopes)
                     }
                 }
             }

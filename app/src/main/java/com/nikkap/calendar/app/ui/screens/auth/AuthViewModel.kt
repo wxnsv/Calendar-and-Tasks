@@ -7,6 +7,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.common.Scopes
+import com.google.android.gms.common.api.Scope
+import com.google.api.services.calendar.CalendarScopes
+import com.google.api.services.tasks.TasksScopes
 import com.nikkap.calendar.app.core.auth.AuthentificationManager
 import com.nikkap.calendar.app.core.auth.AuthorizationManager
 import com.nikkap.calendar.data.local.prefs.UserPrefs
@@ -43,13 +47,13 @@ class AuthViewModel(
 
         if (userPrefs != null) {
 
-            val requiredScopes: MutableList<String> = mutableListOf()
-            if (!userPrefs.isTasksGranted) requiredScopes.add("https://www.googleapis.com/auth/tasks")
-            else requiredScopes.remove("https://www.googleapis.com/auth/tasks")
-            if (!userPrefs.isProfileGranted) requiredScopes.add("profile")
-            else requiredScopes.remove("profile")
-            if (!userPrefs.isCalendarGranted) requiredScopes.add("https://www.googleapis.com/auth/calendar")
-            else requiredScopes.remove("https://www.googleapis.com/auth/calendar")
+            val requiredScopes: MutableList<Scope> = mutableListOf()
+            if (!userPrefs.isTasksGranted) requiredScopes.add(Scope(TasksScopes.TASKS))
+            else requiredScopes.remove(Scope(TasksScopes.TASKS))
+            if (!userPrefs.isProfileGranted) requiredScopes.add(Scope(Scopes.PROFILE))
+            else requiredScopes.remove(Scope(Scopes.PROFILE))
+            if (!userPrefs.isCalendarGranted) requiredScopes.add(Scope(CalendarScopes.CALENDAR_EVENTS))
+            else requiredScopes.remove(Scope(CalendarScopes.CALENDAR_EVENTS))
 
             val isAllGranted =
                 userPrefs.isCalendarGranted && userPrefs.isTasksGranted && userPrefs.isProfileGranted
@@ -114,7 +118,7 @@ class AuthViewModel(
                     }
                     val scopes = result?.grantedScopes
                     if (scopes != null) {
-                        if (scopes.contains("https://www.googleapis.com/auth/calendar")) {
+                        if (scopes.contains("https://www.googleapis.com/auth/calendar.events")) {
                             userPrefRepository.calendarGranted()
                             _state.update { it.copy(isCalendarGranted = true) }
                         }
@@ -160,6 +164,12 @@ class AuthViewModel(
         viewModelScope.launch {
             authorizationManager.revokeToken()
             authentificationManager.revokeCredentials()
+        }
+    }
+
+    fun resetScopes() {
+        viewModelScope.launch {
+            userPrefRepository.clearScopes()
         }
     }
 }

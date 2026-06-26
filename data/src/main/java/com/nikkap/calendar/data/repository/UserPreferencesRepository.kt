@@ -163,5 +163,13 @@ class UserPreferencesRepository(
         }
     }
 
+    suspend fun clearScopes() {
+        dataStore.edit { prefs ->
+            prefs[Keys.IS_PROFILE_GRANTED] = false
+            prefs[Keys.IS_CALENDAR_GRANTED] = false
+            prefs[Keys.IS_TASKS_GRANTED] = false
+        }
+    }
+
 
 }
