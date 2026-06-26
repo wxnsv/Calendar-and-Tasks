@@ -79,13 +79,13 @@ class AuthViewModel(
         viewModelScope.launch {
             val userInfo = authentificationManager.authenticate(context)
             if (userInfo != null) {
-                userPrefRepository.authorizeSession(
+                userPrefRepository.saveUserProfile(
                     userInfo.email,
                     userInfo.displayName ?: "",
                 )
                 _state.update {
                     it.copy(
-                        email = userInfo.email,
+                        email = if (it.email.isNullOrBlank()) userInfo.email else it.email,
                         photoUri = userInfo.photoUri ?: ""
                     )
                 }
