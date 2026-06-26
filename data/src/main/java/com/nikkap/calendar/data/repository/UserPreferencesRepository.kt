@@ -6,14 +6,11 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.nikkap.calendar.core.utils.toIsoDateWithoutSeconds
 import com.nikkap.calendar.data.local.prefs.UserPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
-import java.time.Instant
-import java.time.ZoneOffset
 
 class UserPreferencesRepository(
     private val dataStore: DataStore<Preferences>,
@@ -26,7 +23,6 @@ class UserPreferencesRepository(
         val USER_PHOTO_PATH = stringPreferencesKey("user_photo_path")
         val IS_FIRST_LAUNCH = booleanPreferencesKey("is_first_launch")
         val DEFAULT_TASKLIST_ID = stringPreferencesKey("default_tasklist_id")
-        val CALENDAR_TIME_MIN = stringPreferencesKey("calendar_time_min")
         val IS_LIST_SCREEN_LAST = booleanPreferencesKey("is_list_screen_last")
         val IS_LAST_OPENED_SCREEN = booleanPreferencesKey("is_last_opened_screen")
         val IS_SYSTEM_THEME = booleanPreferencesKey("is_system_theme")
@@ -69,11 +65,9 @@ class UserPreferencesRepository(
             prefs[Keys.DEFAULT_TASKLIST_ID]
         }
 
-    suspend fun authorizeSession(email: String, name: String) {
+    suspend fun saveUserProfile(email: String, name: String) {
         dataStore.edit { prefs ->
             prefs[Keys.USER_EMAIL] = email
-            prefs[Keys.IS_AUTHORIZED] = true
-            prefs[Keys.IS_FIRST_LAUNCH] = false
             prefs[Keys.USER_NAME] = name
         }
     }
@@ -88,16 +82,10 @@ class UserPreferencesRepository(
         dataStore.edit { it.clear() }
     }
 
-    suspend fun completeFirstLaunch() {
+    suspend fun completeAuth() {
         dataStore.edit { prefs ->
             prefs[Keys.IS_FIRST_LAUNCH] = false
-            prefs[Keys.CALENDAR_TIME_MIN] =
-                Instant.now()
-                    .atZone(ZoneOffset.UTC)
-                    .minusYears(1)
-                    .toInstant()
-                    .toEpochMilli()
-                    .toIsoDateWithoutSeconds()
+            prefs[Keys.IS_AUTHORIZED] = true
         }
     }
 

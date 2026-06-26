@@ -217,7 +217,7 @@ class MainViewModel(
 
     fun authorizeSuccess(url: String) {
         viewModelScope.launch {
-            userPrefRepository.completeFirstLaunch()
+            userPrefRepository.completeAuth()
 
             val constraint =
                 Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
