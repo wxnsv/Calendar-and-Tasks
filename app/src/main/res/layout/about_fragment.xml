@@ -47,7 +47,7 @@
                     android:id="@+id/aboutAppIcon"
                     android:layout_width="88dp"
                     android:layout_height="88dp"
-                    android:src="@mipmap/ic_launcher"
+                    app:srcCompat="@mipmap/ic_launcher"
                     app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
 
                 <TextView
@@ -81,22 +81,22 @@
                     android:id="@+id/aboutGithubButton"
                     style="@style/OutlinedCardViewRelativeLayout">
 
-                    <ImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/aboutGithubIcon"
-                        style="@style/OutlinedCardViewImageView"
+                        style="@style/AboutImageView"
                         android:contentDescription="@string/github"
-                        android:src="@drawable/github" />
+                        app:srcCompat="@drawable/github" />
 
                     <TextView
                         style="@style/OutlinedCardViewTextView"
                         android:layout_toEndOf="@id/aboutGithubIcon"
                         android:text="@string/github" />
 
-                    <ImageView
-                        style="@style/OutlinedCardViewImageView"
+                    <androidx.appcompat.widget.AppCompatImageView
+                        style="@style/AboutImageView"
                         android:layout_alignParentEnd="true"
                         android:contentDescription="@string/chevron"
-                        android:src="@drawable/chevron_right" />
+                        app:srcCompat="@drawable/chevron_right" />
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -116,22 +116,22 @@
                         style="@style/OutlinedCardViewRelativeLayout">
 
 
-                        <ImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/aboutRateIcon"
-                            style="@style/OutlinedCardViewImageView"
+                            style="@style/AboutImageView"
                             android:contentDescription="@string/rate_in_play_store"
-                            android:src="@drawable/star" />
+                            app:srcCompat="@drawable/star" />
 
                         <TextView
                             style="@style/OutlinedCardViewTextView"
                             android:layout_toEndOf="@id/aboutRateIcon"
                             android:text="@string/rate_in_play_store" />
 
-                        <ImageView
-                            style="@style/OutlinedCardViewImageView"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            style="@style/AboutImageView"
                             android:layout_alignParentEnd="true"
                             android:contentDescription="@string/chevron"
-                            android:src="@drawable/chevron_right" />
+                            app:srcCompat="@drawable/chevron_right" />
                     </RelativeLayout>
 
                     <com.google.android.material.divider.MaterialDivider
@@ -144,22 +144,22 @@
                         android:id="@+id/aboutReportButton"
                         style="@style/OutlinedCardViewRelativeLayout">
 
-                        <ImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/aboutReportIcon"
-                            style="@style/OutlinedCardViewImageView"
+                            style="@style/AboutImageView"
                             android:contentDescription="@string/bug_report"
-                            android:src="@drawable/bug_report" />
+                            app:srcCompat="@drawable/bug_report" />
 
                         <TextView
                             style="@style/OutlinedCardViewTextView"
                             android:layout_toEndOf="@id/aboutReportIcon"
                             android:text="@string/bug_report" />
 
-                        <ImageView
-                            style="@style/OutlinedCardViewImageView"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            style="@style/AboutImageView"
                             android:contentDescription="@string/chevron"
                             android:layout_alignParentEnd="true"
-                            android:src="@drawable/chevron_right" />
+                            app:srcCompat="@drawable/chevron_right" />
                     </RelativeLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -181,22 +181,22 @@
                         style="@style/OutlinedCardViewRelativeLayout">
 
 
-                        <ImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/aboutPrivacyIcon"
-                            style="@style/OutlinedCardViewImageView"
+                            style="@style/AboutImageView"
                             android:contentDescription="@string/privacy_policy"
-                            android:src="@drawable/privacy_policy" />
+                            app:srcCompat="@drawable/privacy_policy" />
 
                         <TextView
                             android:layout_toEndOf="@id/aboutPrivacyIcon"
                             android:text="@string/privacy_policy"
                             style="@style/OutlinedCardViewTextView" />
 
-                        <ImageView
-                            style="@style/OutlinedCardViewImageView"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            style="@style/AboutImageView"
                             android:layout_alignParentEnd="true"
                             android:contentDescription="@string/chevron"
-                            android:src="@drawable/chevron_right" />
+                            app:srcCompat="@drawable/chevron_right" />
                     </RelativeLayout>
 
                     <com.google.android.material.divider.MaterialDivider
@@ -210,22 +210,22 @@
                         style="@style/OutlinedCardViewRelativeLayout">
 
 
-                        <ImageView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/aboutLicenseIcon"
                             android:contentDescription="@string/license"
-                            android:src="@drawable/license"
-                            style="@style/OutlinedCardViewImageView" />
+                            app:srcCompat="@drawable/license"
+                            style="@style/AboutImageView" />
 
                         <TextView
                             style="@style/OutlinedCardViewTextView"
                             android:layout_toEndOf="@id/aboutLicenseIcon"
                             android:text="@string/license" />
 
-                        <ImageView
-                            style="@style/OutlinedCardViewImageView"
+                        <androidx.appcompat.widget.AppCompatImageView
+                            style="@style/AboutImageView"
                             android:layout_alignParentEnd="true"
                             android:contentDescription="@string/chevron"
-                            android:src="@drawable/chevron_right" />
+                            app:srcCompat="@drawable/chevron_right" />
                     </RelativeLayout>
 
                 </LinearLayout>

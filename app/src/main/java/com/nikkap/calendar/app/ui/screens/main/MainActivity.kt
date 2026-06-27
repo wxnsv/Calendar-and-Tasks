@@ -1,10 +1,11 @@
 package com.nikkap.calendar.app.ui.screens.main
 
 import android.os.Bundle
+import android.view.Window.FEATURE_NO_TITLE
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : FragmentActivity() {
     private val viewModel: MainViewModel by viewModel()
     private lateinit var navController: NavController
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,13 +36,15 @@ class MainActivity : AppCompatActivity() {
                 AppCompatDelegate.setDefaultNightMode(targetMode)
             }
         }
+        val splashScreen = installSplashScreen()
         enableEdgeToEdge()
+        requestWindowFeature(FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         observeNavigation()
         viewModel.checkAuthAndNavigate()
         observeState()
-        installSplashScreen().setKeepOnScreenCondition {
+        splashScreen.setKeepOnScreenCondition {
             !viewModel.state.value.isScreensReady
         }
     }
@@ -95,8 +98,18 @@ class MainActivity : AppCompatActivity() {
                                     putString("id", event.route.itemId)
                                 }
                             }
-                            navController.navigate(resId, bundle, options)
-
+                            if (navController.currentDestination?.id != resId) {
+                                val isAlreadyOnTarget = when (event.route) {
+                                    is NavigationTarget.Settings -> navController.currentDestination?.id == R.id.settingsFragment
+                                    is NavigationTarget.About -> navController.currentDestination?.id == R.id.aboutFragment
+                                    else -> false
+                                }
+                                if (!isAlreadyOnTarget) navController.navigate(
+                                    resId,
+                                    bundle,
+                                    options
+                                )
+                            }
                         }
 
                         is NavEvent.SetRoot -> {

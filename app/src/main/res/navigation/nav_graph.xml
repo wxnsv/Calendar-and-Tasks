@@ -35,12 +35,15 @@
 
         <action
             android:id="@+id/action_mainPager_to_createFragment"
+            app:launchSingleTop="true"
             app:destination="@id/createFragment" />
         <action
             android:id="@+id/action_mainPager_to_settingsFragment"
+            app:launchSingleTop="true"
             app:destination="@id/settingsFragment" />
         <action
             android:id="@+id/action_mainPager_to_authFragment"
+            app:launchSingleTop="true"
             app:destination="@id/authFragment" />
     </fragment>
 

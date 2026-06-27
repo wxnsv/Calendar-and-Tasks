@@ -119,7 +119,7 @@ dependencies {
 // Credentials
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
-// Google Play Services Auth
+// Google Play Services
     implementation(libs.play.services.auth)
     implementation(libs.google.api.services.tasks)
     implementation(libs.google.api.services.calendar)

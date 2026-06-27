@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Base.Theme.Calendar" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Calendar" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
@@ -23,16 +23,18 @@
         <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
 
         <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
-
+        s
         <item name="android:fontFamily">@font/app_font</item>
         <item name="fontFamily">@font/app_font</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.Calendar" parent="Base.Theme.Calendar" />
-
     <style name="Theme.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#FFFFFF</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenBackground">#1D788F</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_svg</item>
+
         <item name="postSplashScreenTheme">@style/Theme.Calendar</item>
     </style>
 
@@ -57,7 +59,8 @@
         <item name="android:contentInsetStart">0dp</item>
         <item name="android:contentInsetEnd">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="android:paddingHorizontal">45dp</item>
+        <item name="android:paddingStart">45dp</item>
+        <item name="android:paddingHorizontal">20dp</item>
         <item name="android:paddingVertical">12dp</item>
     </style>
 </resources>

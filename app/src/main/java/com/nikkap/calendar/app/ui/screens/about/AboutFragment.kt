@@ -1,9 +1,12 @@
 package com.nikkap.calendar.app.ui.screens.about
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -45,6 +48,9 @@ class AboutFragment : Fragment(R.layout.about_fragment) {
         binding.aboutToolbar.setNavigationOnClickListener {
             sharedViewModel.popBackStack()
         }
+        binding.aboutRateButton.setOnClickListener {
+            openPlayStoreForRating()
+        }
     }
 
     private fun observeState() {
@@ -54,6 +60,26 @@ class AboutFragment : Fragment(R.layout.about_fragment) {
 //
 //                }
             }
+        }
+    }
+
+    private fun openPlayStoreForRating() {
+        val appId = requireContext().packageName
+
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$appId".toUri()).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            requireContext().startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                "https://play.google.com/store/apps/details?id=$appId".toUri()
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            requireContext().startActivity(intent)
+            e.printStackTrace()
         }
     }
 }

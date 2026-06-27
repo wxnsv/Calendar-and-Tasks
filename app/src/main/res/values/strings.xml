@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Calendar</string>
+    <string name="app_name">Calendar and Tasks</string>
     <string name="item_text_sample">Item text sample</string>
     <string name="today">Today</string>
     <string name="inbox">Inbox</string>
