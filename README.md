@@ -53,6 +53,7 @@ The application follows modern Android development standards, separating reactiv
 
 ## 🔗 Links & Resources
 
+* **Project Site:** [App site](https://wxnsv.github.io/Calendar-and-Tasks/)
 * **Project Source Code:** [GitHub Repository](https://github.com/wxnsv/calendar-and-tasks)
 * **Privacy Policy:** [Privacy Policy](https://sites.google.com/view/calendarandtasks)
 
