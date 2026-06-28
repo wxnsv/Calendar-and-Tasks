@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar and Tasks App — Google Calendar & Tasks Client</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #2dd4bf;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 0 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 0;
+        }
+
+        /* Hero Section */
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .app-icon {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 24px;
+            border: 2px solid var(--accent-color);
+            border-radius: 28px;
+            background-color: var(--card-bg);
+            overflow: hidden; /* Обрезает углы картинки под border-radius */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px -5px rgba(45, 212, 191, 0.2);
+        }
+
+        .app-icon img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover; /* Растягивает картинку 512x512 на всю область без искажений */
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.05em;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 32px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(45, 212, 191, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-muted);
+        }
+
+        /* Section Styling */
+        section {
+            margin-bottom: 80px;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 32px;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(45, 212, 191, 0.4);
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Tech Stack List */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tech-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .tech-category {
+            font-weight: 700;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tech-libs {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="app-icon">
+            <img src="logo.png" alt="Calendar And Tasks App Icon">
+        </div>
+        <h1>Calendar and Tasks App</h1>
+        <p class="subtitle">A minimalist and functional personal organizer for Android. A lightweight client for Google Calendar and Google Tasks designed to streamline your daily schedule without unnecessary distractions.</p>
+        <div class="cta-buttons">
+            <a href="https://github.com/wxnsv/calendar-and-tasks" class="btn btn-primary">View Source on GitHub</a>
+            <a href="https://sites.google.com/view/calendarandtasks" class="btn btn-secondary">Privacy Policy</a>
+        </div>
+    </header>
+
+    <section>
+        <h2>About the Application</h2>
+        <div class="card" style="background: linear-gradient(135deg, #1e293b, #0f172a);">
+            <p style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 16px;">
+                This application serves as an efficient open-source alternative for managing your time. It interacts directly with the official Google Calendar and Google Tasks APIs, bringing your core schedule, tasks, events and birthdays into a cohesive, highly responsive layout.
+            </p>
+            <p>
+                Built around clear architecture guidelines, it eliminates clutter to give you instant access to your timeline. The application operates with clean client-side logic, managing data locally via advanced persistence methods and syncing updates straight to your Google account.
+            </p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Core Features</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Dual-View Interface</h3>
+                <p>Switch easily between two view paradigms: a continuous unified List stream of all your upcoming items, or a precise Split screen layout.</p>
+            </div>
+            <div class="card">
+                <h3>Smart Split Synchronization</h3>
+                <p>In Split mode, the top half displays a semi-static calendar grid while the bottom hosts a scrollable agenda feed. Scrolling through the list dynamically realigns and updates the calendar grid focus based on visible items.</p>
+            </div>
+            <div class="card">
+                <h3>Essential Task Management</h3>
+                <p>Create and sync tasks directly with Google Tasks API. Assign them to your specific pre-existing task lists seamlessly directly during the task creation flow.</p>
+            </div>
+            <div class="card">
+                <h3>Clean Event Scheduling</h3>
+                <p>Quickly add events to your Google Calendar. Includes standard customization options focusing on core elements: title, date, time, description, and color-coding.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Technical Architecture</h2>
+        <div class="card" style="margin-bottom: 32px;">
+            <p style="color: var(--text-muted);">
+                The application follows a modern MVI architecture framework, blending reactive UI states with reliable asynchronous background tasks. Below is the structured dependency environment used to build the codebase.
+            </p>
+        </div>
+        <div class="tech-grid">
+            <div class="card tech-item">
+                <span class="tech-category">UI Framework & Components</span>
+                <span class="tech-libs">Jetpack Compose (Material 3 & Material), Kizitonwose Compose Calendar, alongside traditional XML components (ConstraintLayout, RecyclerView, SwipeRefreshLayout)</span>
+            </div>
+            <div class="card tech-item">
+                <span class="tech-category">Asynchronous Flow & Threading</span>
+                <span class="tech-libs">Kotlin Coroutines (Android & Play Services extensions) utilizing Channels for predictable, decoupled event-driven navigation processing</span>
+            </div>
+            <div class="card tech-item">
+                <span class="tech-category">Networking & API Integration</span>
+                <span class="tech-libs">Retrofit, OkHttp with Logging Interceptors, and Moshi JSON serialization for reliable remote infrastructure interactions</span>
+            </div>
+            <div class="card tech-item">
+                <span class="tech-category">Google Cloud Ecosystem APIs</span>
+                <span class="tech-libs">Google API Services Calendar, Google API Services Tasks,
