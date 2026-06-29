@@ -194,26 +194,7 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
                 )
             )
         }
-        /**
-         * if start time earlier than now do text red
-         */
-        if (state.eventStartTime < currentTime) {
-            binding.createEventStartTimeButton.setTextColor(
-                ColorStateList.valueOf(
-                    requireContext().getColorFromAttr(
-                        com.google.android.material.R.attr.colorErrorContainer
-                    )
-                )
-            )
-        } else {
-            binding.createEventStartTimeButton.setTextColor(
-                ColorStateList.valueOf(
-                    requireContext().getColorFromAttr(
-                        com.google.android.material.R.attr.colorOnSurface
-                    )
-                )
-            )
-        }
+
         /**
          * if end time earlier than now do text red
          */
@@ -262,6 +243,14 @@ class CreateEventFragment : Fragment(R.layout.create_event_fragment) {
                 ColorStateList.valueOf(
                     requireContext().getColorFromAttr(
                         com.google.android.material.R.attr.colorErrorContainer
+                    )
+                )
+            )
+        } else {
+            binding.createEventEndDateButton.setTextColor(
+                ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(
+                        com.google.android.material.R.attr.colorOnSurface
                     )
                 )
             )

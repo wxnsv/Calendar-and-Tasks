@@ -155,9 +155,9 @@ class CalendarRepositoryImpl(
                     )
                 } else Result.success(Unit)
             }
+            pendingSync()
             eventsResult.await()
             birthdayResult.await()
-            pendingSync()
             Result.success(Unit)
         }
     } catch (e: Exception) {

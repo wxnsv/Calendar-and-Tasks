@@ -187,6 +187,7 @@ class CreateViewModel(
                         if (deleteSubtasks.isNotEmpty()) deleteSubtasks.forEach { deleteSubtask ->
                             taskRepository.deleteSubtask(deleteSubtask.id)
                         }
+                        taskRepository.updateTask(taskToSave)
 
                     } else {
                         taskRepository.saveTask(taskToSave)

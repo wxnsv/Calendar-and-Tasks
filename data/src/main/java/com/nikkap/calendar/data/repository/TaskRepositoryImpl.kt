@@ -291,6 +291,9 @@ class TaskRepositoryImpl(
             dao.deleteSubtasksByIds(allTaskToDelete.toList())
         }
 
+        tasksPendingSync()
+        subtasksPendingSync()
+
         coroutineScope {
             localSyncEntities(
                 subtaskEntitiesToSync,
@@ -307,9 +310,6 @@ class TaskRepositoryImpl(
                     { dao.insertTasks(it) }
                 )
             }
-
-            tasksPendingSync()
-            subtasksPendingSync()
 
             Result.success(Unit)
     } catch (e: Exception) {
@@ -364,11 +364,11 @@ class TaskRepositoryImpl(
                             if (!response.isSuccessful) throw NetworkException.ServerException(
                                 response.code(),
                                 "Insert failed"
-                            )
-
-                            dao.insertTask(
-                                entity.markAsSynchronized(parseIsoDate(response.body()?.updated))
-                            )
+                            ) else {
+                                val task = response.body()!!
+                                dao.deleteTask(entity.id)
+                                dao.insertTask(task.toTaskEntity(entity.taskListId))
+                            }
                         }
 
                         PendingActions.NONE -> {}
