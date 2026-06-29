@@ -177,7 +177,7 @@
 
 
                     <RelativeLayout
-                        android:id="@+id/aboutPolicyButton"
+                        android:id="@+id/aboutPrivacyPolicyButton"
                         style="@style/OutlinedCardViewRelativeLayout">
 
 

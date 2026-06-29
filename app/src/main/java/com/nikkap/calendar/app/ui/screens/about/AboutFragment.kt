@@ -51,6 +51,18 @@ class AboutFragment : Fragment(R.layout.about_fragment) {
         binding.aboutRateButton.setOnClickListener {
             openPlayStoreForRating()
         }
+        binding.aboutGithubButton.setOnClickListener {
+            openAboutSite("https://github.com/wxnsv/calendar-and-tasks")
+        }
+        binding.aboutPrivacyPolicyButton.setOnClickListener {
+            openAboutSite("https://sites.google.com/view/calendarandtasks")
+        }
+        binding.aboutLicenseButton.setOnClickListener {
+            openAboutSite("https://www.apache.org/licenses/LICENSE-2.0")
+        }
+        binding.aboutReportButton.setOnClickListener {
+            openAboutSite("https://github.com/wxnsv/calendar-and-tasks/issues/new")
+        }
     }
 
     private fun observeState() {
@@ -81,5 +93,15 @@ class AboutFragment : Fragment(R.layout.about_fragment) {
             requireContext().startActivity(intent)
             e.printStackTrace()
         }
+    }
+
+    private fun openAboutSite(url: String) {
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            url.toUri()
+        ).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        requireContext().startActivity(intent)
     }
 }
