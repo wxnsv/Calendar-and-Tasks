@@ -72,16 +72,16 @@ class SplitViewModel(
 
         val mixedListWithDate =
             (taskItems + eventItems + birthdayItems + subtaskItems).sortedBy { item ->
-            when (item) {
-                is SplitEntity.TaskItem -> item.task.title
-                is SplitEntity.EventItem -> item.event.summary
-                is SplitEntity.BirthdayItem -> item.birthday.name
-                is SplitEntity.SubtaskItem -> {
-                    val parentTitle = tasks.find { it.id == item.subtask.parentId }?.title ?: ""
-                    "$parentTitle / ${item.subtask.position}"
+                when (item) {
+                    is SplitEntity.TaskItem -> item.task.title
+                    is SplitEntity.EventItem -> item.event.summary
+                    is SplitEntity.BirthdayItem -> item.birthday.name
+                    is SplitEntity.SubtaskItem -> {
+                        val parentTitle = tasks.find { it.id == item.subtask.parentId }?.title ?: ""
+                        "$parentTitle / ${item.subtask.position}"
+                    }
                 }
             }
-        }
 
         val taskItemsWithoutDate =
             tasks.filter { task -> !task.isCompleted && task.deadline == null || !task.isCompleted && task.deadline == 0L }
@@ -89,13 +89,17 @@ class SplitViewModel(
                     val taskWithDate = task.copy(deadline = 0L)
                     SplitEntity.TaskItem(taskWithDate)
                 }
+
         val subtaskItemsWithoutDate =
             subtasks.map { subtask ->
                 SplitEntity.SubtaskItem(
                     subtask,
                     deadline = 0L
                 )
-            }.filter { subtask -> !subtask.subtask.isCompleted }
+            }.filter { subtask ->
+                !subtask.subtask.isCompleted &&
+                        taskItemsWithoutDate.find { it.id == subtask.subtask.parentId } != null
+            }
 
         val mixedListWithoutDate =
             (taskItemsWithoutDate + subtaskItemsWithoutDate).sortedBy { item ->
@@ -104,7 +108,9 @@ class SplitViewModel(
                     is SplitEntity.EventItem -> item.event.summary
                     is SplitEntity.BirthdayItem -> item.birthday.name
                     is SplitEntity.SubtaskItem -> {
-                        val parentTitle = tasks.find { it.id == item.subtask.parentId }?.title ?: ""
+                        val parentTitle =
+                            taskItemsWithoutDate.find { it.id == item.subtask.parentId }?.title
+                                ?: ""
                         "$parentTitle / ${item.subtask.position}"
                     }
                 }
