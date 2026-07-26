@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.nikkap.calendar.app.R
 import com.nikkap.calendar.core.utils.CalendarColors
 import com.nikkap.calendar.core.utils.toListUiDate
-import com.nikkap.calendar.core.utils.toUiDate
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.Subtask
@@ -178,7 +177,7 @@ class ListAdapter(
         fun bind(birthday: Birthday, onClick: () -> Unit, onDelete: () -> Unit) {
             val color = CalendarColors.getBirthdayColor(birthday.colorId).hex.toColorInt()
             birthdayName.text = birthday.name
-            birthdayDate.text = birthday.date.toUiDate()
+            birthdayDate.text = birthday.date?.toListUiDate(true)
             itemType.text = "Birthday"
             itemIcon.setImageResource(R.drawable.birthday)
             itemView.setOnClickListener {

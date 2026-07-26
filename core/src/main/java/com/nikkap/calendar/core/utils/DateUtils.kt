@@ -1,14 +1,10 @@
 package com.nikkap.calendar.core.utils
 
-import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
-import java.time.Month
-import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
 import java.util.Calendar.HOUR_OF_DAY
@@ -23,10 +19,10 @@ import java.util.Locale
  * and can use the phone's system Time Zone.
  */
 fun Long.toListUiDate(isAllDay: Boolean = true, zoneId: ZoneId = ZoneId.systemDefault()): String {
-    val allDayDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    val allDayDateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")
         .withZone(zoneId)
 
-    val defaultDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
+    val defaultDateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy HH:mm")
         .withZone(zoneId)
 
     return if (isAllDay) allDayDateFormatter.format(Instant.ofEpochMilli(this))
@@ -179,28 +175,13 @@ fun Long.toLocalDate(): LocalDate {
 
 fun Long?.toShortUiDate(): String {
     if (this == null) return ""
-    val formatter = DateTimeFormatter.ofPattern("EE, MMM d", Locale.ENGLISH)
+    val formatter = DateTimeFormatter.ofPattern("EE, MMMM d", Locale.ENGLISH)
     return Instant.ofEpochMilli(this)
         .atZone(ZoneId.systemDefault())
         .format(formatter)
 }
 
 private val enLocale = Locale("en-US")
-
-fun YearMonth.displayText(short: Boolean = false): String {
-    return "${month.displayText(short = short)} $year"
-}
-
-
-fun Month.displayText(short: Boolean = true): String {
-    return getDisplayName(if (short) TextStyle.SHORT else TextStyle.FULL, enLocale)
-}
-
-fun DayOfWeek.displayText(uppercase: Boolean = false, narrow: Boolean = false): String {
-    return getDisplayName(if (narrow) TextStyle.NARROW else TextStyle.FULL, enLocale).let { value ->
-        if (uppercase) value.uppercase(enLocale) else value
-    }
-}
 
 fun LocalDate.toDisplayDate(showYear: Boolean = false): String {
     val short = DateTimeFormatter.ofPattern("EEE, MMMM   d", enLocale)

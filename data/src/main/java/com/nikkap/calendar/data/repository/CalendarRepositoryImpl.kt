@@ -101,7 +101,6 @@ class CalendarRepositoryImpl(
     }
 
     override suspend fun syncCalendar(): Result<Unit> = try {
-
         coroutineScope {
             val eventsResult = async {
 
