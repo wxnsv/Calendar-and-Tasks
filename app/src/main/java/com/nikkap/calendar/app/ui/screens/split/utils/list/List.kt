@@ -30,6 +30,7 @@ fun List(
     onEditClick: (String, String) -> Unit,
     onDeleteClick: (String, String) -> Unit,
     listState: LazyListState,
+    modifier: Modifier,
     onCompleteClick: (String, String) -> Unit,
 ) {
     val screenHeight = LocalWindowInfo.current.containerSize.height.div(8)
@@ -39,7 +40,11 @@ fun List(
         .toList()
         .sortedBy { it[0].date.toLocalDate() }
 
-    LazyColumn(state = listState, contentPadding = PaddingValues(bottom = screenHeight.dp)) {
+    LazyColumn(
+        state = listState,
+        contentPadding = PaddingValues(bottom = screenHeight.dp),
+        modifier = modifier
+    ) {
         listOfListsWithSameDateItems.forEach { list ->
             stickyHeader {
                 GroupOfListItemTitle(list.first())

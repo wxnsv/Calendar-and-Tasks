@@ -1,21 +1,24 @@
 package com.nikkap.calendar.app.ui.screens.split
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -51,39 +54,56 @@ class SplitFragment : Fragment() {
         val scope = rememberCoroutineScope()
         val state = viewModel.state.collectAsState().value
         val listState = rememberLazyListState()
-        CalendarTheme {
-            Column(
-                Modifier.background(MaterialTheme.colorScheme.background)
-            ) {
-                Calendar(
-                    state.items,
-                    listState,
-                    state
-                ) { viewModel.onIntent(SplitIntent.UpdateSelectedDate(it)) }
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-                List(
-                    state.items,
-                    itemsWithoutDateList = state.itemsWithoutDate,
-                    onEditClick = { id, type ->
-                        sharedViewModel.onEditListItemClicked(id, type)
-                    },
-                    onDeleteClick = { id, type ->
-                        viewModel.onIntent(SplitIntent.PendingDeleteItem(id, type))
 
-                        scope.launch {
+        val calendarContent = @Composable { modifier: Modifier ->
+            Calendar(
+                listOfItems = state.items,
+                listState = listState,
+                state = state,
+                modifier = modifier
+            ) { viewModel.onIntent(SplitIntent.UpdateSelectedDate(it)) }
+        }
 
-                            snackbarHostState.currentSnackbarData?.dismiss()
+        val listContent = @Composable { modifier: Modifier ->
+            List(
+                itemsList = state.items,
+                itemsWithoutDateList = state.itemsWithoutDate,
+                onEditClick = { id, type ->
+                    sharedViewModel.onEditListItemClicked(id, type)
+                },
+                onDeleteClick = { id, type ->
+                    viewModel.onIntent(SplitIntent.PendingDeleteItem(id, type))
 
-                            sharedViewModel.showSnackbar("Item deleted", "Undo") {
-                                viewModel.onIntent(SplitIntent.UndoPendingDelete(id))
-                            }
+                    scope.launch {
+
+                        snackbarHostState.currentSnackbarData?.dismiss()
+
+                        sharedViewModel.showSnackbar("Item deleted", "Undo") {
+                            viewModel.onIntent(SplitIntent.UndoPendingDelete(id))
                         }
-                    },
-                    onCompleteClick = { id, type ->
-                        sharedViewModel.onCompleteListItemClicked(id, type)
-                    },
-                    listState = listState,
-                )
+                    }
+                },
+                onCompleteClick = { id, type ->
+                    sharedViewModel.onCompleteListItemClicked(id, type)
+                },
+                listState = listState,
+                modifier = modifier
+            )
+        }
+
+        CalendarTheme {
+            if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                Row {
+                    calendarContent(Modifier.weight(0.5f))
+                    VerticalDivider(color = MaterialTheme.colorScheme.outline)
+                    listContent(Modifier.weight(0.5f))
+                }
+            } else {
+                Column {
+                    calendarContent(Modifier)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                    listContent(Modifier)
+                }
             }
         }
         sharedViewModel.setSplitReady()

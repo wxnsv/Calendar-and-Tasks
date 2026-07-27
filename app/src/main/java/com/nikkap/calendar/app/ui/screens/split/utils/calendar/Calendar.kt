@@ -1,8 +1,8 @@
 package com.nikkap.calendar.app.ui.screens.split.utils.calendar
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
@@ -65,7 +65,7 @@ private fun Preview() {
             )
         )
         val listState = rememberLazyListState()
-        Calendar(list, listState, SplitState(), {})
+        Calendar(list, listState, SplitState(), Modifier, {})
     }
 }
 
@@ -75,7 +75,8 @@ fun Calendar(
     listOfItems: List<SplitEntity>,
     listState: LazyListState,
     state: SplitState,
-    onSelectedDateChanged: (LocalDate?) -> Unit
+    modifier: Modifier,
+    onSelectedDateChanged: (LocalDate?) -> Unit,
 ) {
     lateinit var calendarState: CalendarState
     if (listOfItems.isEmpty()) return
@@ -145,38 +146,40 @@ fun Calendar(
         keySelector = { it.date.toLocalDate() },
         valueTransform = { it.colorHex.toColor() }
     )
-    CalendarTitle(
-        modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 12.dp),
-        currentMonth = listEventMonth ?: currentMonth,
-    )
-    HorizontalCalendar(
-        modifier = Modifier
-            .wrapContentWidth()
-            .background(MaterialTheme.colorScheme.outline),
-        state = calendarState,
-        monthHeader = {
-            WeekDaysTitle(daysOfWeek = daysOfWeek)
-        },
-        dayContent = { day ->
-            Day(
-                day,
-                onClick = {
-                    coroutineScope.launch {
-                        listState.animateScrollToItem(
-                            groupedListEntitiesByDate.indexOf(
-                                groupedListEntitiesByDate.find { it.first().date.toLocalDate() == day.date }) * 2
-                        )
-                        onSelectedDateChanged(day.date)
-                    }
-                },
-                isSelected = selectedDate == day.date,
-                colorsList = colorsByDayMap[day.date] ?: emptyList()
+    Column(
+        modifier
+    ) {
+        CalendarTitle(
+            modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 12.dp),
+            currentMonth = listEventMonth ?: currentMonth,
+        )
+        HorizontalCalendar(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.outline),
+            state = calendarState,
+            monthHeader = {
+                WeekDaysTitle(daysOfWeek = daysOfWeek)
+            },
+            dayContent = { day ->
+                Day(
+                    day,
+                    onClick = {
+                        coroutineScope.launch {
+                            listState.animateScrollToItem(
+                                groupedListEntitiesByDate.indexOf(
+                                    groupedListEntitiesByDate.find { it.first().date.toLocalDate() == day.date }) * 2
+                            )
+                            onSelectedDateChanged(day.date)
+                        }
+                    },
+                    isSelected = selectedDate == day.date,
+                    colorsList = colorsByDayMap[day.date] ?: emptyList()
+                )
+            },
+            userScrollEnabled = false,
+
+
             )
-        },
-        userScrollEnabled = false,
-
-
-    )
-
+    }
 }
