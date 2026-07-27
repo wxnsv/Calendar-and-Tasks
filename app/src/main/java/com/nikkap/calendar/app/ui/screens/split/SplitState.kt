@@ -8,5 +8,6 @@ data class SplitState(
     val itemsWithoutDate: List<SplitEntity> = emptyList(),
     val selectedDate: LocalDate? = null,
     val isLoading: Boolean = false,
-    val isMondayFirst: Boolean = true
+    val isMondayFirst: Boolean = true,
+    val isScrolledToNearest: Boolean = false
 )

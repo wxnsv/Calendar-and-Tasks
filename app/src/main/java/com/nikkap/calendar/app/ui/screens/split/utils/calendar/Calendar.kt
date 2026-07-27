@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,10 +33,13 @@ import com.nikkap.calendar.core.utils.toLocalDate
 import com.nikkap.calendar.domain.model.Birthday
 import com.nikkap.calendar.domain.model.Event
 import com.nikkap.calendar.domain.model.Task
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
+import kotlin.math.abs
 
 @Preview
 @Composable
@@ -65,7 +69,7 @@ private fun Preview() {
             )
         )
         val listState = rememberLazyListState()
-        Calendar(list, listState, SplitState(), Modifier, {})
+        Calendar(list, listState, SplitState(), Modifier, {}, {})
     }
 }
 
@@ -76,6 +80,7 @@ fun Calendar(
     listState: LazyListState,
     state: SplitState,
     modifier: Modifier,
+    onScrolledToNearest: () -> Unit,
     onSelectedDateChanged: (LocalDate?) -> Unit,
 ) {
     lateinit var calendarState: CalendarState
@@ -88,7 +93,7 @@ fun Calendar(
 
     key(state.isMondayFirst) {
         calendarState = rememberCalendarState(
-            startMonth = currentMonth.minusMonths(36),
+            startMonth = currentMonth.minusMonths(12),
             endMonth = currentMonth.plusMonths(24),
             firstVisibleMonth = currentMonth,
             firstDayOfWeek = firstDay,
@@ -99,8 +104,10 @@ fun Calendar(
     val daysOfWeek = remember(firstDay) {
         daysOfWeek(firstDayOfWeek = firstDay)
     }
-    val nearest = listOfItems.minByOrNull { item ->
-        System.currentTimeMillis() - item.date
+    val nearest = remember {
+        listOfItems.minByOrNull { item ->
+            abs(System.currentTimeMillis() - item.date)
+        }
     }
 
     val topVisibleIndex by remember {
@@ -112,14 +119,23 @@ fun Calendar(
         .values
         .toList()
         .sortedBy { it[0].date.toLocalDate() }
-    if (nearest != null && listOfItems.isNotEmpty()) {
-        LaunchedEffect(nearest) {
-            coroutineScope.launch {
-                listState.scrollToItem(groupedListEntitiesByDate.indexOf(groupedListEntitiesByDate.find {
+    LaunchedEffect(Unit) {
+        if (nearest != null && listOfItems.isNotEmpty() && !state.isScrolledToNearest) {
+            val nearestItemIndex =
+                groupedListEntitiesByDate.indexOf(groupedListEntitiesByDate.find {
                     it.contains(
                         nearest
                     )
-                }) * 2)
+                }) * 2
+
+            coroutineScope.launch {
+                snapshotFlow { listState.layoutInfo.totalItemsCount }
+                    .filter { totalCount -> totalCount > nearestItemIndex }
+                    .first()
+                listState.scrollToItem(
+                    nearestItemIndex
+                )
+                onScrolledToNearest()
             }
         }
     }

@@ -170,6 +170,14 @@ class SplitViewModel(
 
                 _pendingDeletedIds.value -= intent.id
             }
+
+            is SplitIntent.ScrollToNearest -> {
+                _state.update {
+                    it.copy(
+                        isScrolledToNearest = true
+                    )
+                }
+            }
         }
     }
 }

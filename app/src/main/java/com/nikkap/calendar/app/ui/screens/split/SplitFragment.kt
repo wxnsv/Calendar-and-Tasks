@@ -60,7 +60,8 @@ class SplitFragment : Fragment() {
                 listOfItems = state.items,
                 listState = listState,
                 state = state,
-                modifier = modifier
+                modifier = modifier,
+                { viewModel.onIntent(SplitIntent.ScrollToNearest) }
             ) { viewModel.onIntent(SplitIntent.UpdateSelectedDate(it)) }
         }
 
