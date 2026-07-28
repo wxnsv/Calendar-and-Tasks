@@ -175,13 +175,13 @@ class CreateFragment : Fragment(R.layout.create_fragment) {
         button.setTextColor(
             ColorStateList.valueOf(
                 requireContext().getColorFromAttr(
-                    com.google.android.material.R.attr.colorOnSecondaryContainer
+                    com.google.android.material.R.attr.colorOnSurfaceVariant
                 )
             )
         )
         button.iconTint = ColorStateList.valueOf(
             requireContext().getColorFromAttr(
-                com.google.android.material.R.attr.colorOnSecondaryContainer
+                com.google.android.material.R.attr.colorOnSurfaceVariant
             )
         )
         button.backgroundTintList = ColorStateList.valueOf(

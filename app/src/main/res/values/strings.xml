@@ -48,7 +48,7 @@
     <string name="version_of_app">Version: 1.0</string>
     <string name="general">General</string>
     <string name="create_event_description_hint">Add description</string>
-    <string name="set_color">Set color</string>
+    <string name="color_tag">Color tag</string>
     <string name="save">Save</string>
     <string name="add_deadline">Add deadline</string>
     <string name="add_description">Add description</string>
