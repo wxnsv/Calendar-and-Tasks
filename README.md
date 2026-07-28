@@ -53,9 +53,9 @@ The application follows modern Android development standards, separating reactiv
 
 ## 🔗 Links & Resources
 
-* **Project Site:** [App site](https://wxnsv.github.io/Calendar-and-Tasks/)
+* **Project Site:** [App site](http://calendarandtasks.xyz/)
 * **Project Source Code:** [GitHub Repository](https://github.com/wxnsv/calendar-and-tasks)
-* **Privacy Policy:** [Privacy Policy](https://sites.google.com/view/calendarandtasks)
+* **Privacy Policy:** [Privacy Policy](http://calendarandtasks.xyz/privacy)
 
 ---
 📦 *Developed in 2026 using Kotlin and Jetpack Compose.*
