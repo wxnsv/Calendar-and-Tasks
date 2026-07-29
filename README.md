@@ -1,53 +1,50 @@
-# Calendar App — Google Calendar & Tasks Client
+# Calendar and Tasks — Google Calendar & Tasks Client
 
-**Calendar App** is a minimalist, responsive, and functional personal organizer for Android. The application is a lightweight client for **Google Calendar** and **Google Tasks**, designed to streamline your daily schedule and eliminate unnecessary distractions.
+**Calendar and Tasks** is a minimalist, responsive, and functional personal organizer for Android. The application is a lightweight client for **Google Calendar** and **Google Tasks**, designed to streamline your daily schedule and eliminate unnecessary distractions.
 
-The project is built using modern Android development practices, showcasing a clean MVVM architecture and a fully open-source codebase.
-
----
-
-## 🚀 Core Features
-
-* **Dual-View Interface:** Easily switch between two display paradigms: a continuous unified stream of all upcoming events and tasks (Unified List stream) or a precise split screen layout (Split layout).
-* **Smart Split Synchronization:** In Split mode, the top half displays a semi-static calendar grid while the bottom hosts a scrollable agenda feed. Scrolling through the list dynamically realigns and updates the calendar grid focus based on currently visible items.
-* **Essential Task Management:** Create, edit, and sync tasks directly via the official Google Tasks API. Seamlessly assign tasks to specific pre-existing task lists during the creation flow.
-* **Clean Event Scheduling:** Quickly add and edit events in Google Calendar. Supports all essential customization elements: title, date, time, description, and event color-coding.
+The project is built using modern Android development methods, uses a clean MVVM & MVI architectures and a fully open codebase.
 
 ---
 
-## 🛠 Technical Architecture & Stack
+## Core Features
 
-The application follows modern Android development standards, separating reactive UI states from reliable asynchronous business logic. The entire codebase is structured around the **MVVM** pattern.
+* **Interface with two display modes:** Easy switching between two display modes: a familiar list or combining a calendar and a list.
+* **Intelligent split synchronization:** In split mode, a calendar grid is displayed in the upper half, and a scrollable list of events is displayed in the lower half. When scrolling through the list, the focus of the calendar grid is dynamically rearranged and updated based on the currently displayed items.
+* **Main Task Management Features:** Create, edit, and sync tasks directly through the official Google Tasks API. During the creation process, easily assign tasks to specific task lists that already exist.
+* **Clear planning of events and birthdays:** Quickly add and edit events or birthdays in Google Calendar. Supports all necessary customization elements: name, date, time, description and color tag of the event.
+
+---
+
+## Technical Architecture & Stack
+
+The application follows modern Android development standards, separating reactive UI states from reliable asynchronous business logic. The entire codebase is structured around the **MVVM & MVI** patterns.
 
 ### Dependency Stack:
 
 * **UI & Interface Components:**
-  * *Jetpack Compose (Material 3 & Material)* — for building a fully declarative user interface.
+  * *Jetpack Compose* — for building a fully declarative user interface.
   * *Kizitonwose Compose Calendar* — a highly flexible calendar grid component.
-  * Traditional XML components (*ConstraintLayout, RecyclerView, SwipeRefreshLayout*) for optimal combining of approaches.
-  * *Jetpack Core SplashScreen API* — for a smooth and clean application launch.
+  * *AndroidX Navigation* - for a navigate the fragments.
+  * Traditional XML components for optimal combining of approaches.
 * **Asynchronous Flow & Threading:**
-  * *Kotlin Coroutines & Flow* (including extensions for Android and Play Services).
+  * *Kotlin Coroutines & Flow*.
   * *Channels* are utilized to create a predictable, event-driven, and loosely coupled navigation processing architecture.
-* **Networking & API Integration:**
-  * *Retrofit & OkHttp* (with configured Logging Interceptors) for reliable remote infrastructure interactions.
-  * *Moshi* — for fast and safe JSON serialization/deserialization.
-* **Google Cloud Ecosystem APIs:**
-  * *Google API Services Calendar* & *Google API Services Tasks*.
-  * *Google API Client Android*.
-  * *AndroidX Credentials Manager* & *Play Services Auth* for secure user authentication via Google Accounts.
+* **Network & API Integration:**
+  * *Retrofit & OkHttp* for reliable remote infrastructure interactions.
+* **Google APIs and Auth:**
+  * *Google Calendar v3* & *Google Tasks v1*.
+  * *AndroidX Credentials Manager* for secure user authentication via Google Accounts.
 * **Local Storage & Background Processing:**
-  * *Room Database* — for local structured caching and offline-first support.
+  * *Room Database* — for local structured caching entities and offline-first support.
   * *Jetpack DataStore (Preferences)* — for lightweight user preference persistence.
   * *AndroidX WorkManager* — for guaranteed execution of background data sync tasks even when the app is closed.
 * **Dependency Injection (DI):**
-  * *Koin DI* (featuring native `koin-androidx-compose` and `koin-androidx-workmanager` integrations).
+  * *Koin DI*
 * **Image Processing:**
-  * *Coil* — for asynchronous, coroutine-backed loading of user avatars and other graphical resources.
+  * *Coil* — for loading of user avatar.
 * **Testing Environment:**
   * *JUnit Jupiter (JUnit 5)* — a modern architecture platform for unit testing.
   * *MockK* — a powerful mocking library built specifically for Kotlin.
-  * *Kotlinx Coroutines Test framework* — for deterministic testing of asynchronous execution flows.
 
 ---
 
