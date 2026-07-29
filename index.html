@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-007FH3XVTE"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-007FH3XVTE"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  gtag('config', 'G-007FH3XVTE');
-</script>
+      gtag('config', 'G-007FH3XVTE');
+    </script>
 
     <meta charset="UTF-8">
     <meta name="google-site-verification" content="dadMdQiwE_blLC5A4rcVZvO4O6F90UqCTlmucAW0YMg" />
@@ -17,15 +17,20 @@
     <title>Calendar and Tasks — Google Calendar & Tasks Client</title>
 
     <link rel="icon" type="image/png" href="/favicon.png">
-    
+
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #2dd4bf;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
+            --bg-color: #f8fafc;
+            --bg-secondary: #f1f5f9;
+            --card-bg: #ffffff;
+            --accent-primary: #0f766e;
+            --accent-hover: #115e59;
+            --accent-light: #ccfbf1;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 25px -5px rgba(15, 118, 110, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
         }
 
         * {
@@ -39,53 +44,54 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             line-height: 1.6;
-            padding: 0 20px;
         }
 
-        .container {
-            max-width: 1000px;
+        /* Top Navbar Branding */
+        .navbar {
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 60px 0;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 80px;
-        }
-
-        .app-icon {
-            width: 130px;
-            height: 130px;
-            margin: 0 auto 24px;
-            border: 2px solid var(--accent-color);
-            border-radius: 28px;
-            background-color: var(--card-bg);
-            overflow: hidden;
+            padding: 24px 20px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 25px -5px rgba(45, 212, 191, 0.2);
+            gap: 12px;
         }
 
-        .app-icon img {
-            width: 100%;
-            height: 100%;
-            display: block;
+        .nav-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
             object-fit: cover;
         }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 12px;
-            letter-spacing: -0.05em;
+        .nav-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
         }
 
-        .subtitle {
+        /* Hero Section */
+        .hero {
+            max-width: 850px;
+            margin: 40px auto 60px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .hero p.subtitle {
             font-size: 1.2rem;
             color: var(--text-muted);
-            max-width: 650px;
-            margin: 0 auto 32px;
+            max-width: 700px;
+            margin: 0 auto 36px;
         }
 
         .cta-buttons {
@@ -93,38 +99,151 @@
             gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
-            padding: 12px 24px;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
             border-radius: 12px;
             font-weight: 600;
             text-decoration: none;
             transition: all 0.2s ease;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
         }
 
         .btn-primary {
-            background-color: var(--accent-color);
-            color: var(--bg-color);
+            background-color: var(--accent-primary);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(15, 118, 110, 0.25);
         }
 
         .btn-primary:hover {
+            background-color: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(45, 212, 191, 0.3);
+            box-shadow: 0 6px 20px rgba(15, 118, 110, 0.35);
+        }
+
+        .btn-playstore {
+            background-color: #0f172a;
+            color: #ffffff;
+            border: 1px solid #1e293b;
+        }
+
+        .btn-playstore:hover {
+            background-color: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
         }
 
         .btn-secondary {
-            background-color: transparent;
-            color: var(--text-main);
+            background-color: var(--card-bg);
+            color: var(--accent-primary);
             border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-color: var(--text-muted);
+            background-color: var(--accent-light);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Toast Popup Banner */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 14px 24px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 1000;
+            border: 1px solid #334155;
+        }
+
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toast-icon {
+            color: #2dd4bf;
+        }
+
+        /* Screenshots Showcase Section */
+        .screenshots-section {
+            background-color: var(--bg-secondary);
+            padding: 60px 20px;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 80px;
+        }
+
+        .section-title-center {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-primary);
+            margin-bottom: 40px;
+        }
+
+        .screenshots-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .screenshot-card {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease;
+            background-color: transparent;
+            display: flex;
+        }
+
+        .screenshot-card:hover {
+            transform: translateY(-6px);
+        }
+
+        .screenshot-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 20px;
+        }
+
+        /* Content Sections */
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
         section {
@@ -132,22 +251,11 @@
         }
 
         h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
+            font-size: 2rem;
+            font-weight: 800;
             margin-bottom: 32px;
-            position: relative;
-            padding-bottom: 8px;
-        }
-
-        h2::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 40px;
-            height: 3px;
-            background-color: var(--accent-color);
-            border-radius: 2px;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
         }
 
         .grid {
@@ -160,46 +268,43 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 24px;
-            transition: transform 0.2s ease;
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
         }
 
         .card:hover {
-            border-color: rgba(45, 212, 191, 0.4);
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-lg);
         }
 
         .card h3 {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             margin-bottom: 12px;
             color: var(--text-main);
+            font-weight: 700;
         }
 
         .card p {
             color: var(--text-muted);
-            font-size: 0.95rem;
+            font-size: 0.98rem;
         }
 
         .tech-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 24px;
-        }
-
-        @media (max-width: 600px) {
-            .tech-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         .tech-item {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 8px;
         }
 
         .tech-category {
             font-weight: 700;
-            color: var(--accent-color);
+            color: var(--accent-primary);
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -212,88 +317,168 @@
 
         footer {
             text-align: center;
-            padding-top: 40px;
+            padding: 40px 20px;
             border-top: 1px solid var(--border-color);
             color: var(--text-muted);
             font-size: 0.9rem;
+            background-color: var(--card-bg);
         }
 
         footer a {
-            color: var(--accent-color);
+            color: var(--accent-primary);
             text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            .screenshots-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .screenshots-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <img src="logo.png" alt="Calendar And Tasks Logo" class="nav-logo">
+        <span class="nav-title">Calendar and Tasks </span>
+    </nav>
 
-    <header>
-        <div class="app-icon">
-            <img src="logo.png" alt="Calendar And Tasks App Icon">
-        </div>
-        <h1>Calendar and Tasks App</h1>
-        <p class="subtitle">A minimalist and functional personal organizer for Android. A lightweight client for Google Calendar and Google Tasks designed to streamline your daily schedule without unnecessary distractions.</p>
+    <!-- Hero Section -->
+    <header class="hero">
+        <h1>Organize. Simplify. Connect.</h1>
+        <p class="subtitle">A minimalistic, responsive and functional personal organizer for Android. The app is a lightweight client for Google Calendar and Google Tasks, designed to optimize your daily schedule and combine events.</p>
         <div class="cta-buttons">
+            <button class="btn btn-playstore" onclick="showUpcomingNotice(event)">
+                <svg class="btn-icon" viewBox="0 0 24 24">
+                    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/>
+                </svg>
+                Google Play
+            </button>
             <a href="https://github.com/wxnsv/calendar-and-tasks" class="btn btn-primary">View Source on GitHub</a>
             <a href="http://calendarandtasks.xyz/privacy" class="btn btn-secondary">Privacy Policy</a>
         </div>
     </header>
 
-    <section>
-        <h2>About the Application</h2>
-        <div class="card" style="background: linear-gradient(135deg, #1e293b, #0f172a);">
-            <p style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 16px;">
-                This application serves as an efficient open-source alternative for managing your time. It interacts directly with the official Google Calendar and Google Tasks APIs, bringing your core schedule, tasks, events and birthdays into a cohesive, highly responsive layout.
-            </p>
-            <p>
-                Built around clear architecture guidelines, it eliminates clutter to give you instant access to your timeline. The application operates with clean client-side logic, managing data locally via advanced persistence methods and syncing updates straight to your Google account.
-            </p>
-        </div>
-    </section>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notification">
+        <span>Google Play release coming soon!</span>
+    </div>
 
-    <section>
-        <h2>Core Features</h2>
-        <div class="grid">
-            <div class="card">
-                <h3>Dual-View Interface</h3>
-                <p>Switch easily between two view paradigms: a continuous unified List stream of all your upcoming items, or a precise Split screen layout.</p>
+    <!-- Application Screenshots Showcase -->
+    <div class="screenshots-section">
+        <div class="section-title-center">Application Screenshots</div>
+        <div class="screenshots-grid">
+            <div class="screenshot-card">
+                <img src="screenshot1.png" alt="Clean agenda view">
             </div>
-            <div class="card">
-                <h3>Smart Split Synchronization</h3>
-                <p>In Split mode, the top half displays a semi-static calendar grid while the bottom hosts a scrollable agenda feed. Scrolling through the list dynamically realigns and updates the calendar grid focus based on visible items.</p>
+            <div class="screenshot-card">
+                <img src="screenshot2.png" alt="All-in-one view">
             </div>
-            <div class="card">
-                <h3>Essential Task Management</h3>
-                <p>Create and sync tasks directly with Google Tasks API. Assign them to your specific pre-existing task lists seamlessly directly during the task creation flow.</p>
+            <div class="screenshot-card">
+                <img src="screenshot3.png" alt="Minimalist design">
             </div>
-            <div class="card">
-                <h3>Clean Event Scheduling</h3>
-                <p>Quickly add events to your Google Calendar. Includes standard customization options focusing on core elements: title, date, time, description, and color-coding.</p>
+            <div class="screenshot-card">
+                <img src="screenshot4.png" alt="Light and dark themes">
             </div>
         </div>
-    </section>
+    </div>
 
-    <section>
-        <h2>Technical Architecture</h2>
-        <div class="card" style="margin-bottom: 32px;">
-            <p style="color: var(--text-muted);">
-                The application follows a modern MVI architecture framework, blending reactive UI states with reliable asynchronous background tasks. Below is the structured dependency environment used to build the codebase.
-            </p>
-        </div>
-        <div class="tech-grid">
-            <div class="card tech-item">
-                <span class="tech-category">UI Framework & Components</span>
-                <span class="tech-libs">Jetpack Compose (Material 3 & Material), Kizitonwose Compose Calendar, alongside traditional XML components (ConstraintLayout, RecyclerView, SwipeRefreshLayout)</span>
+    <!-- Main Content Containers -->
+    <main class="main-content">
+        
+        <section>
+            <h2>About the Application</h2>
+            <div class="card" style="background: linear-gradient(135deg, #ffffff, var(--accent-light));">
+                <p style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 16px; font-weight: 500;">
+                    This application serves as an efficient open-source alternative for managing your time. It interacts directly with the official Google Calendar and Google Tasks APIs, bringing your core schedule, tasks, events and birthdays into a cohesive, highly responsive layout.
+                </p>
             </div>
-            <div class="card tech-item">
-                <span class="tech-category">Asynchronous Flow & Threading</span>
-                <span class="tech-libs">Kotlin Coroutines (Android & Play Services extensions) utilizing Channels for predictable, decoupled event-driven navigation processing</span>
+        </section>
+
+        <section>
+            <h2>Core Features</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Interface with two display modes</h3>
+                    <p>Easy switching between two display modes: a familiar list or combining a calendar and a list.</p>
+                </div>
+                <div class="card">
+                    <h3>Intelligent split synchronization</h3>
+                    <p>In split mode, a calendar grid is displayed in the upper half, and a scrollable list of events is displayed in the lower half. When scrolling through the list, the focus of the calendar grid is dynamically rearranged and updated based on the currently displayed items.</p>
+                </div>
+                <div class="card">
+                    <h3>Main tasks management features</h3>
+                    <p>Create, edit, and sync tasks directly through the official Google Tasks API. During the creation process, easily assign tasks to specific task lists that already exist.</p>
+                </div>
+                <div class="card">
+                    <h3>Clear planning of events and birthdays</h3>
+                    <p>Quickly add and edit events or birthdays in Google Calendar. Supports all necessary customization elements: name, date, time, description and color tag of the event.</p>
+                </div>
             </div>
-            <div class="card tech-item">
-                <span class="tech-category">Networking & API Integration</span>
-                <span class="tech-libs">Retrofit, OkHttp with Logging Interceptors, and Moshi JSON serialization for reliable remote infrastructure interactions</span>
+        </section>
+
+        <section>
+            <h2>Technical Architecture</h2>
+            <div class="card" style="margin-bottom: 24px;">
+                <p style="color: var(--text-muted);">
+                    The application follows modern Android development standards, separating reactive UI states from reliable asynchronous business logic. The entire codebase is structured around the MVVM & MVI patterns.
+                </p>
             </div>
-            <div class="card tech-item">
-                <span class="tech-category">Google Cloud Ecosystem APIs</span>
-                <span class="tech-libs">Google API Services Calendar, Google API Services Tasks,
+            <div class="tech-grid">
+                <div class="card tech-item">
+                    <span class="tech-category">UI & Interface Components</span>
+                    <span class="tech-libs">Jetpack Compose, Kizitonwose Compose Calendar, AndroidX Navigation, traditional XML components (ConstraintLayout, RecyclerView, SwipeRefreshLayout)</span>
+                </div>
+                <div class="card tech-item">
+                    <span class="tech-category">Asynchronous Flow & Threading</span>
+                    <span class="tech-libs">Kotlin Coroutines & Flow</span>
+                </div>
+                <div class="card tech-item">
+                    <span class="tech-category">Network & API Integration</span>
+                    <span class="tech-libs">Retrofit & OkHttp for reliable remote infrastructure interactions.</span>
+                </div>
+                <div class="card tech-item">
+                    <span class="tech-category">Google APIs</span>
+                    <span class="tech-libs">Google Calendar v3 & Google Tasks v1</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Calendar & Tasks App. Open Source Project available on <a href="https://github.com/wxnsv/calendar-and-tasks">GitHub</a>.</p>
+    </footer>
+    
+    <script>
+        let toastTimeout;
+        function showUpcomingNotice(event) {
+            event.preventDefault();
+            const toast = document.getElementById('toast');
+            
+            toast.classList.add('show');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+
+</body>
+</html>
