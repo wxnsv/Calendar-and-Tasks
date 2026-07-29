@@ -1,4 +1,4 @@
-# Calendar and Tasks — Google Calendar & Tasks Client
+# Calendar and Tasks - Google Calendar & Tasks Client
 
 **Calendar and Tasks** is a minimalist, responsive, and functional personal organizer for Android. The application is a lightweight client for **Google Calendar** and **Google Tasks**, designed to streamline your daily schedule and eliminate unnecessary distractions.
 
@@ -22,8 +22,8 @@ The application follows modern Android development standards, separating reactiv
 ### Dependency Stack:
 
 * **UI & Interface Components:**
-  * *Jetpack Compose* — for building a fully declarative user interface.
-  * *Kizitonwose Compose Calendar* — a highly flexible calendar grid component.
+  * *Jetpack Compose* - for building a fully declarative user interface.
+  * *Kizitonwose Compose Calendar* - a highly flexible calendar grid component.
   * *AndroidX Navigation* - for a navigate the fragments.
   * Traditional XML components for optimal combining of approaches.
 * **Asynchronous Flow & Threading:**
@@ -35,24 +35,23 @@ The application follows modern Android development standards, separating reactiv
   * *Google Calendar v3* & *Google Tasks v1*.
   * *AndroidX Credentials Manager* for secure user authentication via Google Accounts.
 * **Local Storage & Background Processing:**
-  * *Room Database* — for local structured caching entities and offline-first support.
-  * *Jetpack DataStore (Preferences)* — for lightweight user preference persistence.
-  * *AndroidX WorkManager* — for guaranteed execution of background data sync tasks even when the app is closed.
+  * *Room Database* - for local structured caching entities and offline-first support.
+  * *Jetpack DataStore (Preferences)* - for lightweight user preference persistence.
+  * *AndroidX WorkManager* - for guaranteed execution of background data sync tasks even when the app is closed.
 * **Dependency Injection (DI):**
   * *Koin DI*
 * **Image Processing:**
-  * *Coil* — for loading of user avatar.
+  * *Coil* - for loading of user avatar.
 * **Testing Environment:**
-  * *JUnit Jupiter (JUnit 5)* — a modern architecture platform for unit testing.
-  * *MockK* — a powerful mocking library built specifically for Kotlin.
+  * *JUnit Jupiter (JUnit 5)* - a modern architecture platform for unit testing.
+  * *MockK* - a powerful mocking library built specifically for Kotlin.
 
 ---
 
-## 🔗 Links & Resources
+## Links & Resources
 
 * **Project Site:** [App site](http://calendarandtasks.xyz/)
 * **Project Source Code:** [GitHub Repository](https://github.com/wxnsv/calendar-and-tasks)
 * **Privacy Policy:** [Privacy Policy](http://calendarandtasks.xyz/privacy)
 
 ---
-📦 *Developed in 2026 using Kotlin and Jetpack Compose.*
