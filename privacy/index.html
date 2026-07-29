@@ -1,105 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Privacy Policy - Calendar and Tasks</title>
-    
-    <link rel="icon" type="image/png" href="/favicon.png">
-    
-    <style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-007FH3XVTE"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
+      gtag('config', 'G-007FH3XVTE');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="google-site-verification" content="dadMdQiwE_blLC5A4rcVZvO4O6F90UqCTlmucAW0YMg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — Calendar and Tasks</title>
+
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <style>
         :root {
-            --bg-main: #0B1120;
-            --bg-card: #151E32;
-            --text-main: #FFFFFF;
-            --text-muted: #94A3B8;
-            --accent: #41EAD4;
-            --border-color: #2A3B5C;
+            --bg-color: #f8fafc;
+            --bg-secondary: #f1f5f9;
+            --card-bg: #ffffff;
+            --accent-primary: #0f766e;
+            --accent-hover: #115e59;
+            --accent-light: #ccfbf1;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 25px -5px rgba(15, 118, 110, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-muted);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             line-height: 1.6;
         }
 
+        /* Top Navbar Branding */
+        .navbar {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .nav-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .nav-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--accent-primary);
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            background-color: var(--accent-light);
+            border-color: var(--accent-primary);
+        }
+
+        /* Main Container */
         .container {
             max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px 80px;
+            margin: 20px auto 80px;
+            padding: 0 20px;
         }
 
-        .nav-buttons {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 60px;
+        .page-header {
+            margin-bottom: 40px;
         }
 
-        .btn-outline {
-            display: inline-block;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            background-color: transparent;
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
             color: var(--text-main);
-            border: 1px solid var(--border-color);
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-
-        .btn-outline:hover {
-            background-color: var(--bg-card);
-            border-color: var(--text-muted);
-        }
-
-        h1, h2, h3 {
-            color: var(--text-main);
-            margin-top: 0;
-            font-weight: 700;
-        }
-
-        .section-header {
-            margin-bottom: 24px;
-            margin-top: 48px;
-        }
-
-        .section-header h2 {
-            font-size: 24px;
             margin-bottom: 8px;
         }
 
-        .underline {
-            width: 40px;
-            height: 3px;
-            background-color: var(--accent);
-            border-radius: 2px;
-        }
-        
         .last-updated {
-            font-size: 14px;
+            font-size: 0.95rem;
             color: var(--text-muted);
-            margin-top: 12px;
             font-style: italic;
         }
 
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 40px;
+            margin-bottom: 16px;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background-color: var(--accent-primary);
+            border-radius: 2px;
+        }
+
         .card {
-            background-color: var(--bg-card);
+            background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px 32px;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
             margin-bottom: 24px;
         }
 
         .card h3 {
-            font-size: 18px;
-            margin-bottom: 12px;
-            margin-top: 24px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-top: 20px;
+            margin-bottom: 8px;
         }
 
         .card h3:first-child {
@@ -107,7 +164,9 @@
         }
 
         .card p {
-            margin-bottom: 16px;
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 14px;
         }
 
         .card p:last-child {
@@ -115,36 +174,51 @@
         }
 
         a {
-            color: var(--accent);
+            color: var(--accent-primary);
             text-decoration: none;
+            font-weight: 600;
         }
 
         a:hover {
             text-decoration: underline;
         }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            background-color: var(--card-bg);
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-      
-        <div class="nav-buttons">
-            <a href="/" class="btn-outline">Back to Home</a>
-        </div>
 
-        <div class="section-header">
-            <h2>Privacy Policy</h2>
-            <div class="underline"></div>
-    
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <img src="logo.png" alt="Calendar And Tasks Logo" class="nav-logo">
+            <span class="nav-title">Calendar & Tasks</span>
+        </a>
+        <a href="/" class="btn-back">← Back to Home</a>
+    </nav>
+
+    <!-- Content Container -->
+    <main class="container">
+        
+        <div class="page-header">
+            <h1>Privacy Policy</h1>
             <div class="last-updated">Last updated: July 6, 2026</div>
         </div>
-        <div class="card">
-            <p>This Privacy Policy describes how the Calendar and Tasks application ("the App") operates. The App is a third-party client designed to help you manage your Google Calendar and Google Tasks. Your privacy is our highest priority.</p>
+
+        <div class="card" style="background: linear-gradient(135deg, #ffffff, var(--accent-light));">
+            <p style="color: var(--text-main); font-weight: 500;">
+                This Privacy Policy describes how the Calendar and Tasks application ("the App") operates. The App is a third-party client designed to help you manage your Google Calendar and Google Tasks. Your privacy is our highest priority.
+            </p>
         </div>
 
-        <div class="section-header">
-            <h2>Collecting and Using Your Personal Data</h2>
-            <div class="underline"></div>
-        </div>
+        <h2 class="section-title">Collecting and Using Your Personal Data</h2>
         <div class="card">
             <h3>The Mobile App</h3>
             <p>The App does not collect, store, or transmit any of your personal data, events, or tasks to the developer or any third parties. No analytics, tracking tools or advertising SDKs are integrated into the App.</p>
@@ -153,39 +227,33 @@
             <p>Our official landing page (hosted on GitHub Pages) uses Google Analytics solely for domain verification purposes and basic website traffic monitoring. Google Analytics may process non-personally identifiable technical information (such as cookies, browser type, and masked IP addresses). This data is handled by Google and is entirely separate from the mobile App's operation.</p>
         </div>
 
-        <div class="section-header">
-            <h2>Permissions</h2>
-            <div class="underline"></div>
-        </div>
+        <h2 class="section-title">Permissions</h2>
         <div class="card">
             <p>To function correctly, the App requires you to sign in with your Google account. You must grant permission to access your basic profile, email address, Google Calendar API, and Google Tasks API. Without these permissions, the App cannot bypass the authorization screen and will not function, as it relies entirely on these services to operate.</p>
             <p>These permissions are used solely to allow you to view, create, and edit your events and tasks within the App's interface.</p>
         </div>
 
-        <div class="section-header">
-            <h2>Children's Privacy</h2>
-            <div class="underline"></div>
-        </div>
+        <h2 class="section-title">Children's Privacy</h2>
         <div class="card">
             <p>Because the App does not collect, store, or process any user data on external servers, we do not knowingly collect any personally identifiable information from children under the age of 13.</p>
         </div>
 
-        <div class="section-header">
-            <h2>Security</h2>
-            <div class="underline"></div>
-        </div>
+        <h2 class="section-title">Security</h2>
         <div class="card">
             <p>All communication between the App and Google services is encrypted using secure protocols (HTTPS). The App never sees or stores your Google password, as authentication is handled entirely through Google's secure OAuth 2.0 standard. Your data remains protected by Google's infrastructure.</p>
         </div>
 
-        <div class="section-header">
-            <h2>Contact Us</h2>
-            <div class="underline"></div>
-        </div>
+        <h2 class="section-title">Contact Us</h2>
         <div class="card">
             <p>If you have any questions or suggestions regarding this Privacy Policy, please contact me at:</p>
             <p><strong>Email:</strong> <a href="mailto:nikitaakapitonov@gmail.com">nikitaakapitonov@gmail.com</a></p>
         </div>
-    </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Calendar and Tasks. Open Source Project available on <a href="https://github.com/wxnsv/calendar-and-tasks">GitHub</a>.</p>
+    </footer>
+
 </body>
-</html> 
+</html>
