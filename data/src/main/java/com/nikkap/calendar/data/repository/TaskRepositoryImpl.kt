@@ -41,7 +41,7 @@ class TaskRepositoryImpl(
     private val api: TasksApi,
     private val dao: TaskDao,
     private val userPrefRepository: UserPreferencesRepository,
-    private val appScope: CoroutineScope
+    private val scope: CoroutineScope
 ) : TaskRepository {
 
     override suspend fun getTask(id: String): Task {
@@ -73,7 +73,7 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun saveTask(task: Task) {
-        appScope.launch {
+        scope.launch {
             dao.insertTask(
                 task.toTaskEntity()
                     .changePendingAction(PendingActions.INSERT)
@@ -82,7 +82,7 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun saveSubtask(subtask: Subtask) {
-        appScope.launch {
+        scope.launch {
             dao.insertSubtask(
                 subtask.toSubtaskEntity()
                     .changePendingAction(PendingActions.INSERT)
@@ -91,7 +91,7 @@ class TaskRepositoryImpl(
     }
 
     override fun saveSubtasks(list: List<Subtask>) {
-        appScope.launch {
+        scope.launch {
             val latestPositionSubtask = dao.getLastPositionSubtask(list.first().parentId)
             var currentPosition = latestPositionSubtask?.position?.toLong() ?: -1
             list.forEach { subtask ->
@@ -106,7 +106,7 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun saveTasklist(taskList: TaskList) {
-        appScope.launch {
+        scope.launch {
             dao.insertTaskList(
                 taskList.toTaskListEntity()
                     .changePendingAction(PendingActions.INSERT)
@@ -116,19 +116,19 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun updateTask(task: Task) {
-        appScope.launch {
+        scope.launch {
             dao.updateTask(task.toTaskEntity().changePendingAction(PendingActions.UPDATE))
         }
     }
 
     override suspend fun updateSubtask(subtask: Subtask) {
-        appScope.launch {
+        scope.launch {
             dao.updateSubtask(subtask.toSubtaskEntity().changePendingAction(PendingActions.UPDATE))
         }
     }
 
     override suspend fun updateSubtasks(list: List<Subtask>) {
-        appScope.launch {
+        scope.launch {
             list.forEach { subtask ->
                 dao.updateSubtask(
                     subtask.toSubtaskEntity()
@@ -139,7 +139,7 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun updateTaskList(taskList: TaskList) {
-        appScope.launch {
+        scope.launch {
             dao.updateTasklist(
                 taskList.toTaskListEntity().changePendingAction(PendingActions.UPDATE)
             )
@@ -147,7 +147,7 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun deleteTask(id: String) {
-        appScope.launch {
+        scope.launch {
             dao.markAsDeleteTask(id, System.currentTimeMillis())
             dao.markAsDeleteSubtasksOfTask(id, System.currentTimeMillis())
         }
@@ -181,19 +181,19 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun deleteSubtask(id: String) {
-        appScope.launch {
+        scope.launch {
             dao.markAsDeleteSubtask(id, System.currentTimeMillis())
         }
     }
 
     override suspend fun completeSubtask(id: String) {
-        appScope.launch {
+        scope.launch {
             dao.completeSubtask(id, System.currentTimeMillis())
         }
     }
 
     override suspend fun completeTask(id: String) {
-        appScope.launch {
+        scope.launch {
             dao.completeTask(
                 id, System.currentTimeMillis()
             )
@@ -201,7 +201,7 @@ class TaskRepositoryImpl(
     }
 
     override fun clearAll() {
-        appScope.launch {
+        scope.launch {
             dao.clearSubtasks()
             dao.clearTasks()
             dao.clearTaskLists()
@@ -303,15 +303,15 @@ class TaskRepositoryImpl(
             )
 
 
-                localSyncEntities(
-                    taskEntitiesToSync,
-                    { dao.getNonDeleteTasks().first() },
-                    { dao.deleteTasksByIds(it) },
-                    { dao.insertTasks(it) }
-                )
-            }
+            localSyncEntities(
+                taskEntitiesToSync,
+                { dao.getNonDeleteTasks().first() },
+                { dao.deleteTasksByIds(it) },
+                { dao.insertTasks(it) }
+            )
+        }
 
-            Result.success(Unit)
+        Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(e)
     }

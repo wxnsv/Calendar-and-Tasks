@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 class CalendarRepositoryImpl(
     private val api: CalendarApi,
     private val dao: CalendarDao,
-    private val appScope: CoroutineScope
+    private val scope: CoroutineScope
 ) : CalendarRepository {
 
     override fun getNonDeleteEvents(): Flow<List<Event>> {
@@ -54,13 +54,13 @@ class CalendarRepositoryImpl(
     }
 
     override suspend fun saveEvent(event: Event) {
-        appScope.launch {
+        scope.launch {
             dao.insertEvent(event.toEventEntity().changePendingAction(PendingActions.INSERT))
         }
     }
 
     override suspend fun updateBirthday(birthday: Birthday) {
-        appScope.launch {
+        scope.launch {
             dao.updateBirthday(
                 birthday.toBirthdayEntity().changePendingAction(PendingActions.UPDATE)
             )
@@ -68,32 +68,32 @@ class CalendarRepositoryImpl(
     }
 
     override suspend fun updateEvent(event: Event) {
-        appScope.launch {
+        scope.launch {
             dao.updateEvent(event.toEventEntity().changePendingAction(PendingActions.UPDATE))
         }
     }
 
     override suspend fun deleteEvent(id: String) {
-        appScope.launch {
+        scope.launch {
             dao.markAsDeleteEvent(id, System.currentTimeMillis())
         }
     }
 
     override suspend fun deleteBirthday(id: String) {
-        appScope.launch {
+        scope.launch {
             dao.markAsDeleteBirthday(id, System.currentTimeMillis())
         }
     }
 
     override fun clearAll() {
-        appScope.launch {
+        scope.launch {
             dao.clearBirthdays()
             dao.clearEvents()
         }
     }
 
     override suspend fun saveBirthday(birthday: Birthday) {
-        appScope.launch {
+        scope.launch {
             dao.insertBirthday(
                 birthday.toBirthdayEntity().changePendingAction(PendingActions.INSERT)
             )
