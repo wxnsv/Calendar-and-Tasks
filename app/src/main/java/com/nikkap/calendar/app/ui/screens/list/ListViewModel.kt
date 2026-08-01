@@ -105,6 +105,7 @@ class ListViewModel(
 
 
         state.copy(
+            isLoading = false,
             items = filteredList,
             isRefreshing = isRefreshing,
         )
