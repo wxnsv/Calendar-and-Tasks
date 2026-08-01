@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.work.WorkManager
 import com.nikkap.calendar.app.core.auth.AuthentificationManager
 import com.nikkap.calendar.app.core.auth.AuthorizationManager
-import com.nikkap.calendar.app.ui.screens.about.AboutViewModel
 import com.nikkap.calendar.app.ui.screens.auth.AuthViewModel
 import com.nikkap.calendar.app.ui.screens.create.CreateViewModel
 import com.nikkap.calendar.app.ui.screens.list.ListViewModel
@@ -140,5 +139,4 @@ val appModule = module {
 
     viewModel { SettingsViewModel(get()) }
 
-    viewModel { AboutViewModel() }
 }

@@ -16,12 +16,10 @@ import com.nikkap.calendar.app.R
 import com.nikkap.calendar.app.databinding.AboutFragmentBinding
 import com.nikkap.calendar.app.ui.screens.main.MainViewModel
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AboutFragment : Fragment(R.layout.about_fragment) {
     private var _binding: AboutFragmentBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: AboutViewModel by viewModel()
     private val sharedViewModel: MainViewModel by activityViewModels()
 
 
@@ -55,7 +53,7 @@ class AboutFragment : Fragment(R.layout.about_fragment) {
             openAboutSite("https://github.com/wxnsv/calendar-and-tasks")
         }
         binding.aboutPrivacyPolicyButton.setOnClickListener {
-            openAboutSite("https://sites.google.com/view/calendarandtasks")
+            openAboutSite("https://calendarandtasks.xyz/privacy")
         }
         binding.aboutLicenseButton.setOnClickListener {
             openAboutSite("https://www.apache.org/licenses/LICENSE-2.0")
