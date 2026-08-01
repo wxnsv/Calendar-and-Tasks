@@ -17,7 +17,7 @@ val OnSurfaceVariant = Color(0xFF40484B)
 
 val Outline = Color(0xFF70787C)
 
-val Error = Color(0xFFBA1A1A)
+val ErrorContainer = Color(0xFFFF5E5E)
 val Secondary = Color(0xFF8E9193)
 
 // Dark
@@ -36,4 +36,4 @@ val DarkSurfaceVariant = Color(0xFF3F4947)
 val DarkOnSurfaceVariant = Color(0xFFBEC9C6)
 
 val DarkOutline = Color(0xFF899390)
-val DarkError = Color(0xFFFFB4AB)
+val DarkErrorContainer = Color(0xFFFF4938)

@@ -122,28 +122,7 @@ class AuthFragment : Fragment() {
                     verticalArrangement = Arrangement.Center
                 ) {
                     if (!state.isAllGranted && !state.isFirstLaunch) {
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        ) {
-                            Text(
-                                text = "Permissions Required",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = Color.White,
-                                modifier = Modifier.padding(horizontal = 8.dp)
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = "To enable all features, please grant the missing permissions in the next step.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha = 0.8f),
-                                modifier = Modifier.padding(horizontal = 8.dp)
-                            )
-                        }
+                        PermissionBlock()
                     }
                     Button(
                         onClick = {
@@ -160,7 +139,34 @@ class AuthFragment : Fragment() {
     @Composable
     private fun Preview() {
         CalendarTheme {
-            LoginScreen { }
+            PermissionBlock()
+        }
+    }
+
+    @Composable
+    private fun PermissionBlock() {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Column(Modifier.padding(8.dp)) {
+                Text(
+                    text = "Permissions Required",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "To enable all features, please grant the missing permissions in the next step.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+            }
         }
     }
 }
