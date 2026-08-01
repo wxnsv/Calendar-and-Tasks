@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/list_item"
     android:layout_width="match_parent"
     android:layout_height="75dp"
@@ -36,8 +37,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="5dp"
-            android:text="@string/item_text_sample"
+            tools:text="@tools:sample/lorem/random"
+            android:maxLines="1"
             android:textColor="?attr/colorOnSurface"
+            android:ellipsize="end"
             android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@+id/list_item_checkbox"
             app:layout_constraintTop_toTopOf="parent" />
