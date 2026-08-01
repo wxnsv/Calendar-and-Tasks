@@ -19,6 +19,7 @@ import java.util.Locale
  * and can use the phone's system Time Zone.
  */
 fun Long.toListUiDate(isAllDay: Boolean = true, zoneId: ZoneId = ZoneId.systemDefault()): String {
+    if (this == 0L) return ""
     val allDayDateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")
         .withZone(zoneId)
 
@@ -89,6 +90,7 @@ fun Long.toIsoDateAllDay(): String {
 
 
 fun Long.toUiTime(zoneId: ZoneId = ZoneId.systemDefault()): String {
+    if (this == 0L) return ""
     val formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())
     return Instant.ofEpochMilli(this)
         .atZone(zoneId)
@@ -96,7 +98,7 @@ fun Long.toUiTime(zoneId: ZoneId = ZoneId.systemDefault()): String {
 }
 
 fun Long?.toUiDate(): String {
-    if (this == null) return ""
+    if (this == null || this == 0L) return ""
     val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy", Locale.ENGLISH)
     return Instant.ofEpochMilli(this)
         .atZone(ZoneId.systemDefault())
@@ -174,7 +176,7 @@ fun Long.toLocalDate(): LocalDate {
 }
 
 fun Long?.toShortUiDate(): String {
-    if (this == null) return ""
+    if (this == null || this == 0L) return ""
     val formatter = DateTimeFormatter.ofPattern("EE, MMMM d", Locale.ENGLISH)
     return Instant.ofEpochMilli(this)
         .atZone(ZoneId.systemDefault())

@@ -73,14 +73,14 @@ class ListAdapter(
         val title: TextView = view.findViewById(R.id.itemText)
         val itemType: TextView = view.findViewById(R.id.list_item_type_tv)
         val itemIcon: ImageView = view.findViewById(R.id.list_item_type_icon)
-        val itemTime: TextView = view.findViewById(R.id.item_timestamp)
+        val itemDateTime: TextView = view.findViewById(R.id.item_timestamp)
         val itemCheckBox: CheckBox = view.findViewById(R.id.list_item_checkbox)
 
 
         fun bind(
             task: Task, onClick: () -> Unit, onTaskComplete: () -> Unit, onDelete: () -> Unit
         ) {
-            itemTime.text = task.deadline?.toListUiDate() ?: ""
+            itemDateTime.text = task.deadline?.toListUiDate() ?: ""
             title.text = task.title
             itemType.text = "Task"
             itemIcon.setImageResource(R.drawable.task)
