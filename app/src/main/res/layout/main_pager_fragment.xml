@@ -134,6 +134,7 @@
         android:scaleY="1.2"
         app:icon="@drawable/add"
         app:iconSize="30dp"
+        app:marginBottomSystemWindowInsets="true"
         app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.FloatingActionButton" />
 
     <View

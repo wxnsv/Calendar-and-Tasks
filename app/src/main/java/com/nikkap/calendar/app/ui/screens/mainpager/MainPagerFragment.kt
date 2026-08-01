@@ -6,7 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.marginBottom
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -63,6 +66,7 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
         }
 
         setupListeners()
+        setupFab()
         observeMainState()
         observeMainSnackbar()
     }
@@ -165,6 +169,8 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
     }
 
     private fun setupListeners() {
+
+
         binding.scrim.setOnClickListener { viewModel.toggleMenu() }
 
         binding.createTask.setOnClickListener {
@@ -185,6 +191,22 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
         binding.mainPagerSettingsBtn.setOnClickListener {
             sharedViewModel.toSettingsScreen()
         }
+    }
+
+    private fun setupFab() {
+        val fab = binding.createItemButton
+        val initialBottomMargin = fab.marginBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(fab) { view, insets ->
+            val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            val params = view.layoutParams as ViewGroup.MarginLayoutParams
+
+            params.bottomMargin = initialBottomMargin + navigationBarsInsets.bottom
+            view.layoutParams = params
+
+            insets
+        }
+
     }
 
     private fun renderMenu(isExpanded: Boolean) {
