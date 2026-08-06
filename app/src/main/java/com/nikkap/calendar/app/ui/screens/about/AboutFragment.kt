@@ -12,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.nikkap.calendar.app.BuildConfig
 import com.nikkap.calendar.app.R
 import com.nikkap.calendar.app.databinding.AboutFragmentBinding
 import com.nikkap.calendar.app.ui.screens.main.MainViewModel
@@ -43,6 +44,7 @@ class AboutFragment : Fragment(R.layout.about_fragment) {
     }
 
     private fun setupListeners() {
+        binding.aboutVersionTV.text = "Version: ${BuildConfig.VERSION_NAME}"
         binding.aboutToolbar.setNavigationOnClickListener {
             sharedViewModel.popBackStack()
         }

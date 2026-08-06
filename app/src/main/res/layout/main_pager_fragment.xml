@@ -79,64 +79,6 @@
 
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/create_task"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="230dp"
-        android:text="@string/task"
-        android:textSize="20sp"
-        android:fontFamily="@font/inter_regular"
-        android:visibility="gone"
-        app:icon="@drawable/task"
-        app:iconSize="40dp"
-        app:layout_anchor="@id/create_event"
-        app:layout_anchorGravity="top|end" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/create_event"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="165dp"
-        android:text="@string/event"
-        android:fontFamily="@font/inter_regular"
-        android:textSize="20sp"
-        android:visibility="gone"
-        app:icon="@drawable/event"
-        app:iconSize="40dp"
-        app:layout_anchor="@id/create_birthday"
-        app:layout_anchorGravity="top|end" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/create_birthday"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="25dp"
-        android:layout_marginBottom="100dp"
-        android:text="@string/birthday"
-        android:textSize="20sp"
-        android:fontFamily="@font/inter_regular"
-        android:visibility="gone"
-        app:icon="@drawable/birthday"
-        app:iconSize="40dp"
-        app:layout_anchor="@id/create_item_button"
-        app:layout_anchorGravity="top|end" />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/create_item_button"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="25dp"
-        android:scaleX="1.2"
-        android:scaleY="1.2"
-        app:icon="@drawable/add"
-        app:iconSize="30dp"
-        app:marginBottomSystemWindowInsets="true"
-        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.FloatingActionButton" />
-
     <View
         android:id="@+id/scrim"
         android:layout_width="match_parent"
@@ -145,5 +87,71 @@
         android:clickable="true"
         android:focusable="true"
         android:visibility="gone" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/create_menu_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="70dp"
+        android:minWidth="70dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="25dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/create_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:text="@string/task"
+            android:textSize="20sp"
+            android:visibility="gone"
+            app:icon="@drawable/task"
+            app:iconSize="40dp"
+            app:layout_constraintBottom_toTopOf="@+id/create_event"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/create_event"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_regular"
+            android:text="@string/event"
+            android:textSize="20sp"
+            android:visibility="gone"
+            app:icon="@drawable/event"
+            app:iconSize="40dp"
+            app:layout_constraintBottom_toTopOf="@+id/create_birthday"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/create_birthday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="@font/inter_regular"
+            android:text="@string/birthday"
+            android:textSize="20sp"
+            android:visibility="gone"
+            app:icon="@drawable/birthday"
+            app:iconSize="40dp"
+            app:layout_constraintBottom_toTopOf="@+id/create_item_button"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/create_item_button"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:scaleX="1.2"
+            android:scaleY="1.2"
+            android:outlineProvider="none"
+            app:icon="@drawable/add"
+            android:layout_marginTop="12dp"
+            android:layout_margin="8dp"
+            app:iconSize="30dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.FloatingActionButton" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

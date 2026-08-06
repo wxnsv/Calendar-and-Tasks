@@ -36,7 +36,7 @@ fun WeekDaysTitle(daysOfWeek: List<DayOfWeek>) {
                     modifier = Modifier.weight(1f),
                     text = dayOfWeek.getDisplayName(
                         TextStyle.SHORT,
-                        java.util.Locale.getDefault()
+                        java.util.Locale.ENGLISH
                     ),
                     fontSize = 12.sp,
                     textAlign = TextAlign.Center,

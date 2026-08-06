@@ -1,6 +1,7 @@
 package com.nikkap.calendar.app.ui.screens.mainpager
 
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.marginBottom
+import androidx.core.view.marginRight
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -66,7 +68,7 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
         }
 
         setupListeners()
-        setupFab()
+        setupCreateMenu()
         observeMainState()
         observeMainSnackbar()
     }
@@ -193,19 +195,41 @@ class MainPagerFragment : Fragment(R.layout.main_pager_fragment) {
         }
     }
 
-    private fun setupFab() {
-        val fab = binding.createItemButton
-        val initialBottomMargin = fab.marginBottom
+    private fun setupCreateMenu() {
+        val menu = binding.createMenuLayout
 
-        ViewCompat.setOnApplyWindowInsetsListener(fab) { view, insets ->
-            val navigationBarsInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-            val params = view.layoutParams as ViewGroup.MarginLayoutParams
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-            params.bottomMargin = initialBottomMargin + navigationBarsInsets.bottom
-            view.layoutParams = params
+            val initialBottomMargin = menu.marginBottom
 
-            insets
+            ViewCompat.setOnApplyWindowInsetsListener(menu) { view, insets ->
+                val navigationBarsInsets =
+                    insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                val params = view.layoutParams as ViewGroup.MarginLayoutParams
+
+                params.bottomMargin = initialBottomMargin + navigationBarsInsets.bottom
+                view.layoutParams = params
+
+                insets
+            }
+        } else {
+
+            val initialRightMargin = menu.marginRight
+
+            ViewCompat.setOnApplyWindowInsetsListener(menu) { view, insets ->
+                val navigationBarsInsets =
+                    insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                val params = view.layoutParams as ViewGroup.MarginLayoutParams
+
+                params.rightMargin = initialRightMargin + navigationBarsInsets.right
+                view.layoutParams = params
+
+                insets
+            }
+
+
         }
+
 
     }
 
