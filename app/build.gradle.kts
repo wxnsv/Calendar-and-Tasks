@@ -18,8 +18,8 @@ android {
         applicationId = "com.nikkap.calendar"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.1"
+        versionCode = 4
+        versionName = "1.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -53,16 +53,6 @@ android {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/INDEX.LIST"
-            excludes += "/META-INF/DEPENDENCIES"
-        }
-    }
-    configurations.all {
-        exclude(group = "com.intellij", module = "annotations")
-        exclude(group = "org.jetbrains", module = "annotations-java5")
     }
     buildFeatures {
         viewBinding = true

@@ -20,10 +20,11 @@ import java.util.Locale
  */
 fun Long.toListUiDate(isAllDay: Boolean = true, zoneId: ZoneId = ZoneId.systemDefault()): String {
     if (this == 0L) return ""
-    val allDayDateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy")
+    val allDayDateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy", Locale.ENGLISH)
         .withZone(zoneId)
 
-    val defaultDateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy HH:mm")
+    val defaultDateFormatter =
+        DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy HH:mm", Locale.ENGLISH)
         .withZone(zoneId)
 
     return if (isAllDay) allDayDateFormatter.format(Instant.ofEpochMilli(this))
@@ -91,7 +92,7 @@ fun Long.toIsoDateAllDay(): String {
 
 fun Long.toUiTime(zoneId: ZoneId = ZoneId.systemDefault()): String {
     if (this == 0L) return ""
-    val formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())
+    val formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH)
     return Instant.ofEpochMilli(this)
         .atZone(zoneId)
         .format(formatter)
